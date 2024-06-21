@@ -2,10 +2,14 @@ name: Feature Branch Continous Integration
 
 on:
   push:
-    branches: [ "feature/**" ]
-    
+    branches:
+      - "feature/**"
+      - master
+  pull_request:
+
 jobs:
   build-and-test:
+    name: "Build and test extension"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,19 +31,17 @@ jobs:
 
     - name: Build
       run: ./gradlew extendAgent
-      
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Package
         path: build/libs
-    
-  dependency-submission:
 
+  dependency-submission:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17

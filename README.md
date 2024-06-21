@@ -1,34 +1,7 @@
-# Extension
-This extension is used as a showcase for VHV in order to demonstrate that we can move inspectit's
-agent logic to opentelemetry agent enhanced via an extension.
-
-Use `./gradlew extendAgent` (no tests) or `./gradlew build` to build an agent jar with your current
+# inspectIT Gepard Extension
+Extension for the OpenTelemetry Java agent.
+Use `./gradlew extendedAgent` (no tests) or `./gradlew build` to build an agent jar with your current
 changes.
-
-## TODOs / next steps
-* otel agent wants to export spans.
-  * Find out where otel wants to report spans to. Jaeger? Something else?
-  * Do we want to use that? Do we want to disable it?
-  * Is it easy to change it to an url provided by the config server?
-* this extension sends an additional http header named `X-OCELOT-AGENT-TYPE` to the config server. Use it over there to display a different icon in the config server's UI
-* tests do not work
-  * Probably not that important
-
-# Documentation
-This extension calls the agent configuration endpoint of the configuration server. For your local
-installation this is typically available at http://localhost:8090/v1/api/agent/configuration. The
-endpoint of the server is defined in class `rocks.inspectit.ocelot.rest.agent.AgentController` of inspectit-ocelot.
-
-Calling that endpoint serves the following purposes:
-* First call registers Agent with configuration server
-  * uses query parameter `service` to display something meaningful in the UI. Currently, hardcoded to `otel-extension`
-* Regularly polls configuration server to fetch potentially updated configurations
-* Transmits by each call the health state of the agent
-* Send an `X-OCELOT-AGENT-TYPE` to distinguish inspectit-ocelot-agent and this agent
-
-Currently, you can influence the target url via SystemProperty named `inspectit.config.http.url`.
-
-Polling of configuration is handled in classes `ConfigurationPolling` and `HttpConfiguration`.
 
 # Original Readme
 The following is the original content from which this work is derived.
