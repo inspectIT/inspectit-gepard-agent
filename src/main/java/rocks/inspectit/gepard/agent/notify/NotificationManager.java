@@ -34,7 +34,7 @@ public class NotificationManager {
     try {
       return doSend(notification);
     } catch (IOException e) {
-      log.error("Could not send start notification to configuration server", e);
+      log.error("Could not execute start notification for configuration server successfully", e);
       return false;
     }
   }
@@ -43,8 +43,7 @@ public class NotificationManager {
    * Executes the provided HTTP request.
    *
    * @param request the HTTP request
-   * @return True, if the HTTP request could be executed successfully. False, if the request
-   *     received an unexpected response or the HTTP request is null
+   * @return True, if the HTTP request could be executed successfully, otherwise false.
    * @throws IOException In case of a problem or the connection was aborted
    */
   private static boolean doSend(ClassicHttpRequest request) throws IOException {

@@ -25,7 +25,7 @@ public class AgentInfo {
 
   private final String javaVersion;
 
-  private final String startTime;
+  private final long startTime;
 
   private final long pid;
 
@@ -36,7 +36,7 @@ public class AgentInfo {
     this.otelVersion = AgentVersion.VERSION;
     this.javaVersion = config.getString("java.version");
     RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-    this.startTime = String.valueOf(runtime.getStartTime());
+    this.startTime = runtime.getStartTime();
     this.pid = runtime.getPid();
   }
 

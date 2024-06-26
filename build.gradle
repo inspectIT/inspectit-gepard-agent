@@ -80,7 +80,7 @@ dependencies {
     implementation("org.slf4j:jcl-over-slf4j:2.0.13")
     // http client for server notification
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
 
     /*
     Interfaces and SPIs that we implement. We use `compileOnly` dependency because during
@@ -97,16 +97,15 @@ dependencies {
     annotationProcessor deps.autoservice
 
     // All dependencies below are only for tests
-    testImplementation("org.testcontainers:testcontainers:1.19.8")
-    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
-    testImplementation("com.google.protobuf:protobuf-java-util:3.25.3")
-    testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
-    testImplementation("io.opentelemetry:opentelemetry-api")
-    testImplementation("io.opentelemetry.proto:opentelemetry-proto:1.3.1-alpha")
+    testImplementation("org.mock-server:mockserver-junit-jupiter:5.15.0")
+    testImplementation("org.mockito:mockito-core:5.12.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
+    testImplementation("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
+    testCompileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
+    testCompileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junit}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
-    testRuntimeOnly('ch.qos.logback:logback-classic:1.5.6')
 
     // Otel Java instrumentation that we use and extend during integration tests
     otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
