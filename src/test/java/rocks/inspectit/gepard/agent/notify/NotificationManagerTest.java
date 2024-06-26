@@ -20,6 +20,7 @@ public class NotificationManagerTest {
   @BeforeAll
   public static void startServer() {
     mockServer = ClientAndServer.startClientAndServer(8080);
+    mockServer.withSecure(true);
   }
 
   @AfterEach

@@ -2,6 +2,7 @@ package rocks.inspectit.gepard.agent.notify.http;
 
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.util.Args;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ public class NotificationResponseHandler implements HttpClientResponseHandler<Bo
 
   @Override
   public Boolean handleResponse(ClassicHttpResponse response) {
+    response = Args.notNull(response, "HTTP response cannot be null");
     int statusCode = response.getCode();
 
     if (statusCode == 200) {

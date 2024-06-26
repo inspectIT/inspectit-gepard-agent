@@ -19,7 +19,7 @@ public class InspectitAgentExtension implements AgentExtension {
    * @param agentBuilder the configuration builder for the instrumentation agent provided by
    *     OpenTelemetry
    * @param config the properties used for OpenTelemetry autoconfiguration
-   * @return the extended agent builder, which will be used by OpenTelemetry
+   * @return the extended AgentBuilder, which will be used by OpenTelemetry
    */
   @Override
   public AgentBuilder extend(AgentBuilder agentBuilder, ConfigProperties config) {

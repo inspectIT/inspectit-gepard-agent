@@ -17,7 +17,10 @@ import rocks.inspectit.gepard.agent.notify.http.NotificationResponseHandler;
 public class NotificationManager {
   private static final Logger log = LoggerFactory.getLogger(NotificationManager.class);
 
-  private static final String SERVER_URL = "http://localhost:8080/api/v1/connections";
+  /**
+   * Hard coded server url, which should configurable in the future
+   */
+  private static final String SERVER_URL = "https://localhost:8080/api/v1/connections";
 
   private NotificationManager() {}
 
@@ -34,7 +37,7 @@ public class NotificationManager {
     try {
       return doSend(notification);
     } catch (IOException e) {
-      log.error("Could not execute start notification for configuration server successfully", e);
+      log.error("Error executing start notification for configuration server", e);
       return false;
     }
   }
