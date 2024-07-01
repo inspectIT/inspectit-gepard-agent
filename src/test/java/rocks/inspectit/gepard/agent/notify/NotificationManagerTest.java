@@ -17,10 +17,12 @@ public class NotificationManagerTest {
 
   private static ClientAndServer mockServer;
 
+  /** Inside the agent we only test for HTTP */
+  private static final String SERVER_URL = "http://localhost:8080/api/v1/connections";
+
   @BeforeAll
   public static void startServer() {
     mockServer = ClientAndServer.startClientAndServer(8080);
-    mockServer.withSecure(true);
   }
 
   @AfterEach
@@ -34,12 +36,12 @@ public class NotificationManagerTest {
   }
 
   @Test
-  public void notificationIsReceivedSuccessfully() {
+  public void notificationIsSentSuccessfully() {
     mockServer
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
         .respond(response().withStatusCode(200));
 
-    boolean successful = NotificationManager.sendStartNotification();
+    boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
 
     assertTrue(successful);
   }
@@ -50,14 +52,14 @@ public class NotificationManagerTest {
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
         .respond(response().withStatusCode(503));
 
-    boolean successful = NotificationManager.sendStartNotification();
+    boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
 
     assertFalse(successful);
   }
 
   @Test
   public void serverIsNotFound() {
-    boolean successful = NotificationManager.sendStartNotification();
+    boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
 
     assertFalse(successful);
   }

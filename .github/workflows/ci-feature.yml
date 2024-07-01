@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - "feature/**"
-      - master
-  pull_request:
+        master
+      -
 
 jobs:
   build-and-test:
@@ -25,6 +25,10 @@ jobs:
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-service-url: "https://gradle.com/terms-of-service"
+        build-scan-terms-of-service-agree: "yes
 
     - name: Test
       run: ./gradlew test

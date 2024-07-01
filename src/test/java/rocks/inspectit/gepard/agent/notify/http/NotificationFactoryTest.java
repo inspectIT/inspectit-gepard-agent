@@ -3,9 +3,9 @@ package rocks.inspectit.gepard.agent.notify.http;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URISyntaxException;
-import java.util.Objects;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.junit.jupiter.api.Test;
+import rocks.inspectit.gepard.agent.notify.model.AgentInfo;
 
 public class NotificationFactoryTest {
 
@@ -13,12 +13,13 @@ public class NotificationFactoryTest {
   public void validUrlCreatesStartNotification() throws Exception {
     String url = "http://localhost:8080/";
     String contentType = "application/json";
+    String info = AgentInfo.getAsString();
 
-    HttpPost httpPost = NotificationFactory.createStartNotification(url);
+    SimpleHttpRequest request = NotificationFactory.createStartNotification(url);
 
-    assertEquals(url, httpPost.getUri().toString());
-    assertEquals(contentType, httpPost.getHeader("content-type").getValue());
-    assertTrue(Objects.nonNull(httpPost.getEntity()));
+    assertEquals(url, request.getUri().toString());
+    assertEquals(contentType, request.getHeader("content-type").getValue());
+    assertEquals(info, request.getBodyText());
   }
 
   @Test
