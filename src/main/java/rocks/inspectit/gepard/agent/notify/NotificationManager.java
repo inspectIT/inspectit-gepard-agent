@@ -8,10 +8,12 @@ import java.util.concurrent.Future;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.notify.http.HttpClientHolder;
+import rocks.inspectit.gepard.agent.notify.http.NotificationCallback;
 import rocks.inspectit.gepard.agent.notify.http.NotificationFactory;
 
 /** This manager should notify the configuration server about the agent itself and its status. */
@@ -56,7 +58,8 @@ public class NotificationManager {
     if (Objects.isNull(request)) return false;
 
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
-    Future<SimpleHttpResponse> future = client.execute(request, null);
+    FutureCallback<SimpleHttpResponse> callback = new NotificationCallback();
+    Future<SimpleHttpResponse> future = client.execute(request, callback);
 
     HttpResponse response = future.get();
     return Objects.nonNull(response) && 200 == response.getCode();

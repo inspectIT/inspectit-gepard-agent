@@ -30,6 +30,7 @@ public class InspectitAgentExtension implements AgentExtension {
 
     boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
     if (successful) log.info("Successfully notified configuration server about start");
+    else log.info("Could not notify configuration server about start");
 
     return agentBuilder;
   }
