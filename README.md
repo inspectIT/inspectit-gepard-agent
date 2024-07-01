@@ -46,7 +46,7 @@ To configure TLS
 The repository was build upon this example project: https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/examples/extension
 
 ### Why Gepard?
-Gepard the German name for the animal cheetah as well as an acronym for 
+Gepard is the German name for the animal cheetah as well as an acronym for: 
 
 "**G**anzheitliche, **e**ffizienz-orientierte, **P**erformance **A**nwendungsüberwachung mit **R**eporting und **D**iagnose"
 
