@@ -5,7 +5,6 @@ on:
     branches:
       - "feature/**"
         master
-      -
 
 jobs:
   build-and-test:

@@ -13,7 +13,7 @@ import rocks.inspectit.gepard.agent.notify.NotificationManager;
 public class InspectitAgentExtension implements AgentExtension {
   private static final Logger log = LoggerFactory.getLogger(InspectitAgentExtension.class);
 
-  /** Hard coded server url, which should configurable in the future */
+  /** Hard coded server url, which should configurable be in the future */
   private static final String SERVER_URL = "https://localhost:8080/api/v1/connections";
 
   /**

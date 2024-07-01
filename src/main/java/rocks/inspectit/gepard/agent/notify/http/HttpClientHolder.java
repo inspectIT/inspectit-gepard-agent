@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 public class HttpClientHolder {
   private static final Logger log = LoggerFactory.getLogger(HttpClientHolder.class);
 
+  /** Single instance of the HTTP client */
   private static CloseableHttpAsyncClient client;
 
   private HttpClientHolder() {}
@@ -67,6 +68,9 @@ public class HttpClientHolder {
   }
 
   /**
+   * Creates a connection manager to handle HTTPS communication. Currently, only server certificates
+   * with the common name "localhost" are accepted.
+   *
    * @return the connection manager to handle HTTPS
    */
   private static AsyncClientConnectionManager getConnectionManager()

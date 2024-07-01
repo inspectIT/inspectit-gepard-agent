@@ -42,7 +42,7 @@ public class AgentInfo {
 
   /**
    * @return The agent information as JSON string
-   * @throws JsonProcessingException
+   * @throws JsonProcessingException corrupted agent information
    */
   public static String getAsString() throws JsonProcessingException {
     return mapper.writeValueAsString(INFO);
