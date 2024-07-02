@@ -8,6 +8,7 @@ import io.opentelemetry.javaagent.bootstrap.internal.InstrumentationConfig;
 import io.opentelemetry.javaagent.tooling.AgentVersion;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.Objects;
 
 /** Meta-information about the current agent */
 public class AgentInfo {
@@ -30,11 +31,10 @@ public class AgentInfo {
   private final long pid;
 
   private AgentInfo() {
-    InstrumentationConfig config = InstrumentationConfig.get();
-    this.serviceName = config.getString("otel.service.name");
+    this.serviceName = getServiceName();
     this.gepardVersion = "0.0.1";
     this.otelVersion = AgentVersion.VERSION;
-    this.javaVersion = config.getString("java.version");
+    this.javaVersion = System.getProperty("java.version");
     RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
     this.startTime = runtime.getStartTime();
     this.pid = runtime.getPid();
@@ -46,5 +46,19 @@ public class AgentInfo {
    */
   public static String getAsString() throws JsonProcessingException {
     return mapper.writeValueAsString(INFO);
+  }
+
+  /**
+   * Returns current service name. If no service name was configured, or it's blank, a default
+   * service name will be returned.
+   *
+   * @return Current service name
+   */
+  private String getServiceName() {
+    InstrumentationConfig config = InstrumentationConfig.get();
+    String serviceName = config.getString("otel.service.name");
+    return Objects.isNull(serviceName) || serviceName.isBlank()
+        ? "inspectit-gepard-agent"
+        : serviceName;
   }
 }

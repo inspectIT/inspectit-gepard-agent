@@ -18,7 +18,8 @@ To add the extension to the instrumentation agent:
 
      ```bash
      java -javaagent:path/to/opentelemetry-javaagent.jar \
-          -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar
+          -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar \
+          -Dotel.service.name="my-service"
           -jar myapp.jar
      ```
 
@@ -36,6 +37,7 @@ To configure TLS
    ```bash
      java -javaagent:path/to/opentelemetry-javaagent.jar \
           -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar \
+          -Dotel.service.name="my-service" \
           -Djavax.net.ssl.trustStore="path\to\keystore\agent-keystore.jks" \
           -Djavax.net.ssl.trustStorePassword="password"
           -jar myapp.jar

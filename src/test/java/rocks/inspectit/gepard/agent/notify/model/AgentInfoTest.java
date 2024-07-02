@@ -17,6 +17,7 @@ public class AgentInfoTest {
     String info = AgentInfo.getAsString();
 
     assertTrue(info.contains("serviceName"));
+    assertTrue(info.contains("inspectit-gepard-agent"));
     assertTrue(info.contains("gepardVersion"));
     assertTrue(info.contains("otelVersion"));
     assertTrue(info.contains("javaVersion"));
