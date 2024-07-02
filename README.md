@@ -1,49 +1,15 @@
-# Extension
-This extension is used as a showcase for VHV in order to demonstrate that we can move inspectit's
-agent logic to opentelemetry agent enhanced via an extension.
+# inspectIT Gepard Extension
 
-Use `./gradlew extendAgent` (no tests) or `./gradlew build` to build an agent jar with your current
-changes.
+Extension for the OpenTelemetry Java agent.
 
-## TODOs / next steps
-* otel agent wants to export spans.
-  * Find out where otel wants to report spans to. Jaeger? Something else?
-  * Do we want to use that? Do we want to disable it?
-  * Is it easy to change it to an url provided by the config server?
-* this extension sends an additional http header named `X-OCELOT-AGENT-TYPE` to the config server. Use it over there to display a different icon in the config server's UI
-* tests do not work
-  * Probably not that important
+inspectIT Gepard is the further development of [inspectIT Ocelot](https://github.com/inspectIT/inspectit-ocelot).
+While the inspectIT Ocelot Java agent is self-made, inspectIT Gepard uses the OpenTelemetry Java agent as basis
+and extends it with features from inspectIT Ocelot.
 
-# Documentation
-This extension calls the agent configuration endpoint of the configuration server. For your local
-installation this is typically available at http://localhost:8090/v1/api/agent/configuration. The
-endpoint of the server is defined in class `rocks.inspectit.ocelot.rest.agent.AgentController` of inspectit-ocelot.
+## Installation
 
-Calling that endpoint serves the following purposes:
-* First call registers Agent with configuration server
-  * uses query parameter `service` to display something meaningful in the UI. Currently, hardcoded to `otel-extension`
-* Regularly polls configuration server to fetch potentially updated configurations
-* Transmits by each call the health state of the agent
-* Send an `X-OCELOT-AGENT-TYPE` to distinguish inspectit-ocelot-agent and this agent
-
-Currently, you can influence the target url via SystemProperty named `inspectit.config.http.url`.
-
-Polling of configuration is handled in classes `ConfigurationPolling` and `HttpConfiguration`.
-
-# Original Readme
-The following is the original content from which this work is derived.
-Source: https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/examples/extension
-## Introduction
-
-Extensions add new features and capabilities to the agent without having to create a separate distribution (for examples and ideas, see [Use cases for extensions](#sample-use-cases)).
-
-The contents in this folder demonstrate how to create an extension for the OpenTelemetry Java instrumentation agent, with examples for every extension point.
-
-> Read both the source code and the Gradle build script, as they contain documentation that explains the purpose of all the major components.
-
-## Build and add extensions
-
-To build this extension project, run `./gradlew build`. You can find the resulting jar file in `build/libs/`.
+To build this extension project, run `./gradlew build` or `./gradlew extendedAgent` (no tests). 
+You can find the resulting jar file in `build/libs/`.
 
 To add the extension to the instrumentation agent:
 
@@ -52,52 +18,39 @@ To add the extension to the instrumentation agent:
 
      ```bash
      java -javaagent:path/to/opentelemetry-javaagent.jar \
-          -Dotel.javaagent.extensions=build/libs/opentelemetry-java-instrumentation-extension-demo-1.0-all.jar
+          -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar \
+          -Dotel.service.name="my-service"
           -jar myapp.jar
      ```
 
 Note: to load multiple extensions, you can specify a comma-separated list of extension jars or directories (that
 contain extension jars) for the `otel.javaagent.extensions` value.
 
-## Embed extensions in the OpenTelemetry Agent
+## Network communication
 
-To simplify deployment, you can embed extensions into the OpenTelemetry Java Agent to produce a single jar file. With an integrated extension, you no longer need the `-Dotel.javaagent.extensions` command line option.
+The extension contains a client, who is able to communicate with other servers via HTTPS.
+To configure TLS 
 
-For more information, see the `extendedAgent` task in [build.gradle](build.gradle).
+1. Provide a local keystore, which contains the certificate of your server
+2. Modify the startup command to add the path to the keystore as well as the password. For example:
 
-## Extensions examples
+   ```bash
+     java -javaagent:path/to/opentelemetry-javaagent.jar \
+          -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar \
+          -Dotel.service.name="my-service" \
+          -Djavax.net.ssl.trustStore="path\to\keystore\agent-keystore.jks" \
+          -Djavax.net.ssl.trustStorePassword="password"
+          -jar myapp.jar
+     ```
 
-* Custom `IdGenerator`: [DemoIdGenerator](src/main/java/com/example/javaagent/DemoIdGenerator.java)
-* Custom `TextMapPropagator`: [DemoPropagator](src/main/java/com/example/javaagent/DemoPropagator.java)
-* Custom `Sampler`: [DemoSampler](src/main/java/com/example/javaagent/DemoSampler.java)
-* Custom `SpanProcessor`: [DemoSpanProcessor](src/main/java/com/example/javaagent/DemoSpanProcessor.java)
-* Custom `SpanExporter`: [DemoSpanExporter](src/main/java/com/example/javaagent/DemoSpanExporter.java)
-* Additional instrumentation: [DemoServlet3InstrumentationModule](src/main/java/com/example/javaagent/instrumentation/DemoServlet3InstrumentationModule.java)
+## Further Information
 
-## Sample use cases
+The repository was build upon this example project: https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/examples/extension
 
-Extensions are designed to override or customize the instrumentation provided by the upstream agent without having to create a new OpenTelemetry distribution or alter the agent code in any way.
+### Why Gepard?
+Gepard is the German name for the animal cheetah as well as an acronym for: 
 
-Consider an instrumented database client that creates a span per database call and extracts data from the database connection to provide span attributes. The following are sample use cases for that scenario that can be solved by using extensions.
+"**G**anzheitliche, **e**ffizienz-orientierte, **P**erformance **A**nwendungsüberwachung mit **R**eporting und **D**iagnose"
 
-### "I don't want this span at all"
+meaning: holistic, efficiency-orientated, performance application monitoring with reporting and diagnostics.
 
-Create an extension to disable selected instrumentation by providing new default settings.
-
-### "I want to edit some attributes that don't depend on any db connection instance"
-
-Create an extension that provide a custom `SpanProcessor`.
-
-### "I want to edit some attributes and their values depend on a specific db connection instance"
-
-Create an extension with new instrumentation which injects its own advice into the same method as the original one. You can use the `order` method to ensure it runs after the original instrumentation and augment the current span with new information.
-
-For example, see [DemoServlet3InstrumentationModule](src/main/java/com/example/javaagent/instrumentation/DemoServlet3InstrumentationModule.java).
-
-### "I want to remove some attributes"
-
-Create an extension with a custom exporter or use the attribute filtering functionality in the OpenTelemetry Collector.
-
-### "I don't like the OTel spans. I want to modify them and their lifecycle"
-
-Create an extension that disables existing instrumentation and replace it with new one that injects `Advice` into the same (or a better) method as the original instrumentation. You can write your `Advice` for this and use the existing `Tracer` directly or extend it. As you have your own `Advice`, you can control which `Tracer` you use.

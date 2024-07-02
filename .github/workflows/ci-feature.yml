@@ -2,10 +2,13 @@ name: Feature Branch Continous Integration
 
 on:
   push:
-    branches: [ "feature/**" ]
-    
+    branches:
+      - "feature/**"
+      - master
+
 jobs:
   build-and-test:
+    name: "Build and test extension"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,25 +24,27 @@ jobs:
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-service-url: 'https://gradle.com/terms-of-service'
+        build-scan-terms-of-service-agree: 'yes'
 
     - name: Test
       run: ./gradlew test
 
     - name: Build
-      run: ./gradlew extendAgent
-      
+      run: ./gradlew extendedAgent
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Package
         path: build/libs
-    
-  dependency-submission:
 
+  dependency-submission:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
