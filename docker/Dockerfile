@@ -1,4 +1,4 @@
-# lightweigt base image
+# lightweight base image
 FROM busybox
 
 COPY . .
