@@ -18,6 +18,7 @@ plugins {
 
     id "pl.allegro.tech.build.axion-release" version "1.17.2"
 
+    id "com.palantir.docker" version "0.36.0"
 }
 
 group 'rocks.inspectit.gepard.agent'
@@ -154,19 +155,17 @@ tasks {
     }
 
     assemble.dependsOn(shadowJar)
-}
 
-muzzle {
-    pass {
-        group.set("javax.servlet")
-        module.set("javax.servlet-api")
-        versions.set("[3.0,)")
-        assertInverse.set(true)
+    dockerPrepare {
+        dependsOn extendedAgent
     }
-    pass {
-        group.set("javax.servlet")
-        module.set("servlet-api")
-        versions.set("[2.2, 3.0)")
-        assertInverse.set(true)
+
+    docker {
+        Provider<Directory> agentJar = layout.buildDirectory.dir("/libs/opentelemetry-javaagent.jar")
+
+        name "inspectit/inspectit-gepard-agent"
+        tag 'versioned', "hub.docker.com/${name}:${version}"
+        dockerfile file('docker/Dockerfile')
+        files 'docker/entrypoint.sh', agentJar.get().asFile
     }
 }
