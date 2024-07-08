@@ -17,6 +17,7 @@ import org.apache.hc.core5.ssl.TrustStrategy;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.notify.http.exception.ClientConfigurationException;
 
 /**
  * This class should hold one single instance of an asynchronous HTTP client. The client should only
@@ -43,8 +44,7 @@ public class HttpClientHolder {
       try {
         connectionManager = getConnectionManager();
       } catch (GeneralSecurityException | IOException e) {
-        log.error("Could not create connection manager for HTTP client");
-        throw new RuntimeException(e);
+        throw new ClientConfigurationException("Could not create connection manager", e);
       }
       client =
           HttpAsyncClientBuilder.create()

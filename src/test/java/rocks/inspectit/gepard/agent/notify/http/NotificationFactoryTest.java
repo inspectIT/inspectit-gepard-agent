@@ -7,10 +7,10 @@ import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.notify.model.AgentInfo;
 
-public class NotificationFactoryTest {
+class NotificationFactoryTest {
 
   @Test
-  public void validUrlCreatesStartNotification() throws Exception {
+  void validUrlCreatesStartNotification() throws Exception {
     String url = "http://localhost:8080/";
     String contentType = "application/json";
     String info = AgentInfo.getAsString();
@@ -23,7 +23,7 @@ public class NotificationFactoryTest {
   }
 
   @Test
-  public void invalidUrlThrowsException() {
+  void invalidUrlThrowsException() {
     String url = "invalid url";
 
     assertThrows(URISyntaxException.class, () -> NotificationFactory.createStartNotification(url));

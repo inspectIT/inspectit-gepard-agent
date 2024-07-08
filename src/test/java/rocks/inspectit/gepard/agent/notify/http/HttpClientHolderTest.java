@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.junit.jupiter.api.Test;
 
-public class HttpClientHolderTest {
+class HttpClientHolderTest {
 
   @Test
-  public void getClientReturnsOnlyOneInstance() {
+  void getClientReturnsOnlyOneInstance() {
     CloseableHttpAsyncClient client1 = HttpClientHolder.getClient();
 
     CloseableHttpAsyncClient client2 = HttpClientHolder.getClient();

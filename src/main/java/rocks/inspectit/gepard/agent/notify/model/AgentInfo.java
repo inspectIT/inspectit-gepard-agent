@@ -56,9 +56,9 @@ public class AgentInfo {
    */
   private String getServiceName() {
     InstrumentationConfig config = InstrumentationConfig.get();
-    String serviceName = config.getString("otel.service.name");
-    return Objects.isNull(serviceName) || serviceName.isBlank()
+    String configuredServiceName = config.getString("otel.service.name");
+    return Objects.isNull(configuredServiceName) || configuredServiceName.isBlank()
         ? "inspectit-gepard-agent"
-        : serviceName;
+        : configuredServiceName;
   }
 }
