@@ -5,15 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 
-public class AgentInfoTest {
+class AgentInfoTest {
 
   @Test
-  public void agentInformationIsWritableAsJson() {
+  void agentInformationIsWritableAsJson() {
     assertDoesNotThrow(AgentInfo::getAsString);
   }
 
   @Test
-  public void agentInformationContainsProperties() throws JsonProcessingException {
+  void agentInformationContainsProperties() throws JsonProcessingException {
     String info = AgentInfo.getAsString();
 
     assertTrue(info.contains("serviceName"));

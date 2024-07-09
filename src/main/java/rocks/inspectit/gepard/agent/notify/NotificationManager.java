@@ -44,6 +44,7 @@ public class NotificationManager {
       log.error("Error executing start notification for configuration server", e);
     } catch (InterruptedException e) {
       log.error("Start notification for configuration server was interrupted", e);
+      Thread.currentThread().interrupt();
     }
     return false;
   }
@@ -61,10 +62,10 @@ public class NotificationManager {
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
     FutureCallback<SimpleHttpResponse> callback = new NotificationCallback();
     Future<SimpleHttpResponse> future = client.execute(request, callback);
+    HttpResponse response = future.get();
+
     // Close HTTP client, since it's no longer needed at the moment
     client.close(CloseMode.GRACEFUL);
-
-    HttpResponse response = future.get();
     return Objects.nonNull(response) && 200 == response.getCode();
   }
 }

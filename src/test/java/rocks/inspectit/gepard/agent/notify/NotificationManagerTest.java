@@ -13,7 +13,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
 
 @ExtendWith(MockServerExtension.class)
-public class NotificationManagerTest {
+class NotificationManagerTest {
 
   private static ClientAndServer mockServer;
 
@@ -21,22 +21,22 @@ public class NotificationManagerTest {
   private static final String SERVER_URL = "http://localhost:8080/api/v1/connections";
 
   @BeforeAll
-  public static void startServer() {
+  static void startServer() {
     mockServer = ClientAndServer.startClientAndServer(8080);
   }
 
   @AfterEach
-  public void resetServer() {
+  void resetServer() {
     mockServer.reset();
   }
 
   @AfterAll
-  public static void stopServer() {
+  static void stopServer() {
     mockServer.stop();
   }
 
   @Test
-  public void notificationIsSentSuccessfully() {
+  void notificationIsSentSuccessfully() {
     mockServer
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
         .respond(response().withStatusCode(200));
@@ -47,7 +47,7 @@ public class NotificationManagerTest {
   }
 
   @Test
-  public void serverIsNotAvailable() {
+  void serverIsNotAvailable() {
     mockServer
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
         .respond(response().withStatusCode(503));
@@ -58,7 +58,7 @@ public class NotificationManagerTest {
   }
 
   @Test
-  public void serverIsNotFound() {
+  void serverIsNotFound() {
     boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
 
     assertFalse(successful);
