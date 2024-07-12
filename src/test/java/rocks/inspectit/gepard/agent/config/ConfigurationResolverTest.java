@@ -1,6 +1,5 @@
 package rocks.inspectit.gepard.agent.config;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.SetSystemProperty;
@@ -17,10 +16,6 @@ class ConfigurationResolverTest {
 
     private static final String TEST_URL_2 = "https://inspectit.github.io/inspectit-ocelot";
 
-    @BeforeAll
-    @SetEnvironmentVariable(key = SERVER_URL_ENV_PROPERTY, value = TEST_URL_1)
-    static void clear() {}
-
     @Test
     @SetSystemProperty(key = SERVER_URL_SYSTEM_PROPERTY, value= TEST_URL_1)
     void resolverReturnsUrlIfSystemPropertyExists() {
@@ -30,6 +25,7 @@ class ConfigurationResolverTest {
     }
 
     @Test
+    @SetEnvironmentVariable(key = SERVER_URL_ENV_PROPERTY, value = TEST_URL_1)
     void resolverReturnsUrlIfEnvPropertyExists() {
         String url = ConfigurationResolver.getServerUrl();
 
@@ -37,10 +33,11 @@ class ConfigurationResolverTest {
     }
 
     @Test
-    @SetSystemProperty(key = SERVER_URL_SYSTEM_PROPERTY, value= TEST_URL_2)
+    @SetSystemProperty(key = SERVER_URL_SYSTEM_PROPERTY, value= TEST_URL_1)
+    @SetEnvironmentVariable(key = SERVER_URL_ENV_PROPERTY, value = TEST_URL_2)
     void resolverReturnsSystemPropertyIfSystemAndEnvPropertyExist() {
         String url = ConfigurationResolver.getServerUrl();
 
-        assertEquals(TEST_URL_2, url);
+        assertEquals(TEST_URL_1, url);
     }
 }
