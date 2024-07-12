@@ -29,6 +29,7 @@ contain extension jars) for the `otel.javaagent.extensions` value.
 ## Network communication
 
 The extension contains a client, who is able to communicate with other servers via HTTPS.
+You can set the server url via system or environmental properties.
 To configure TLS 
 
 1. Provide a local keystore, which contains the certificate of your server
@@ -38,6 +39,7 @@ To configure TLS
      java -javaagent:path/to/opentelemetry-javaagent.jar \
           -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar \
           -Dotel.service.name="my-service" \
+          -Dinspectit.config.http.url="https://{server-host:port}/api/v1/connections" \
           -Djavax.net.ssl.trustStore="path\to\keystore\agent-keystore.jks" \
           -Djavax.net.ssl.trustStorePassword="password"
           -jar myapp.jar
