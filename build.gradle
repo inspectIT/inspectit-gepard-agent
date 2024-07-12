@@ -107,6 +107,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junit}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
+    testImplementation("org.junit-pioneer:junit-pioneer:2.2.0")
 
     // Otel Java instrumentation that we use and extend during integration tests
     otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
@@ -156,9 +157,7 @@ tasks {
 
     assemble.dependsOn(shadowJar)
 
-    dockerPrepare {
-        dependsOn extendedAgent
-    }
+    dockerPrepare.dependsOn(extendedAgent)
 
     docker {
         Provider<Directory> agentJar = layout.buildDirectory.dir("/libs/opentelemetry-javaagent.jar")
