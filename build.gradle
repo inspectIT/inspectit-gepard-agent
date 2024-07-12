@@ -107,7 +107,6 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junit}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
-    testImplementation("org.junit-pioneer:junit-pioneer:2.2.0")
 
     // Otel Java instrumentation that we use and extend during integration tests
     otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
