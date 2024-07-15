@@ -30,7 +30,7 @@ contain extension jars) for the `otel.javaagent.extensions` value.
 
 The extension contains a client, who is able to communicate with other servers via HTTPS.
 You can set the server url via system or environmental properties.
-To configure TLS 
+You have the option to use a keystore for TLS:
 
 1. Provide a local keystore, which contains the certificate of your server
 2. Modify the startup command to add the path to the keystore as well as the password. For example:
@@ -52,7 +52,7 @@ The repository was build upon this example project: https://github.com/open-tele
 ### Why Gepard?
 Gepard is the German name for the animal cheetah as well as an acronym for: 
 
-"**G**anzheitliche, **e**ffizienz-orientierte, **P**erformance **A**nwendungsüberwachung mit **R**eporting und **D**iagnose"
+"**G**anzheitliche, **e**ffizienz-orientierte, **P**erformance **A**nwendungsüberwachung mit **R**eporting und **D**iagnose",
 
-meaning: holistic, efficiency-orientated, performance application monitoring with reporting and diagnostics.
+which means: holistic, efficiency-orientated, performance application monitoring with reporting and diagnostics.
 

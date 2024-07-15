@@ -1,5 +1,7 @@
 package rocks.inspectit.gepard.agent.config;
 
+import java.util.Objects;
+
 /**
  * This resolver provides the configured configuration server url. Currently, it is possible to
  * configure the url via system properties or environmental properties. System properties are higher
@@ -21,9 +23,9 @@ public class ConfigurationResolver {
    */
   public static String getServerUrl() {
     String serverUrlSystemProperty = System.getProperty(SERVER_URL_SYSTEM_PROPERTY);
-    if(serverUrlSystemProperty != null) return serverUrlSystemProperty;
+    if (Objects.nonNull(serverUrlSystemProperty)) return serverUrlSystemProperty;
 
     String serverUrlEnvProperty = System.getenv(SERVER_URL_ENV_PROPERTY);
-    return serverUrlEnvProperty != null ? serverUrlEnvProperty : "";
+    return Objects.nonNull(serverUrlEnvProperty) ? serverUrlEnvProperty : "";
   }
 }
