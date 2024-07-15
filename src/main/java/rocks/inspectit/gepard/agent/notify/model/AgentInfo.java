@@ -31,7 +31,7 @@ public class AgentInfo {
   private final long pid;
 
   private AgentInfo() {
-    this.serviceName = getServiceName();
+    this.serviceName = getServiceNameFromSdk();
     this.gepardVersion = "0.0.1";
     this.otelVersion = AgentVersion.VERSION;
     this.javaVersion = System.getProperty("java.version");
@@ -54,11 +54,23 @@ public class AgentInfo {
    *
    * @return Current service name
    */
-  private String getServiceName() {
+  private String getServiceNameFromSdk() {
     InstrumentationConfig config = InstrumentationConfig.get();
     String configuredServiceName = config.getString("otel.service.name");
     return Objects.isNull(configuredServiceName) || configuredServiceName.isBlank()
         ? "inspectit-gepard-agent"
         : configuredServiceName;
+  }
+
+  /**
+   *
+   * @return the service name of the agent.
+   */
+  public String getServiceName() {
+    return serviceName;
+  }
+
+  public long getPid() {
+    return pid;
   }
 }

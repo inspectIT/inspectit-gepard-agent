@@ -13,6 +13,10 @@ public class ConfigurationResolver {
 
   private static final String SERVER_URL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_URL";
 
+  private static final String POLLING_INTERVAL_SYSTEM_PROPERTY = "inspectit.config.http.polling-interval"
+          ;
+  private static final String POLLING_INTERVAL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_POLLING_INTERVAL";
+
   private ConfigurationResolver() {}
 
   /**
@@ -28,4 +32,17 @@ public class ConfigurationResolver {
     String serverUrlEnvProperty = System.getenv(SERVER_URL_ENV_PROPERTY);
     return Objects.nonNull(serverUrlEnvProperty) ? serverUrlEnvProperty : "";
   }
+
+  /**
+   * Get the configured polling interval for the configuration server. If no interval was configured,
+   * the default interval of 15 seconds will be returned.
+   * @return the configured polling interval
+   */
+    public static long getPollingInterval() {
+      String pollingIntervalSystemProperty = System.getProperty(POLLING_INTERVAL_SYSTEM_PROPERTY);
+      if (pollingIntervalSystemProperty != null) return Long.parseLong(pollingIntervalSystemProperty);
+
+      String pollingIntervalEnvProperty = System.getenv(POLLING_INTERVAL_ENV_PROPERTY);
+      return pollingIntervalEnvProperty != null ? Long.parseLong(pollingIntervalEnvProperty) : 15;
+    }
 }
