@@ -21,10 +21,9 @@ public class ConfigurationResolver {
    */
   public static String getServerUrl() {
     String serverUrlSystemProperty = System.getProperty(SERVER_URL_SYSTEM_PROPERTY);
-    String serverUrlEnvProperty = System.getenv(SERVER_URL_ENV_PROPERTY);
+    if(serverUrlSystemProperty != null) return serverUrlSystemProperty;
 
-    return serverUrlSystemProperty != null
-        ? serverUrlSystemProperty
-        : serverUrlEnvProperty != null ? serverUrlEnvProperty : "";
+    String serverUrlEnvProperty = System.getenv(SERVER_URL_ENV_PROPERTY);
+    return serverUrlEnvProperty != null ? serverUrlEnvProperty : "";
   }
 }
