@@ -64,8 +64,6 @@ public class NotificationManager {
     Future<SimpleHttpResponse> future = client.execute(request, callback);
     HttpResponse response = future.get();
 
-    // Close HTTP client, since it's no longer needed at the moment
-    client.close(CloseMode.GRACEFUL);
     return Objects.nonNull(response) && 200 == response.getCode();
   }
 }

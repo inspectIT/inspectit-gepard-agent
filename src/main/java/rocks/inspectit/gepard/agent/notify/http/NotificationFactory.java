@@ -23,7 +23,7 @@ public class NotificationFactory {
    */
   public static SimpleHttpRequest createStartNotification(String url)
       throws URISyntaxException, JsonProcessingException {
-    URI uri = new URI(url);
+    URI uri = new URI(url + "/connections");
     String agentInfoString = AgentInfo.getAsString();
 
     return SimpleRequestBuilder.post(uri)
