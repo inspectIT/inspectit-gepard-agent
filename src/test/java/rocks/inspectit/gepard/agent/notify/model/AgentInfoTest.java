@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
+import rocks.inspectit.gepard.agent.config.http.registration.model.AgentInfo;
 
 class AgentInfoTest {
 

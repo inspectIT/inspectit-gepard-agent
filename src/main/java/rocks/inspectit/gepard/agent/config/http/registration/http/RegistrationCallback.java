@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.notify.http;
+package rocks.inspectit.gepard.agent.config.http.registration.http;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Callback for notifications to the configuration server. Currently, only used for logging. */
-public class NotificationCallback implements FutureCallback<SimpleHttpResponse> {
-  private static final Logger log = LoggerFactory.getLogger(NotificationCallback.class);
+public class RegistrationCallback implements FutureCallback<SimpleHttpResponse> {
+  private static final Logger log = LoggerFactory.getLogger(RegistrationCallback.class);
 
   @Override
   public void completed(SimpleHttpResponse result) {

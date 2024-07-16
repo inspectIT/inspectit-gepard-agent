@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.core5.net.URIBuilder;
+import rocks.inspectit.gepard.agent.internal.PropertiesResolver;
 
 public class HttpConfigurationFactory {
 
@@ -16,9 +17,10 @@ public class HttpConfigurationFactory {
    * @return the HTTP post request, containing agent information
    * @throws URISyntaxException invalid uri
    */
-  public static SimpleHttpRequest createConfigurationRequest(String baseUrl)
-      throws URISyntaxException {
-    URI uri = new URIBuilder(baseUrl + "/agent-configuration").build();
+  public static SimpleHttpRequest createConfigurationRequest() throws URISyntaxException {
+
+    String configurationServerUrl = PropertiesResolver.getServerUrl();
+    URI uri = new URIBuilder(configurationServerUrl + "/agent-configuration").build();
 
     return SimpleRequestBuilder.get(uri).build();
   }

@@ -1,11 +1,12 @@
 package rocks.inspectit.gepard.agent.config.http;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.EventBus;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
@@ -13,18 +14,20 @@ import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.notify.http.HttpClientHolder;
+import rocks.inspectit.gepard.agent.config.ConfigurationUpdatedEvent;
+import rocks.inspectit.gepard.agent.internal.http.HttpClientHolder;
 
 /** */
 public class HttpConfigurationPoller implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationPoller.class);
 
-  private final String serverUrl;
+  private final EventBus eventBus;
 
-  public HttpConfigurationPoller(String serverUrl) {
-    this.serverUrl = serverUrl;
+  public HttpConfigurationPoller(EventBus eventBus) {
+    this.eventBus = eventBus;
   }
 
+  @Override
   public void run() {
     log.info("Polling configuration...");
     boolean successful;
@@ -44,7 +47,7 @@ public class HttpConfigurationPoller implements Runnable {
     log.debug("Fetching configuration from server...");
     SimpleHttpRequest request = null;
     try {
-      request = HttpConfigurationFactory.createConfigurationRequest(serverUrl);
+      request = HttpConfigurationFactory.createConfigurationRequest();
     } catch (URISyntaxException e) {
       log.error("Error building HTTP URI for configuration polling", e);
     }
@@ -66,6 +69,18 @@ public class HttpConfigurationPoller implements Runnable {
     Future<SimpleHttpResponse> future = client.execute(request, callback);
     HttpResponse response = future.get();
 
-    return Objects.nonNull(response) && 200 == response.getCode();
+    if(Objects.isNull(response)) {
+      log.error("No response received from configuration server");
+      return false;
+    }
+
+    if (200 == response.getCode()) {
+      log.info("Configuration polling successful");
+      eventBus.post(new ConfigurationUpdatedEvent(response));
+      return true;
+    } else {
+      log.error("Configuration polling failed with status code {}", response.getCode());
+      return false;
+    }
   }
 }

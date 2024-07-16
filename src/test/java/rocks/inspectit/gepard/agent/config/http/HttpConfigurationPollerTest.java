@@ -10,8 +10,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
+import rocks.inspectit.gepard.agent.internal.PropertiesResolver;
 
 @ExtendWith(MockServerExtension.class)
 public class HttpConfigurationPollerTest {
@@ -21,9 +24,17 @@ public class HttpConfigurationPollerTest {
   /** Inside the agent we only test for HTTP */
   private static final String SERVER_URL = "http://localhost:8080/api/v1";
 
+  private static MockedStatic<PropertiesResolver> mockedPropertiesResolver;
+
   @BeforeAll
   static void startServer() {
     mockServer = ClientAndServer.startClientAndServer(8080);
+  }
+
+  @BeforeAll
+  public static void setUp() {
+    mockedPropertiesResolver = Mockito.mockStatic(PropertiesResolver.class);
+    mockedPropertiesResolver.when(PropertiesResolver::getServerUrl).thenReturn(SERVER_URL);
   }
 
   @AfterEach
@@ -36,13 +47,18 @@ public class HttpConfigurationPollerTest {
     mockServer.stop();
   }
 
+  @AfterAll
+  public static void tearDown() {
+    mockedPropertiesResolver.close();
+  }
+
   @Test
   void configurationRequestIsSentSuccessfully() {
     mockServer
         .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
         .respond(response().withStatusCode(200));
 
-    HttpConfigurationPoller poller = new HttpConfigurationPoller(SERVER_URL);
+    HttpConfigurationPoller poller = new HttpConfigurationPoller();
     boolean successful = poller.pollConfiguration();
 
     assertTrue(successful);
@@ -51,10 +67,10 @@ public class HttpConfigurationPollerTest {
   @Test
   void serverIsNotAvailable() {
     mockServer
-            .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
-            .respond(response().withStatusCode(503));
+        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
+        .respond(response().withStatusCode(503));
 
-    HttpConfigurationPoller poller = new HttpConfigurationPoller(SERVER_URL);
+    HttpConfigurationPoller poller = new HttpConfigurationPoller();
     boolean successful = poller.pollConfiguration();
 
     assertFalse(successful);
@@ -62,7 +78,7 @@ public class HttpConfigurationPollerTest {
 
   @Test
   void serverIsNotFound() {
-    HttpConfigurationPoller poller = new HttpConfigurationPoller(SERVER_URL);
+    HttpConfigurationPoller poller = new HttpConfigurationPoller();
     boolean successful = poller.pollConfiguration();
 
     assertFalse(successful);

@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.notify.http;
+package rocks.inspectit.gepard.agent.internal.http;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.notify.http.exception.ClientConfigurationException;
+import rocks.inspectit.gepard.agent.internal.http.exception.ClientConfigurationException;
 
 /**
  * This class should hold one single instance of an asynchronous HTTP client. The client should only

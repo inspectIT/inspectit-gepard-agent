@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.notify.model;
+package rocks.inspectit.gepard.agent.config.http.registration.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;

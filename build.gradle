@@ -118,6 +118,9 @@ dependencies {
     add("muzzleBootstrap", "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations-support:${versions.opentelemetryJavaagentAlpha}")
     add("muzzleTooling", "io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:${versions.opentelemetryJavaagentAlpha}")
     add("muzzleTooling", "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${versions.opentelemetryJavaagentAlpha}")
+
+    implementation 'org.sonatype.nexus:google-guava-eventbus:3.2.0-01'
+
 }
 
 // Produces a copy of upstream javaagent with this extension jar included inside it

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.junit.jupiter.api.Test;
+import rocks.inspectit.gepard.agent.internal.http.HttpClientHolder;
 
 class HttpClientHolderTest {
 

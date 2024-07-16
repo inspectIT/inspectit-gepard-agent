@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.notify.model.AgentInfo;
+import rocks.inspectit.gepard.agent.config.http.registration.http.RegistrationFactory;
+import rocks.inspectit.gepard.agent.config.http.registration.model.AgentInfo;
 
-class NotificationFactoryTest {
+class RegistrationFactoryTest {
 
   @Test
   void validUrlCreatesStartNotification() throws Exception {
@@ -16,7 +17,7 @@ class NotificationFactoryTest {
     String contentType = "application/json";
     String info = AgentInfo.getAsString();
 
-    SimpleHttpRequest request = NotificationFactory.createStartNotification(baseUrl);
+    SimpleHttpRequest request = RegistrationFactory.createStartNotification(baseUrl);
 
     assertEquals(url, request.getUri().toString());
     assertEquals(contentType, request.getHeader("content-type").getValue());
@@ -27,6 +28,6 @@ class NotificationFactoryTest {
   void invalidUrlThrowsException() {
     String url = "invalid url";
 
-    assertThrows(URISyntaxException.class, () -> NotificationFactory.createStartNotification(url));
+    assertThrows(URISyntaxException.class, () -> RegistrationFactory.createStartNotification(url));
   }
 }

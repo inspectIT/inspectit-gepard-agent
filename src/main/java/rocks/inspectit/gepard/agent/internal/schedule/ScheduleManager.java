@@ -10,12 +10,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.config.http.HttpConfigurationPoller;
-import rocks.inspectit.gepard.agent.config.internal.PropertiesResolver;
-import rocks.inspectit.gepard.agent.internal.ApplicationConfiguration;
 
 /**
- * Global manager, who starts scheduled task and keeps track of them. At shutdown all scheduled
+ * Global manager, which starts scheduled task and keeps track of them. At shutdown all scheduled
  * tasks are cancelled.
  */
 public class ScheduleManager {
@@ -26,7 +23,7 @@ public class ScheduleManager {
 
   /** executor for runnables */
   private static final ScheduledExecutorService executor =
-      ApplicationConfiguration.getScheduledExecutorService();
+      ScheduledExecutorHolder.getScheduledExecutorService();
 
   /** set of already scheduled futures */
   private static final Set<NamedScheduledFuture> scheduledFutures = new HashSet<>();
@@ -47,28 +44,26 @@ public class ScheduleManager {
   /**
    * Start the polling of configuration via HTTP
    *
-   * @param serverUrl the url of the configuration server
+   * @param runnable the runnable, which should be scheduled. Mostly a class, which implements the
+   *     {@link Runnable} interface.
+   * @param futureName the name of the future, which should be scheduled
+   * @param interval the interval, in which the runnable should be executed in milliseconds
    */
-  public void startPolling(String serverUrl) {
-    String futureName = "config-polling";
+  public void startRunnable(Runnable runnable, String futureName, Duration interval) {
+
     if (isAlreadyScheduled(futureName)) {
       log.info("Configuration polling is already scheduled");
       return;
     }
 
-    Duration pollingInterval = PropertiesResolver.getPollingInterval();
-    log.info(
-        "Starting configuration polling with interval of {} seconds", pollingInterval.getSeconds());
+    log.info("Starting configuration polling with interval of {} seconds", interval.getSeconds());
     ScheduledFuture<?> future =
-        executor.scheduleWithFixedDelay(
-            new HttpConfigurationPoller(serverUrl),
-            0,
-            pollingInterval.toMillis(),
-            TimeUnit.MILLISECONDS);
+        executor.scheduleWithFixedDelay(runnable, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
     NamedScheduledFuture namedFuture = new NamedScheduledFuture(future, futureName);
     scheduledFutures.add(namedFuture);
   }
 
+  // This should not be part of the scheduler...
   public void startClassDiscovery() {
     String futureName = "class-discovery";
     if (isAlreadyScheduled(futureName)) {

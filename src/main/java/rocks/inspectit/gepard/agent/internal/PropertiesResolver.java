@@ -1,7 +1,10 @@
-package rocks.inspectit.gepard.agent.config.internal;
+package rocks.inspectit.gepard.agent.internal;
 
 import java.time.Duration;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.config.ConfigurationSource;
 
 /**
  * This resolver provides the configured configuration server url. Currently, it is possible to
@@ -9,6 +12,8 @@ import java.util.Objects;
  * prioritized than environmental properties.
  */
 public class PropertiesResolver {
+
+  private static final Logger log = LoggerFactory.getLogger(PropertiesResolver.class);
 
   private static final String SERVER_URL_SYSTEM_PROPERTY = "inspectit.config.http.url";
 
@@ -50,5 +55,17 @@ public class PropertiesResolver {
     return Objects.nonNull(pollingIntervalEnvProperty)
         ? Duration.parse(pollingIntervalEnvProperty)
         : Duration.ofSeconds(15);
+  }
+
+  // This should be moved into a model as well as the rest...
+  public static ConfigurationSource getConfigurationSource() {
+    String url = getServerUrl();
+    if (url.isEmpty()) {
+      log.info("No configuration server url was provided. Falling back to local configuration");
+      return ConfigurationSource.FILE;
+    } else {
+      log.info("Using configuration server with url: {}", url);
+      return ConfigurationSource.HTTP;
+    }
   }
 }

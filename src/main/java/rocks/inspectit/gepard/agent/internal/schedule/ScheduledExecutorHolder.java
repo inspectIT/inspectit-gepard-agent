@@ -1,16 +1,16 @@
-package rocks.inspectit.gepard.agent.internal;
+package rocks.inspectit.gepard.agent.internal.schedule;
 
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ApplicationConfiguration {
+public class ScheduledExecutorHolder {
 
   /** Single instance of the ScheduledExecutorService */
   private static ScheduledExecutorService executorService;
 
-  private ApplicationConfiguration() {}
+  private ScheduledExecutorHolder() {}
 
   /**
    * Get instance of the ScheduledThreadPool with 4 threads.

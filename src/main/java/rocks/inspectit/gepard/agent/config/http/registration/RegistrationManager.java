@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.notify;
+package rocks.inspectit.gepard.agent.config.http.registration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URISyntaxException;
@@ -12,25 +12,27 @@ import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.notify.http.HttpClientHolder;
-import rocks.inspectit.gepard.agent.notify.http.NotificationCallback;
-import rocks.inspectit.gepard.agent.notify.http.NotificationFactory;
+import rocks.inspectit.gepard.agent.config.http.registration.http.RegistrationCallback;
+import rocks.inspectit.gepard.agent.config.http.registration.http.RegistrationFactory;
+import rocks.inspectit.gepard.agent.internal.PropertiesResolver;
+import rocks.inspectit.gepard.agent.internal.http.HttpClientHolder;
 
 /** This manager should notify the configuration server about the agent itself and its status. */
-public class NotificationManager {
-  private static final Logger log = LoggerFactory.getLogger(NotificationManager.class);
+public class RegistrationManager {
+  private static final Logger log = LoggerFactory.getLogger(RegistrationManager.class);
 
-  private NotificationManager() {}
+  public RegistrationManager() {}
 
   /**
    * Sends a message to the configuration server, to notify it about this agent starting
    *
    * @return True, if the notification was executed successfully
    */
-  public static boolean sendStartNotification(String serverUrl) {
+  public boolean sendStartNotification() {
     SimpleHttpRequest notification = null;
     try {
-      notification = NotificationFactory.createStartNotification(serverUrl);
+      String serverUrl = PropertiesResolver.getServerUrl();
+      notification = RegistrationFactory.createStartNotification(serverUrl);
     } catch (URISyntaxException e) {
       log.error("Error building HTTP URI for configuration server notification", e);
     } catch (JsonProcessingException e) {
@@ -54,12 +56,12 @@ public class NotificationManager {
    * @param request the HTTP request
    * @return True, if the HTTP request returned the status code 200
    */
-  private static boolean doSend(SimpleHttpRequest request)
+  private boolean doSend(SimpleHttpRequest request)
       throws ExecutionException, InterruptedException {
     if (Objects.isNull(request)) return false;
 
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
-    FutureCallback<SimpleHttpResponse> callback = new NotificationCallback();
+    FutureCallback<SimpleHttpResponse> callback = new RegistrationCallback();
     Future<SimpleHttpResponse> future = client.execute(request, callback);
     HttpResponse response = future.get();
 
