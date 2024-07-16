@@ -63,7 +63,6 @@ public class AgentInfo {
   }
 
   /**
-   *
    * @return the service name of the agent.
    */
   public String getServiceName() {
