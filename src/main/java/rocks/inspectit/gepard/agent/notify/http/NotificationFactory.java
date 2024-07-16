@@ -17,13 +17,14 @@ public class NotificationFactory {
    * Create an HTTP post request to notify the configuration server about the starting agent and
    * it's information
    *
+   * @param baseUrl the base url of the configuration server
    * @return the HTTP post request, containing agent information
    * @throws URISyntaxException invalid uri
    * @throws JsonProcessingException corrupted agent information
    */
-  public static SimpleHttpRequest createStartNotification(String url)
+  public static SimpleHttpRequest createStartNotification(String baseUrl)
       throws URISyntaxException, JsonProcessingException {
-    URI uri = new URI(url + "/connections");
+    URI uri = new URI(baseUrl + "/connections");
     String agentInfoString = AgentInfo.getAsString();
 
     return SimpleRequestBuilder.post(uri)

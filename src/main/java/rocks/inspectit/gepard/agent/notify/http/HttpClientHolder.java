@@ -39,7 +39,7 @@ public class HttpClientHolder {
    * @return the HTTP client
    */
   public static CloseableHttpAsyncClient getClient() {
-    if (client == null) {
+    if (Objects.isNull(client)) {
       RequestConfig config = getRequestConfig();
       AsyncClientConnectionManager connectionManager;
       try {

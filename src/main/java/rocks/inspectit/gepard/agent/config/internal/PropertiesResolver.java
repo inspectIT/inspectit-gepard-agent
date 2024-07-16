@@ -1,5 +1,6 @@
-package rocks.inspectit.gepard.agent.config;
+package rocks.inspectit.gepard.agent.config.internal;
 
+import java.time.Duration;
 import java.util.Objects;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Objects;
  * configure the url via system properties or environmental properties. System properties are higher
  * prioritized than environmental properties.
  */
-public class ConfigurationResolver {
+public class PropertiesResolver {
 
   private static final String SERVER_URL_SYSTEM_PROPERTY = "inspectit.config.http.url";
 
@@ -18,7 +19,7 @@ public class ConfigurationResolver {
   private static final String POLLING_INTERVAL_ENV_PROPERTY =
       "INSPECTIT_CONFIG_HTTP_POLLING_INTERVAL";
 
-  private ConfigurationResolver() {}
+  private PropertiesResolver() {}
 
   /**
    * Get the configured configuration server url. If no url was configured, an empty string will be
@@ -40,11 +41,14 @@ public class ConfigurationResolver {
    *
    * @return the configured polling interval
    */
-  public static long getPollingInterval() {
+  public static Duration getPollingInterval() {
     String pollingIntervalSystemProperty = System.getProperty(POLLING_INTERVAL_SYSTEM_PROPERTY);
-    if (pollingIntervalSystemProperty != null) return Long.parseLong(pollingIntervalSystemProperty);
+    if (Objects.nonNull(pollingIntervalSystemProperty))
+      return Duration.parse(pollingIntervalSystemProperty);
 
     String pollingIntervalEnvProperty = System.getenv(POLLING_INTERVAL_ENV_PROPERTY);
-    return pollingIntervalEnvProperty != null ? Long.parseLong(pollingIntervalEnvProperty) : 15;
+    return Objects.nonNull(pollingIntervalEnvProperty)
+        ? Duration.parse(pollingIntervalEnvProperty)
+        : Duration.ofSeconds(15);
   }
 }

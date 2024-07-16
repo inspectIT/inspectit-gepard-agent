@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.config;
+package rocks.inspectit.gepard.agent.config.internal;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class ConfigurationResolverTest {
+class PropertiesResolverTest {
 
   private static final String SERVER_URL_SYSTEM_PROPERTY = "inspectit.config.http.url";
 
@@ -21,7 +21,7 @@ class ConfigurationResolverTest {
         () -> {
           System.setProperty(SERVER_URL_SYSTEM_PROPERTY, TEST_URL);
 
-          String url = ConfigurationResolver.getServerUrl();
+          String url = PropertiesResolver.getServerUrl();
 
           assertEquals(TEST_URL, url);
         });
@@ -31,7 +31,7 @@ class ConfigurationResolverTest {
   void resolverReturnsUrlIfEnvironmentPropertyExists() throws Exception {
     String url =
         withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, TEST_URL)
-            .execute(ConfigurationResolver::getServerUrl);
+            .execute(PropertiesResolver::getServerUrl);
 
     assertEquals(TEST_URL, url);
   }
@@ -45,7 +45,7 @@ class ConfigurationResolverTest {
 
           String url =
               withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, envTestUrl)
-                  .execute(ConfigurationResolver::getServerUrl);
+                  .execute(PropertiesResolver::getServerUrl);
 
           assertEquals(TEST_URL, url);
         });
@@ -53,7 +53,7 @@ class ConfigurationResolverTest {
 
   @Test
   void resolverReturnsEmptyStringIfNoPropertyExists() {
-    String url = ConfigurationResolver.getServerUrl();
+    String url = PropertiesResolver.getServerUrl();
 
     assertTrue(url.isEmpty());
   }
