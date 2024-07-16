@@ -17,7 +17,7 @@ public class HttpAgentConfigurer {
 
   private static final Logger log = LoggerFactory.getLogger(HttpAgentConfigurer.class);
 
-  public static boolean fetchConfiguration() {
+  public static int fetchConfiguration() {
     log.debug("Fetching configuration from server...");
     try {
       SimpleHttpRequest request = HttpConfigurationFactory.createConfigurationRequest();
@@ -29,18 +29,21 @@ public class HttpAgentConfigurer {
       log.error("Configuration Polling was interrupted", e);
       Thread.currentThread().interrupt();
     }
-      return false;
+      return -1;
   }
 
-  private static boolean doSend(SimpleHttpRequest request)
-      throws ExecutionException, InterruptedException {
-    if (Objects.isNull(request)) return false;
+  private static int doSend(SimpleHttpRequest request)
+      throws ExecutionException, InterruptedException {;
 
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
     FutureCallback<SimpleHttpResponse> callback = new ConfigurationCallback();
     Future<SimpleHttpResponse> future = client.execute(request, callback);
     HttpResponse response = future.get();
 
-    return Objects.nonNull(response) && 200 == response.getCode();
+    if(Objects.nonNull(response)) {
+      return response.getCode();
+    }
+
+    return -1;
   }
 }

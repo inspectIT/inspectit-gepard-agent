@@ -9,6 +9,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
 import rocks.inspectit.gepard.agent.notify.NotificationManager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -43,9 +44,9 @@ public class AgentConfigurationPollerTest {
                 .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
                 .respond(response().withStatusCode(200));
 
-        boolean successful = HttpAgentConfigurer.fetchConfiguration();
+        int status_code = HttpAgentConfigurer.fetchConfiguration();
 
-        assertTrue(successful);
+        assertEquals(200, status_code);
     }
 
 }
