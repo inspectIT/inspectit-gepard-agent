@@ -1,6 +1,7 @@
-package rocks.inspectit.gepard.agent.notify;
+package rocks.inspectit.gepard.agent.agentconfiguration.http;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -13,12 +14,12 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
 
 @ExtendWith(MockServerExtension.class)
-class NotificationManagerTest {
+public class AgentConfigurationPollerTest {
 
   private static ClientAndServer mockServer;
 
   /** Inside the agent we only test for HTTP */
-  private static final String SERVER_URL = "http://localhost:8080/api/v1";
+  private static final String SERVER_URL = "http://localhost:8080/api/v1/agent-configuration";
 
   @BeforeAll
   static void startServer() {
@@ -36,31 +37,18 @@ class NotificationManagerTest {
   }
 
   @Test
-  void notificationIsSentSuccessfully() {
+  void configurationRequestIsSentSuccessfully() throws Exception {
     mockServer
-        .when(request().withMethod("POST").withPath("/api/v1/connections"))
+        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
         .respond(response().withStatusCode(200));
 
-    boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
+    restoreSystemProperties(
+        () -> {
+          System.setProperty("inspectit.config.http.url", "http://localhost:8080/api/v1");
 
-    assertTrue(successful);
-  }
+          int status_code = HttpAgentConfigurer.fetchConfiguration();
 
-  @Test
-  void serverIsNotAvailable() {
-    mockServer
-        .when(request().withMethod("POST").withPath("/api/v1/connections"))
-        .respond(response().withStatusCode(503));
-
-    boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
-
-    assertFalse(successful);
-  }
-
-  @Test
-  void serverIsNotFound() {
-    boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
-
-    assertFalse(successful);
+          assertEquals(200, status_code);
+        });
   }
 }

@@ -11,11 +11,12 @@ class NotificationFactoryTest {
 
   @Test
   void validUrlCreatesStartNotification() throws Exception {
-    String url = "http://localhost:8080/";
+    String baseUrl = "http://localhost:8080";
+    String url = "http://localhost:8080/connections";
     String contentType = "application/json";
     String info = AgentInfo.getAsString();
 
-    SimpleHttpRequest request = NotificationFactory.createStartNotification(url);
+    SimpleHttpRequest request = NotificationFactory.createStartNotification(baseUrl);
 
     assertEquals(url, request.getUri().toString());
     assertEquals(contentType, request.getHeader("content-type").getValue());

@@ -10,7 +10,6 @@ import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
-import org.apache.hc.core5.io.CloseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.notify.http.HttpClientHolder;
