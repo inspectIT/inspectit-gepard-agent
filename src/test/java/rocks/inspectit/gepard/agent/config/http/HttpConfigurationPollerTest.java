@@ -10,11 +10,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
 import rocks.inspectit.gepard.agent.internal.PropertiesResolver;
+import rocks.inspectit.gepard.agent.internal.ServiceLocator;
+import rocks.inspectit.gepard.agent.internal.eventbus.EventBusInitializer;
+import rocks.inspectit.gepard.agent.internal.schedule.ScheduledExecutorInitializer;
 
 @ExtendWith(MockServerExtension.class)
 public class HttpConfigurationPollerTest {
@@ -35,6 +39,9 @@ public class HttpConfigurationPollerTest {
   public static void setUp() {
     mockedPropertiesResolver = Mockito.mockStatic(PropertiesResolver.class);
     mockedPropertiesResolver.when(PropertiesResolver::getServerUrl).thenReturn(SERVER_URL);
+
+    ScheduledExecutorInitializer.initialize();
+    EventBusInitializer.initialize();
   }
 
   @AfterEach

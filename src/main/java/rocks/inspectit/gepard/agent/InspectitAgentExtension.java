@@ -12,14 +12,15 @@ import rocks.inspectit.gepard.agent.config.ConfigurationManagerFactory;
 import rocks.inspectit.gepard.agent.config.ConfigurationSource;
 import rocks.inspectit.gepard.agent.instrumentation.ClassDiscoveryService;
 import rocks.inspectit.gepard.agent.internal.PropertiesResolver;
+import rocks.inspectit.gepard.agent.internal.ServiceLocator;
+import rocks.inspectit.gepard.agent.internal.eventbus.EventBusInitializer;
+import rocks.inspectit.gepard.agent.internal.schedule.ScheduledExecutorInitializer;
 
 @SuppressWarnings("unused")
 @AutoService(AgentExtension.class)
 public class InspectitAgentExtension implements AgentExtension {
 
   private static final Logger log = LoggerFactory.getLogger(InspectitAgentExtension.class);
-
-  EventBus eventBus = new EventBus();
 
   // Basically what we want to do here is to register some modules.
   // Currently We´ve got the following functionality:
@@ -41,35 +42,25 @@ public class InspectitAgentExtension implements AgentExtension {
 
     log.info("Starting inspectIT Gepard agent extension ...");
 
+    ScheduledExecutorInitializer.initialize();
+    EventBusInitializer.initialize();
+
     ConfigurationSource configurationSource = PropertiesResolver.getConfigurationSource();
 
-    // All we need to know here is, that we want to configure the agent with the configuration
-    // service.
     ConfigurationManager configurationManager =
-        ConfigurationManagerFactory.create(configurationSource, eventBus);
+        ConfigurationManagerFactory.create(configurationSource);
 
     ClassDiscoveryService classDiscoveryService = new ClassDiscoveryService();
-
-    eventBus.register(classDiscoveryService);
-
-
-    // This was moved into the resolver.
-    /*String url = PropertiesResolver.getServerUrl();
-    if (url.isEmpty()) log.info("No configuration server url was provided");
-    else {
-
-      log.info("Sending start notification to configuration server with url: {}", url);
-    // This will be handled by the configuration manager.
-      boolean successful = NotificationManager.sendStartNotification(url);
-
-      if (successful) {
-        log.info("Successfully notified configuration server about start");
-        ScheduleManager.getInstance().startPolling(url);
-      } else log.warn("Could not notify configuration server about start");
-    }*/
+    registerDiscoveryService(classDiscoveryService);
 
     return agentBuilder;
   }
+
+  private void registerDiscoveryService(ClassDiscoveryService classDiscoveryService) {
+    EventBus eventBus = ServiceLocator.getInstance().getService(EventBus.class);
+    eventBus.register(classDiscoveryService);
+  }
+
 
   @Override
   public String extensionName() {

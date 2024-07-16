@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.internal.ServiceLocator;
 
 /**
  * Global manager, which starts scheduled task and keeps track of them. At shutdown all scheduled
@@ -21,9 +22,8 @@ public class ScheduleManager {
   /** singleton instance */
   private static ScheduleManager instance;
 
-  /** executor for runnables */
-  private static final ScheduledExecutorService executor =
-      ScheduledExecutorHolder.getScheduledExecutorService();
+    /** executor service for scheduling */
+  private final ScheduledExecutorService executor = ServiceLocator.getInstance().getService(ScheduledExecutorService.class);
 
   /** set of already scheduled futures */
   private static final Set<NamedScheduledFuture> scheduledFutures = new HashSet<>();

@@ -18,8 +18,8 @@ public class HttpConfigurationManager implements ConfigurationManager {
   private final ScheduleManager scheduleManager = ScheduleManager.getInstance();
   private final Duration interval = PropertiesResolver.getPollingInterval();
 
-  public HttpConfigurationManager(EventBus eventBus) {
-    this.httpConfigurationPoller = new HttpConfigurationPoller(eventBus);
+  public HttpConfigurationManager() {
+    this.httpConfigurationPoller = new HttpConfigurationPoller();
   }
 
   @Override

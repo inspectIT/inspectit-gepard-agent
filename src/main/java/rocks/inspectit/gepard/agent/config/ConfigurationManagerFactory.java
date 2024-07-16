@@ -4,15 +4,15 @@ import com.google.common.eventbus.EventBus;
 import rocks.inspectit.gepard.agent.config.http.HttpConfigurationManager;
 
 public class ConfigurationManagerFactory {
-  public static ConfigurationManager create(ConfigurationSource source, EventBus eventBus) {
-    ConfigurationManager manager = createConfigurationManager(source, eventBus);
+  public static ConfigurationManager create(ConfigurationSource source) {
+    ConfigurationManager manager = createConfigurationManager(source);
     manager.manageConfiguration();
     return manager;
   }
 
-  protected static ConfigurationManager createConfigurationManager(ConfigurationSource source, EventBus eventBus) {
+  protected static ConfigurationManager createConfigurationManager(ConfigurationSource source) {
     return switch (source) {
-      case HTTP -> new HttpConfigurationManager(eventBus);
+      case HTTP -> new HttpConfigurationManager();
       case FILE ->
           throw new UnsupportedOperationException(
               "File configuration source is not yet implemented");

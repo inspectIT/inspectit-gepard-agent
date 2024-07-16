@@ -15,16 +15,18 @@ import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.config.ConfigurationUpdatedEvent;
+import rocks.inspectit.gepard.agent.internal.ServiceLocator;
 import rocks.inspectit.gepard.agent.internal.http.HttpClientHolder;
 
 /** */
 public class HttpConfigurationPoller implements Runnable {
+
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationPoller.class);
+  private final EventBus eventBus = ServiceLocator.getInstance().getService(EventBus.class);
 
-  private final EventBus eventBus;
 
-  public HttpConfigurationPoller(EventBus eventBus) {
-    this.eventBus = eventBus;
+  public HttpConfigurationPoller() {
+
   }
 
   @Override
