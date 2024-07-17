@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.config.internal;
+package rocks.inspectit.gepard.agent.configuration.internal;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;

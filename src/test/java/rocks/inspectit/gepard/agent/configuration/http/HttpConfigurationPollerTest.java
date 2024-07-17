@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.config.http;
+package rocks.inspectit.gepard.agent.configuration.http;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,8 +51,8 @@ public class HttpConfigurationPollerTest {
   @Test
   void serverIsNotAvailable() {
     mockServer
-            .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
-            .respond(response().withStatusCode(503));
+        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
+        .respond(response().withStatusCode(503));
 
     HttpConfigurationPoller poller = new HttpConfigurationPoller(SERVER_URL);
     boolean successful = poller.pollConfiguration();

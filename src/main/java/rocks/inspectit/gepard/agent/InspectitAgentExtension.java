@@ -6,7 +6,7 @@ import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.config.internal.PropertiesResolver;
+import rocks.inspectit.gepard.agent.configuration.internal.PropertiesResolver;
 import rocks.inspectit.gepard.agent.internal.schedule.ScheduleManager;
 import rocks.inspectit.gepard.agent.notify.NotificationManager;
 
@@ -14,6 +14,9 @@ import rocks.inspectit.gepard.agent.notify.NotificationManager;
 @AutoService(AgentExtension.class)
 public class InspectitAgentExtension implements AgentExtension {
   private static final Logger log = LoggerFactory.getLogger(InspectitAgentExtension.class);
+
+  /** manager used for starting scheduled tasks */
+  private final ScheduleManager scheduleManager = ScheduleManager.getInstance();
 
   /**
    * Entrypoint for the inspectIT gepard extension
@@ -35,9 +38,11 @@ public class InspectitAgentExtension implements AgentExtension {
 
       if (successful) {
         log.info("Successfully notified configuration server about start");
-        ScheduleManager.getInstance().startPolling(url);
+        scheduleManager.startPolling(url);
       } else log.warn("Could not notify configuration server about start");
     }
+
+    scheduleManager.startClassDiscovery();
 
     return agentBuilder;
   }

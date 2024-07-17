@@ -1,17 +1,18 @@
 package rocks.inspectit.gepard.agent.internal.schedule;
 
+import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
+import java.lang.instrument.Instrumentation;
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.config.http.HttpConfigurationPoller;
-import rocks.inspectit.gepard.agent.config.internal.PropertiesResolver;
+import rocks.inspectit.gepard.agent.configuration.http.HttpConfigurationPoller;
+import rocks.inspectit.gepard.agent.configuration.internal.PropertiesResolver;
+import rocks.inspectit.gepard.agent.instrumentation.BatchInstrumenter;
+import rocks.inspectit.gepard.agent.instrumentation.discovery.ClassDiscoveryService;
 import rocks.inspectit.gepard.agent.internal.ApplicationConfiguration;
 
 /**
@@ -29,7 +30,8 @@ public class ScheduleManager {
       ApplicationConfiguration.getScheduledExecutorService();
 
   /** set of already scheduled futures */
-  private static final Set<NamedScheduledFuture> scheduledFutures = new HashSet<>();
+  private static final Set<NamedScheduledFuture> scheduledFutures =
+      Collections.synchronizedSet(new HashSet<>());
 
   private ScheduleManager() {}
 
@@ -45,7 +47,7 @@ public class ScheduleManager {
   }
 
   /**
-   * Start the polling of configuration via HTTP
+   * Start the polling of configurations via HTTP
    *
    * @param serverUrl the url of the configuration server
    */
@@ -63,12 +65,14 @@ public class ScheduleManager {
         executor.scheduleWithFixedDelay(
             new HttpConfigurationPoller(serverUrl),
             0,
-            pollingInterval.toMillis(),
-            TimeUnit.MILLISECONDS);
+            pollingInterval.toSeconds(),
+            TimeUnit.SECONDS);
+
     NamedScheduledFuture namedFuture = new NamedScheduledFuture(future, futureName);
     scheduledFutures.add(namedFuture);
   }
 
+  /** Start the discovery of loaded classes. Currently, the discovery interval is fixed to 60s */
   public void startClassDiscovery() {
     String futureName = "class-discovery";
     if (isAlreadyScheduled(futureName)) {
@@ -76,8 +80,15 @@ public class ScheduleManager {
       return;
     }
 
-    log.info("Starting class discovery...");
-    // TODO
+    Instrumentation instrumentation = InstrumentationHolder.getInstrumentation();
+    BatchInstrumenter instrumenter = BatchInstrumenter.getInstance();
+    log.info("Starting class discovery with interval of 60 seconds...");
+    ScheduledFuture<?> future =
+        executor.scheduleWithFixedDelay(
+            new ClassDiscoveryService(instrumentation, instrumenter), 60, 60, TimeUnit.SECONDS);
+
+    NamedScheduledFuture namedFuture = new NamedScheduledFuture(future, futureName);
+    scheduledFutures.add(namedFuture);
   }
 
   /** Add hook, so every scheduled future will be cancelled at shutdown */
@@ -85,13 +96,12 @@ public class ScheduleManager {
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
-                () -> {
-                  scheduledFutures.forEach(
-                      f -> {
-                        log.info("Shutting down {}", f.getName());
-                        f.cancel(true);
-                      });
-                }));
+                () ->
+                    scheduledFutures.forEach(
+                        f -> {
+                          log.info("Shutting down {}", f.getName());
+                          f.cancel(true);
+                        })));
   }
 
   /**

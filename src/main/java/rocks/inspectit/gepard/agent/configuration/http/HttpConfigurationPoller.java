@@ -1,11 +1,10 @@
-package rocks.inspectit.gepard.agent.config.http;
+package rocks.inspectit.gepard.agent.configuration.http;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
@@ -31,7 +30,7 @@ public class HttpConfigurationPoller implements Runnable {
     try {
       successful = pollConfiguration();
     } catch (Throwable e) {
-      log.error("Could not poll configuration", e);
+      log.error("Error while polling configuration", e);
       return;
     }
 

@@ -1,12 +1,12 @@
-package rocks.inspectit.gepard.agent.config.internal;
+package rocks.inspectit.gepard.agent.configuration.internal;
 
 import java.time.Duration;
 import java.util.Objects;
 
 /**
- * This resolver provides the configured configuration server url. Currently, it is possible to
- * configure the url via system properties or environmental properties. System properties are higher
- * prioritized than environmental properties.
+ * This resolver provides configurable properties or their default values. Currently, it is possible
+ * to configure the properties via system properties or environmental properties. System properties
+ * are higher prioritized than environmental properties.
  */
 public class PropertiesResolver {
 
@@ -37,7 +37,7 @@ public class PropertiesResolver {
 
   /**
    * Get the configured polling interval for the configuration server. If no interval was
-   * configured, the default interval of 15 seconds will be returned.
+   * configured, the default interval of 30 seconds will be returned.
    *
    * @return the configured polling interval
    */
@@ -49,6 +49,6 @@ public class PropertiesResolver {
     String pollingIntervalEnvProperty = System.getenv(POLLING_INTERVAL_ENV_PROPERTY);
     return Objects.nonNull(pollingIntervalEnvProperty)
         ? Duration.parse(pollingIntervalEnvProperty)
-        : Duration.ofSeconds(15);
+        : Duration.ofSeconds(60);
   }
 }

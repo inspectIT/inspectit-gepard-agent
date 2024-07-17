@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.config.http;
+package rocks.inspectit.gepard.agent.configuration.http;
 
 import java.net.URI;
 import java.net.URISyntaxException;

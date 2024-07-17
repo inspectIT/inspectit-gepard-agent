@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.config.http;
+package rocks.inspectit.gepard.agent.configuration.http;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
