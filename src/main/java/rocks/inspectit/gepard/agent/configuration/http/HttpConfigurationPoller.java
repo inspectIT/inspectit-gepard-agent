@@ -12,10 +12,11 @@ import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.notify.http.HttpClientHolder;
+import rocks.inspectit.gepard.agent.internal.http.HttpClientHolder;
+import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
-/** */
-public class HttpConfigurationPoller implements Runnable {
+/** Task to poll configuration from remote configuration server */
+public class HttpConfigurationPoller implements NamedRunnable {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationPoller.class);
 
   private final String serverUrl;
@@ -38,6 +39,11 @@ public class HttpConfigurationPoller implements Runnable {
     else log.error("Configuration polling failed");
   }
 
+  /**
+   * Sends a poll to the configuration server to receive a configuration.
+   *
+   * @return true, if the configuration was polled successfully
+   */
   @VisibleForTesting
   boolean pollConfiguration() {
     log.debug("Fetching configuration from server...");
@@ -58,13 +64,25 @@ public class HttpConfigurationPoller implements Runnable {
     return false;
   }
 
+  /**
+   * Executes the provided HTTP request.
+   *
+   * @param request the HTTP request
+   * @return True, if the HTTP request returned the status code 200
+   */
   private boolean doSend(SimpleHttpRequest request)
       throws ExecutionException, InterruptedException {
+    // TODO Duplicate of NotificationManager#doSend()
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
     FutureCallback<SimpleHttpResponse> callback = new HttpConfigurationCallback();
     Future<SimpleHttpResponse> future = client.execute(request, callback);
     HttpResponse response = future.get();
 
     return Objects.nonNull(response) && 200 == response.getCode();
+  }
+
+  @Override
+  public String getName() {
+    return "configuration-polling";
   }
 }

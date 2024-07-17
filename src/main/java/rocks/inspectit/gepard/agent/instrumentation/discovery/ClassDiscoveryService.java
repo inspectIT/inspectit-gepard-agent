@@ -1,5 +1,6 @@
 package rocks.inspectit.gepard.agent.instrumentation.discovery;
 
+import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
 import java.util.HashSet;
@@ -7,8 +8,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
-public class ClassDiscoveryService implements Runnable {
+public class ClassDiscoveryService implements NamedRunnable {
   private static final Logger log = LoggerFactory.getLogger(ClassDiscoveryService.class);
 
   private final Set<Class<?>> discoveredClasses = Collections.newSetFromMap(new WeakHashMap<>());
@@ -17,8 +19,8 @@ public class ClassDiscoveryService implements Runnable {
 
   private final ClassDiscoveryListener listener;
 
-  public ClassDiscoveryService(Instrumentation instrumentation, ClassDiscoveryListener listener) {
-    this.instrumentation = instrumentation;
+  public ClassDiscoveryService(ClassDiscoveryListener listener) {
+    this.instrumentation = InstrumentationHolder.getInstrumentation();
     this.listener = listener;
   }
 
@@ -59,5 +61,10 @@ public class ClassDiscoveryService implements Runnable {
   private boolean shouldBeInstrumented(Class<?> clazz) {
     String className = clazz.getName();
     return !className.contains("$$Lambda") && !className.startsWith("[");
+  }
+
+  @Override
+  public String getName() {
+    return "class-discovery";
   }
 }

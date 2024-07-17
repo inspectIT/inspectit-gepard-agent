@@ -1,11 +1,11 @@
-package rocks.inspectit.gepard.agent.notify.http;
+package rocks.inspectit.gepard.agent.notification.http;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.notify.model.AgentInfo;
+import rocks.inspectit.gepard.agent.notification.model.AgentInfo;
 
 class NotificationFactoryTest {
 

@@ -39,7 +39,7 @@ You have the option to use a keystore for TLS:
      java -javaagent:path/to/opentelemetry-javaagent.jar \
           -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar \
           -Dotel.service.name="my-service" \
-          -Dinspectit.config.http.url="https://{server-host:port}/api/v1/connections" \
+          -Dinspectit.config.http.url="https://{server-host:port}/api/v1" \
           -Djavax.net.ssl.trustStore="path\to\keystore\agent-keystore.jks" \
           -Djavax.net.ssl.trustStorePassword="password"
           -jar myapp.jar

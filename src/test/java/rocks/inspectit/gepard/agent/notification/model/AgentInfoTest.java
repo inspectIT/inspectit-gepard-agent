@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.notify.model;
+package rocks.inspectit.gepard.agent.notification.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
