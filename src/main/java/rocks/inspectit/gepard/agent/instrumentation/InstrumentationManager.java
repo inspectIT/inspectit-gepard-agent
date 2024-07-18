@@ -13,6 +13,8 @@ public class InstrumentationManager {
   
   private final DynamicTransformer transformer = new DynamicTransformer();
 
+  InstrumentationManager() {}
+
   public static void initialize() {
     // Currently, not necessary
     // ServiceLocator.registerService(InstrumentationManager.class, new InstrumentationManager());

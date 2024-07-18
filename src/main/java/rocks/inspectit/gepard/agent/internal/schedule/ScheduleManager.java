@@ -19,7 +19,7 @@ public class ScheduleManager {
   /** set of already scheduled futures */
   private final ConcurrentMap<String, ScheduledFuture<?>> scheduledFutures;
 
-  public ScheduleManager() {
+  ScheduleManager() {
     this.executor = ServiceLocator.getService(ScheduledExecutorService.class);
     this.scheduledFutures = new ConcurrentHashMap<>();
     addShutdownHook();

@@ -8,6 +8,8 @@ import rocks.inspectit.gepard.agent.internal.ServiceLocator;
 /** Initializes and registers a ScheduledExecutorService instance with {@code ServiceLocator}. */
 public class ScheduledExecutorServiceInitializer {
 
+  ScheduledExecutorServiceInitializer() {}
+
   public static void initialize() {
     AtomicInteger threadCount = new AtomicInteger();
     ScheduledExecutorService executorService =
