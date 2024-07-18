@@ -12,6 +12,8 @@ import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.configuration.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.configuration.ConfigurationSubject;
 import rocks.inspectit.gepard.agent.internal.http.HttpClientHolder;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
@@ -21,8 +23,13 @@ public class HttpConfigurationPoller implements NamedRunnable {
 
   private final String serverUrl;
 
+  private final ConfigurationSubject configurationSubject;
+
   public HttpConfigurationPoller(String serverUrl) {
     this.serverUrl = serverUrl;
+    this.configurationSubject = new ConfigurationSubject();
+    ConfigurationResolver configurationResolver = new ConfigurationResolver();
+    this.configurationSubject.addListener(configurationResolver);
   }
 
   public void run() {
@@ -74,7 +81,8 @@ public class HttpConfigurationPoller implements NamedRunnable {
       throws ExecutionException, InterruptedException {
     // TODO Duplicate of NotificationManager#doSend()
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
-    FutureCallback<SimpleHttpResponse> callback = new HttpConfigurationCallback();
+    FutureCallback<SimpleHttpResponse> callback =
+        new HttpConfigurationCallback(this.configurationSubject);
     Future<SimpleHttpResponse> future = client.execute(request, callback);
     HttpResponse response = future.get();
 

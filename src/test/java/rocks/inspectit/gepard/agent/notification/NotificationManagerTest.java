@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
-import org.mockserver.model.Not;
 
 @ExtendWith(MockServerExtension.class)
 class NotificationManagerTest {

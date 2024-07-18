@@ -4,11 +4,14 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.discovery.ClassDiscoveryService;
+import rocks.inspectit.gepard.agent.instrumentation.transformation.DynamicTransformer;
 import rocks.inspectit.gepard.agent.internal.ServiceLocator;
 import rocks.inspectit.gepard.agent.internal.schedule.ScheduleManager;
 
 public class InstrumentationManager {
   private static final Logger log = LoggerFactory.getLogger(InstrumentationManager.class);
+  
+  private final DynamicTransformer transformer = new DynamicTransformer();
 
   public static void initialize() {
     // Currently, not necessary
