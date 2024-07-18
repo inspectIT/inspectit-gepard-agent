@@ -11,6 +11,8 @@ import rocks.inspectit.gepard.agent.internal.schedule.ScheduleManager;
 public class ConfigurationManager {
   private static final Logger log = LoggerFactory.getLogger(ConfigurationManager.class);
 
+  ConfigurationManager() {}
+
   public static void initialize() {
     // Currently, not necessary
     // ServiceLocator.registerService(ConfigurationManager.class, new ConfigurationManager());

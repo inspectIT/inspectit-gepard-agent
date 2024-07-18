@@ -23,6 +23,8 @@ import rocks.inspectit.gepard.agent.notification.http.NotificationFactory;
 public class NotificationManager {
   private static final Logger log = LoggerFactory.getLogger(NotificationManager.class);
 
+  NotificationManager() {}
+
   /**
    * Sends a message to the configuration server, to notify it about this agent starting
    *

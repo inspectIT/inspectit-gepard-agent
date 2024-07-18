@@ -10,6 +10,8 @@ import rocks.inspectit.gepard.agent.internal.schedule.ScheduleManager;
 public class InstrumentationManager {
   private static final Logger log = LoggerFactory.getLogger(InstrumentationManager.class);
 
+  InstrumentationManager() {}
+
   public static void initialize() {
     // Currently, not necessary
     // ServiceLocator.registerService(InstrumentationManager.class, new InstrumentationManager());
