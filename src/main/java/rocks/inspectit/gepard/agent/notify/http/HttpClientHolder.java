@@ -1,8 +1,10 @@
 package rocks.inspectit.gepard.agent.notify.http;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.cert.X509Certificate;
+import java.security.KeyStore;
+import java.util.Objects;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -13,7 +15,6 @@ import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
 import org.apache.hc.client5.http.ssl.*;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.ssl.SSLContexts;
-import org.apache.hc.core5.ssl.TrustStrategy;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,15 +76,20 @@ public class HttpClientHolder {
    */
   private static AsyncClientConnectionManager getConnectionManager()
       throws GeneralSecurityException, IOException {
-    TrustStrategy trustStrategy =
-        (chain, authType) -> {
-          final X509Certificate certificate = chain[0];
-          // Later the CN should be configurable
-          return "CN=localhost".equalsIgnoreCase(certificate.getSubjectX500Principal().getName());
-        };
-    SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(trustStrategy).build();
-    HostnameVerifier hostnameVerifier = HttpsSupport.getDefaultHostnameVerifier();
+    String keystorePath = System.getProperty("javax.net.ssl.trustStore");
+    String keystorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+    SSLContext sslContext;
 
+    if (Objects.nonNull(keystorePath) || Objects.nonNull(keystorePassword)) {
+      KeyStore keyStore =
+          KeyStore.getInstance(new File(keystorePath), keystorePassword.toCharArray());
+      sslContext = SSLContexts.custom().loadTrustMaterial(keyStore, null).build();
+    } else {
+      log.info("No keystore found. Using default SSL context");
+      sslContext = SSLContexts.custom().loadTrustMaterial(TrustAllStrategy.INSTANCE).build();
+    }
+
+    HostnameVerifier hostnameVerifier = HttpsSupport.getDefaultHostnameVerifier();
     TlsStrategy tlsStrategy =
         ClientTlsStrategyBuilder.create()
             .setSslContext(sslContext)

@@ -6,15 +6,13 @@ import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.config.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.notify.NotificationManager;
 
 @SuppressWarnings("unused")
 @AutoService(AgentExtension.class)
 public class InspectitAgentExtension implements AgentExtension {
   private static final Logger log = LoggerFactory.getLogger(InspectitAgentExtension.class);
-
-  /** Hard coded server url, which should configurable be in the future */
-  private static final String SERVER_URL = "https://localhost:8080/api/v1/connections";
 
   /**
    * Entrypoint for the inspectIT gepard extension
@@ -28,9 +26,15 @@ public class InspectitAgentExtension implements AgentExtension {
   public AgentBuilder extend(AgentBuilder agentBuilder, ConfigProperties config) {
     log.info("Starting inspectIT Gepard agent extension ...");
 
-    boolean successful = NotificationManager.sendStartNotification(SERVER_URL);
-    if (successful) log.info("Successfully notified configuration server about start");
-    else log.info("Could not notify configuration server about start");
+    String url = ConfigurationResolver.getServerUrl();
+    if (url.isEmpty()) log.info("No configuration server url was provided");
+    else {
+      log.info("Sending start notification to configuration server with url: {}", url);
+      boolean successful = NotificationManager.sendStartNotification(url);
+
+      if (successful) log.info("Successfully notified configuration server about start");
+      else log.warn("Could not notify configuration server about start");
+    }
 
     return agentBuilder;
   }

@@ -29,7 +29,8 @@ contain extension jars) for the `otel.javaagent.extensions` value.
 ## Network communication
 
 The extension contains a client, who is able to communicate with other servers via HTTPS.
-To configure TLS 
+You can set the server url via system or environmental properties.
+You have the option to use a keystore for TLS:
 
 1. Provide a local keystore, which contains the certificate of your server
 2. Modify the startup command to add the path to the keystore as well as the password. For example:
@@ -38,6 +39,7 @@ To configure TLS
      java -javaagent:path/to/opentelemetry-javaagent.jar \
           -Dotel.javaagent.extensions=build/libs/opentelemetry-javaagent.jar \
           -Dotel.service.name="my-service" \
+          -Dinspectit.config.http.url="https://{server-host:port}/api/v1/connections" \
           -Djavax.net.ssl.trustStore="path\to\keystore\agent-keystore.jks" \
           -Djavax.net.ssl.trustStorePassword="password"
           -jar myapp.jar
@@ -50,7 +52,7 @@ The repository was build upon this example project: https://github.com/open-tele
 ### Why Gepard?
 Gepard is the German name for the animal cheetah as well as an acronym for: 
 
-"**G**anzheitliche, **e**ffizienz-orientierte, **P**erformance **A**nwendungsüberwachung mit **R**eporting und **D**iagnose"
+"**G**anzheitliche, **e**ffizienz-orientierte, **P**erformance **A**nwendungsüberwachung mit **R**eporting und **D**iagnose",
 
-meaning: holistic, efficiency-orientated, performance application monitoring with reporting and diagnostics.
+which means: holistic, efficiency-orientated, performance application monitoring with reporting and diagnostics.
 
