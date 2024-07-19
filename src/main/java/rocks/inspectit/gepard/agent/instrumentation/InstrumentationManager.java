@@ -17,10 +17,12 @@ public class InstrumentationManager {
 
   public void startClassDiscovery() {
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
-    BatchInstrumenter batchInstrumenter = new BatchInstrumenter();
+    BatchInstrumenter batchInstrumenter = BatchInstrumenter.create();
     ClassDiscoveryService discoveryService = new ClassDiscoveryService(batchInstrumenter);
     Duration discoveryInterval = Duration.ofSeconds(30);
+    Duration batchInterval = Duration.ofMillis(500);
 
     scheduler.startRunnable(discoveryService, discoveryInterval);
+    scheduler.startRunnable(batchInstrumenter, batchInterval);
   }
 }

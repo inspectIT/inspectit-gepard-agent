@@ -17,6 +17,7 @@ public class ClassDiscoveryService implements NamedRunnable {
 
   private final Instrumentation instrumentation;
 
+  // TODO Apply observer pattern, after multiple listeners exist
   private final ClassDiscoveryListener listener;
 
   public ClassDiscoveryService(ClassDiscoveryListener listener) {
