@@ -7,13 +7,9 @@ import net.bytebuddy.agent.builder.AgentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.ConfigurationManager;
-import rocks.inspectit.gepard.agent.configuration.ConfigurationSubject;
 import rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager;
-import rocks.inspectit.gepard.agent.internal.schedule.ScheduleManager;
-import rocks.inspectit.gepard.agent.internal.schedule.ScheduledExecutorServiceInitializer;
 import rocks.inspectit.gepard.agent.notification.NotificationManager;
-
-import static net.bytebuddy.matcher.ElementMatchers.any;
+import rocks.inspectit.gepard.agent.transformation.TransformationManager;
 
 @SuppressWarnings("unused")
 @AutoService(AgentExtension.class)
@@ -32,13 +28,17 @@ public class InspectitAgentExtension implements AgentExtension {
   public AgentBuilder extend(AgentBuilder agentBuilder, ConfigProperties config) {
     log.info("Starting inspectIT Gepard agent extension ...");
 
-    ScheduledExecutorServiceInitializer.initialize();
-    ScheduleManager.initialize();
-    NotificationManager.initialize();
-    ConfigurationManager.initialize();
-    InstrumentationManager.initialize();
+    NotificationManager notificationManager = NotificationManager.create();
+    notificationManager.sendStartNotification();
 
-    ConfigurationSubject configurationSubject = new ConfigurationSubject();
+    ConfigurationManager configurationManager = ConfigurationManager.create();
+    configurationManager.startHttpPolling();
+
+    InstrumentationManager instrumentationManager = InstrumentationManager.create();
+    instrumentationManager.startClassDiscovery();
+
+    TransformationManager transformationManager = TransformationManager.create();
+    agentBuilder = transformationManager.modify(agentBuilder);
 
     return agentBuilder;
   }

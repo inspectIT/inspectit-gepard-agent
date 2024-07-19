@@ -4,26 +4,23 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.discovery.ClassDiscoveryService;
-import rocks.inspectit.gepard.agent.instrumentation.transformation.DynamicTransformer;
-import rocks.inspectit.gepard.agent.internal.ServiceLocator;
-import rocks.inspectit.gepard.agent.internal.schedule.ScheduleManager;
+import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
 
 public class InstrumentationManager {
   private static final Logger log = LoggerFactory.getLogger(InstrumentationManager.class);
-  
-  private final DynamicTransformer transformer = new DynamicTransformer();
 
-  InstrumentationManager() {}
+  private InstrumentationManager() {}
 
-  public static void initialize() {
-    // Currently, not necessary
-    // ServiceLocator.registerService(InstrumentationManager.class, new InstrumentationManager());
+  public static InstrumentationManager create() {
+    return new InstrumentationManager();
+  }
 
-    ScheduleManager scheduleManager = ServiceLocator.getService(ScheduleManager.class);
+  public void startClassDiscovery() {
+    InspectitScheduler scheduler = InspectitScheduler.getInstance();
     BatchInstrumenter batchInstrumenter = new BatchInstrumenter();
     ClassDiscoveryService discoveryService = new ClassDiscoveryService(batchInstrumenter);
     Duration discoveryInterval = Duration.ofSeconds(30);
 
-    scheduleManager.startRunnable(discoveryService, discoveryInterval);
+    scheduler.startRunnable(discoveryService, discoveryInterval);
   }
 }

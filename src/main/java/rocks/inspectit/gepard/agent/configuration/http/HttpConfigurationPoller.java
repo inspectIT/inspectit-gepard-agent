@@ -1,6 +1,5 @@
 package rocks.inspectit.gepard.agent.configuration.http;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -12,8 +11,6 @@ import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.configuration.ConfigurationResolver;
-import rocks.inspectit.gepard.agent.configuration.ConfigurationSubject;
 import rocks.inspectit.gepard.agent.internal.http.HttpClientHolder;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
@@ -23,13 +20,8 @@ public class HttpConfigurationPoller implements NamedRunnable {
 
   private final String serverUrl;
 
-  private final ConfigurationSubject configurationSubject;
-
   public HttpConfigurationPoller(String serverUrl) {
     this.serverUrl = serverUrl;
-    this.configurationSubject = new ConfigurationSubject();
-    ConfigurationResolver configurationResolver = new ConfigurationResolver();
-    this.configurationSubject.addListener(configurationResolver);
   }
 
   public void run() {
@@ -51,15 +43,16 @@ public class HttpConfigurationPoller implements NamedRunnable {
    *
    * @return true, if the configuration was polled successfully
    */
-  @VisibleForTesting
-  boolean pollConfiguration() {
+  public boolean pollConfiguration() {
     log.debug("Fetching configuration from server...");
     SimpleHttpRequest request = null;
+    // TODO try-catch in eigene Methode auslagern
     try {
       request = HttpConfigurationFactory.createConfigurationRequest(serverUrl);
     } catch (URISyntaxException e) {
       log.error("Error building HTTP URI for configuration polling", e);
     }
+    // TODO try-catch in eigene Methode auslagern
     try {
       return doSend(request);
     } catch (ExecutionException e) {
@@ -81,8 +74,7 @@ public class HttpConfigurationPoller implements NamedRunnable {
       throws ExecutionException, InterruptedException {
     // TODO Duplicate of NotificationManager#doSend()
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
-    FutureCallback<SimpleHttpResponse> callback =
-        new HttpConfigurationCallback(this.configurationSubject);
+    FutureCallback<SimpleHttpResponse> callback = new HttpConfigurationCallback();
     Future<SimpleHttpResponse> future = client.execute(request, callback);
     HttpResponse response = future.get();
 

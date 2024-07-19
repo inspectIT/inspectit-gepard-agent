@@ -1,20 +1,21 @@
 package rocks.inspectit.gepard.agent.configuration.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.configuration.ConfigurationSubject;
-import rocks.inspectit.gepard.agent.configuration.model.InstrumentationRequest;
+import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
+import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
 
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationCallback.class);
 
-  private final ConfigurationSubject configurationSubject;
+  private final ConfigurationReceivedSubject configurationSubject;
 
-  public HttpConfigurationCallback(ConfigurationSubject configurationSubject) {
-    this.configurationSubject = configurationSubject;
+  public HttpConfigurationCallback() {
+    this.configurationSubject = ConfigurationReceivedSubject.getInstance();
   }
 
   @Override
@@ -23,21 +24,22 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
         "Fetched configuration from configuration server and received status code {}",
         result.getCode());
 
-    if (result.getCode() != 200) {
-      return;
-    }
+    if (result.getCode() != 200) return;
 
-    InstrumentationRequest configuration = serializeConfiguration(result.getBodyText());
+    log.debug("Notifying about new inspectit configuration...");
+    InspectitConfiguration configuration = serializeConfiguration(result.getBodyText());
     configurationSubject.notifyListeners(configuration);
   }
 
-  private InstrumentationRequest serializeConfiguration(String body) {
+  // TODO Auslagern, vllt Util-Klasse?
+  private InspectitConfiguration serializeConfiguration(String body) {
     ObjectMapper mapper = new ObjectMapper();
     try {
-      return mapper.readValue(body, InstrumentationRequest.class);
-    } catch (Exception e) {
-      log.error("Failed to deserialize configuration", e);
-      return null;
+      return mapper.readValue(body, InspectitConfiguration.class);
+    } catch (IOException e) {
+      log.error("Failed to deserialize inspectit configuration", e);
+      // TODO Custom exception
+      throw new RuntimeException();
     }
   }
 

@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.internal.configuration;
+package rocks.inspectit.gepard.agent.internal.properties;
 
 import java.time.Duration;
 import java.util.Objects;

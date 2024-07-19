@@ -1,12 +1,10 @@
-package rocks.inspectit.gepard.agent.configuration.model;
+package rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation;
 
 public class Scope {
-  private String fqn;
-  private boolean enabled;
 
-  public Scope() {
-    ;
-  }
+  private String fqn;
+
+  private boolean enabled;
 
   public String getFqn() {
     return fqn;

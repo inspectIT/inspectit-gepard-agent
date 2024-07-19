@@ -1,17 +1,19 @@
 package rocks.inspectit.gepard.agent.internal.schedule;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.internal.ServiceLocator;
 
 /**
  * Global manager, who starts scheduled task and keeps track of them. At shutdown all scheduled
  * tasks are cancelled.
  */
-public class ScheduleManager {
-  private static final Logger log = LoggerFactory.getLogger(ScheduleManager.class);
+public class InspectitScheduler {
+  private static final Logger log = LoggerFactory.getLogger(InspectitScheduler.class);
+
+  private static InspectitScheduler instance;
 
   /** executor for runnables */
   private final ScheduledExecutorService executor;
@@ -19,10 +21,15 @@ public class ScheduleManager {
   /** set of already scheduled futures */
   private final ConcurrentMap<String, ScheduledFuture<?>> scheduledFutures;
 
-  ScheduleManager() {
-    this.executor = ServiceLocator.getService(ScheduledExecutorService.class);
+  private InspectitScheduler() {
+    this.executor = ScheduledExecutorServiceFactory.create();
     this.scheduledFutures = new ConcurrentHashMap<>();
     addShutdownHook();
+  }
+
+  public static InspectitScheduler getInstance() {
+    if (Objects.isNull(instance)) instance = new InspectitScheduler();
+    return instance;
   }
 
   /**
@@ -66,9 +73,5 @@ public class ScheduleManager {
    */
   private boolean isAlreadyScheduled(String runnableName) {
     return scheduledFutures.containsKey(runnableName);
-  }
-
-  public static void initialize() {
-    ServiceLocator.registerService(ScheduleManager.class, new ScheduleManager());
   }
 }

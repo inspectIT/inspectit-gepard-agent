@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.internal.configuration.PropertiesResolver;
+import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 
 class PropertiesResolverTest {
 

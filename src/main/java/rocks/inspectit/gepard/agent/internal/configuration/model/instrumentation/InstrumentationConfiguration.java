@@ -1,11 +1,10 @@
-package rocks.inspectit.gepard.agent.configuration.model;
+package rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation;
 
 import java.util.List;
 
-public class InstrumentationRequest {
-  private List<Scope> scopes;
+public class InstrumentationConfiguration {
 
-  public InstrumentationRequest() {}
+  private List<Scope> scopes;
 
   public List<Scope> getScopes() {
     return scopes;
