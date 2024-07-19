@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.instrumentation.ClassQueue;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
 public class ClassDiscoveryService implements NamedRunnable {
@@ -17,12 +18,11 @@ public class ClassDiscoveryService implements NamedRunnable {
 
   private final Instrumentation instrumentation;
 
-  // TODO Apply observer pattern, after multiple listeners exist
-  private final ClassDiscoveryListener listener;
+  private final ClassQueue classQueue;
 
-  public ClassDiscoveryService(ClassDiscoveryListener listener) {
+  public ClassDiscoveryService(ClassQueue classQueue) {
     this.instrumentation = InstrumentationHolder.getInstrumentation();
-    this.listener = listener;
+    this.classQueue = classQueue;
   }
 
   @Override
@@ -45,23 +45,11 @@ public class ClassDiscoveryService implements NamedRunnable {
     for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
       if (!discoveredClasses.contains(clazz)) {
         discoveredClasses.add(clazz);
-        if (shouldBeInstrumented(clazz)) newClasses.add(clazz);
+        newClasses.add(clazz);
       }
     }
     log.debug("Discovered {} new classes", newClasses.size());
-    listener.onNewClassesDiscovered(newClasses);
-  }
-
-  /**
-   * Check, if the class should be able to be instrumented. Currently, we don't instrument lambda-
-   * or array classes.
-   *
-   * @param clazz the class to check
-   * @return true, if this should be able to be instrumented
-   */
-  private boolean shouldBeInstrumented(Class<?> clazz) {
-    String className = clazz.getName();
-    return !className.contains("$$Lambda") && !className.startsWith("[");
+    classQueue.addAll(newClasses);
   }
 
   @Override

@@ -15,8 +15,9 @@ public class ConfigurationResolver {
    */
   public static boolean shouldRetransform(Class<?> clazz) {
     InstrumentationConfiguration configuration = getConfiguration();
-    return configuration.getScopes().stream()
-        .anyMatch(scope -> scope.getFqn().equals(clazz.getName()));
+    return !shouldIgnore(clazz)
+        && configuration.getScopes().stream()
+            .anyMatch(scope -> scope.getFqn().equals(clazz.getName()));
   }
 
   /**
@@ -32,5 +33,17 @@ public class ConfigurationResolver {
 
   private static InstrumentationConfiguration getConfiguration() {
     return ConfigurationHolder.getInstance().getConfiguration().getInstrumentation();
+  }
+
+  /**
+   * Check, if the class should be able to be instrumented. Currently, we don't instrument lambda-
+   * or array classes.
+   *
+   * @param clazz the class to check
+   * @return true, if this should be able to be instrumented
+   */
+  private static boolean shouldIgnore(Class<?> clazz) {
+    String className = clazz.getName();
+    return className.contains("$$Lambda") || className.startsWith("[");
   }
 }

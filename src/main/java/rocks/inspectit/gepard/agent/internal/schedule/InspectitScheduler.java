@@ -46,7 +46,7 @@ public class InspectitScheduler {
       return;
     }
 
-    log.info("Starting {} with interval of {} seconds", name, interval.getSeconds());
+    log.info("Starting {} with interval of {} milliseconds", name, interval.toMillis());
     ScheduledFuture<?> future =
         executor.scheduleWithFixedDelay(runnable, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
     scheduledFutures.put(name, future);

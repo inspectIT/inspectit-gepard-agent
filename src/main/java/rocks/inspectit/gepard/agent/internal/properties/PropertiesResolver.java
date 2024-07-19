@@ -47,6 +47,6 @@ public class PropertiesResolver {
     String pollingIntervalEnvProperty = System.getenv(POLLING_INTERVAL_ENV_PROPERTY);
     return Objects.nonNull(pollingIntervalEnvProperty)
         ? Duration.parse(pollingIntervalEnvProperty)
-        : Duration.ofSeconds(60);
+        : Duration.ofSeconds(10);
   }
 }

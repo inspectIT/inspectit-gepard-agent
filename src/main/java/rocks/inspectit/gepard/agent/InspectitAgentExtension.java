@@ -36,6 +36,8 @@ public class InspectitAgentExtension implements AgentExtension {
 
     InstrumentationManager instrumentationManager = InstrumentationManager.create();
     instrumentationManager.startClassDiscovery();
+    instrumentationManager.startBatchInstrumentation();
+    instrumentationManager.createConfigurationReceiver();
 
     TransformationManager transformationManager = TransformationManager.create();
     agentBuilder = transformationManager.modify(agentBuilder);

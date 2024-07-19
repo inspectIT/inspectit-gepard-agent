@@ -12,7 +12,7 @@ public class ConfigurationReceivedEvent extends EventObject {
     this.configuration = configuration;
   }
 
-  public InspectitConfiguration getInstrumentationConfiguration() {
+  public InspectitConfiguration getInspectitConfiguration() {
     return configuration;
   }
 }

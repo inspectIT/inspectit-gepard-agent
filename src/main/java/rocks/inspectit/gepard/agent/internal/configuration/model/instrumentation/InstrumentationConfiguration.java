@@ -10,6 +10,9 @@ public class InstrumentationConfiguration {
     return scopes;
   }
 
+  public InstrumentationConfiguration() {
+    this.scopes = List.of();
+  }
   public Scope getScope(String fqn) {
     return scopes.stream().filter(scope -> scope.getFqn().equals(fqn)).findFirst().orElse(null);
   }

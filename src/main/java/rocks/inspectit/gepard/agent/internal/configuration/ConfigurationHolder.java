@@ -12,7 +12,9 @@ public class ConfigurationHolder implements ConfigurationReceivedObserver {
   /** Single instance of the current inspectit configuration */
   private InspectitConfiguration configuration;
 
-  private ConfigurationHolder() {}
+  private ConfigurationHolder() {
+    this.configuration = new InspectitConfiguration();
+  }
 
   public static ConfigurationHolder getInstance() {
     if (Objects.isNull(instance)) {
@@ -29,6 +31,6 @@ public class ConfigurationHolder implements ConfigurationReceivedObserver {
   @Override
   public void handleConfiguration(ConfigurationReceivedEvent event) {
     // Currently, we just overwrite the configuration
-    configuration = event.getInstrumentationConfiguration();
+    configuration = event.getInspectitConfiguration();
   }
 }
