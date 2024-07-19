@@ -24,7 +24,7 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       JavaModule module,
       ProtectionDomain protectionDomain) {
     if (ConfigurationResolver.shouldInstrument(typeDescription)) {
-      log.debug("Transforming type: {}", typeDescription.getName());
+      log.info("Transforming type: {}", typeDescription.getName());
 
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(any()));
     }

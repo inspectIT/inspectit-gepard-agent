@@ -9,33 +9,33 @@ import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
 public class InstrumentationManager {
   private static final Logger log = LoggerFactory.getLogger(InstrumentationManager.class);
 
-  private final ClassQueue classQueue;
+  private final InstrumentationCache instrumentationCache;
 
-  private InstrumentationManager(ClassQueue classQueue) {
-    this.classQueue = classQueue;
+  private InstrumentationManager(InstrumentationCache instrumentationCache) {
+    this.instrumentationCache = instrumentationCache;
   }
 
   public static InstrumentationManager create() {
-    ClassQueue classQueue = new ClassQueue();
-    return new InstrumentationManager(classQueue);
+    InstrumentationCache instrumentationCache = new InstrumentationCache();
+    return new InstrumentationManager(instrumentationCache);
   }
 
   public void startClassDiscovery() {
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
-    ClassDiscoveryService discoveryService = new ClassDiscoveryService(classQueue);
+    ClassDiscoveryService discoveryService = new ClassDiscoveryService(instrumentationCache);
     Duration discoveryInterval = Duration.ofSeconds(10);
     scheduler.startRunnable(discoveryService, discoveryInterval);
   }
 
   public void startBatchInstrumentation() {
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
-    BatchInstrumenter batchInstrumenter = BatchInstrumenter.create(classQueue);
+    BatchInstrumenter batchInstrumenter = BatchInstrumenter.create(instrumentationCache);
     Duration batchInterval = Duration.ofMillis(500);
     scheduler.startRunnable(batchInstrumenter, batchInterval);
   }
 
   public void createConfigurationReceiver() {
-    ConfigurationReceiver configurationReceiver = new ConfigurationReceiver(classQueue);
+    ConfigurationReceiver configurationReceiver = new ConfigurationReceiver(instrumentationCache);
     configurationReceiver.subscribeToConfigurationReceivedEvents();
   }
 }
