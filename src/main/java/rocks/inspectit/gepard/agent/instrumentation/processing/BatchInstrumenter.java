@@ -41,11 +41,10 @@ public class BatchInstrumenter implements NamedRunnable {
   }
 
   /**
-   * Retrieves the next batch out of {@link PendingClassesCache}.
-   * Currently, the batch size is fixed to 1000.
+   * Retrieves the next batch out of {@link PendingClassesCache}. Currently, the batch size is fixed
+   * to 1000.
    *
    * @param batchSize the size of the next batch
-   *
    * @return the batch of retrieved pending classes
    */
   @VisibleForTesting

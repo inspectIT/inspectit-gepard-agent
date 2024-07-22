@@ -2,7 +2,6 @@ package rocks.inspectit.gepard.agent.configuration.http;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,23 +39,22 @@ public class HttpConfigurationPoller implements NamedRunnable {
    */
   @VisibleForTesting
   boolean pollConfiguration() {
+    SimpleHttpRequest request = createConfigurationRequest();
+
+    return HttpRequestSender.send(request, new HttpConfigurationCallback());
+  }
+
+  /**
+   * @return the created polling request
+   */
+  private SimpleHttpRequest createConfigurationRequest() {
     SimpleHttpRequest request = null;
-    // TODO try-catch in eigene Methode auslagern
     try {
       request = HttpConfigurationFactory.createConfigurationRequest(serverUrl);
     } catch (URISyntaxException e) {
       log.error("Error building HTTP URI for configuration polling", e);
     }
-    // TODO try-catch in eigene Methode auslagern
-    try {
-      return HttpRequestSender.send(request, new HttpConfigurationCallback());
-    } catch (ExecutionException e) {
-      log.error("Error executing configuration polling", e);
-    } catch (InterruptedException e) {
-      log.error("Configuration polling was interrupted", e);
-      Thread.currentThread().interrupt();
-    }
-    return false;
+    return request;
   }
 
   @Override

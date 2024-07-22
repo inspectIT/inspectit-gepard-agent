@@ -6,7 +6,8 @@ import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
 /**
- * Observer pattern subject, which notifies all registered listeners about {@link ConfigurationReceivedEvent}s.
+ * Observer pattern subject, which notifies all registered listeners about {@link
+ * ConfigurationReceivedEvent}s.
  */
 public class ConfigurationReceivedSubject {
 

@@ -2,7 +2,6 @@ package rocks.inspectit.gepard.agent.notification;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +19,17 @@ public class StartNotifier {
    * @return true, if the notification was executed successfully
    */
   public boolean sendNotification(String serverUrl) {
+    SimpleHttpRequest notification = createStartNotification(serverUrl);
+
+    return HttpRequestSender.send(notification, new NotificationCallback());
+  }
+
+  /**
+   * @param serverUrl the url of the configuration server
+   * @return the created start notification request
+   */
+  private SimpleHttpRequest createStartNotification(String serverUrl) {
     SimpleHttpRequest notification = null;
-    // TODO try-catch in eigene Methode auslagern
     try {
       notification = NotificationFactory.createStartNotification(serverUrl);
     } catch (URISyntaxException e) {
@@ -29,16 +37,6 @@ public class StartNotifier {
     } catch (JsonProcessingException e) {
       log.error("Could not process agent information for configuration server notification", e);
     }
-
-    // TODO try-catch in eigene Methode auslagern
-    try {
-      return HttpRequestSender.send(notification, new NotificationCallback());
-    } catch (ExecutionException e) {
-      log.error("Error executing start notification for configuration server", e);
-    } catch (InterruptedException e) {
-      log.error("Start notification for configuration server was interrupted", e);
-      Thread.currentThread().interrupt();
-    }
-    return false;
+    return notification;
   }
 }

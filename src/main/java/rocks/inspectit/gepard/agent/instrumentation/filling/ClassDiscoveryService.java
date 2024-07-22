@@ -41,8 +41,8 @@ public class ClassDiscoveryService implements NamedRunnable {
 
   /**
    * Checks all loaded classes of the Instrumentation API and adds newly discovered classes to our
-   * {@code discoveredClasses}. Additionally, the {@link PendingClassesCache} will be filled with the newly
-   * discovered classes.
+   * {@code discoveredClasses}. Additionally, the {@link PendingClassesCache} will be filled with
+   * the newly discovered classes.
    */
   void discoverClasses() {
     Set<Class<?>> newClasses = new HashSet<>();

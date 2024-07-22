@@ -10,7 +10,8 @@ import rocks.inspectit.gepard.agent.internal.configuration.observer.Configuratio
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 
 /**
- * Listens to {@link ConfigurationReceivedEvent}s and updates the {@link PendingClassesCache} afterward.
+ * Listens to {@link ConfigurationReceivedEvent}s and updates the {@link PendingClassesCache}
+ * afterward.
  */
 public class ConfigurationReceiver implements ConfigurationReceivedObserver {
   private final Logger log = LoggerFactory.getLogger(ConfigurationReceiver.class);
