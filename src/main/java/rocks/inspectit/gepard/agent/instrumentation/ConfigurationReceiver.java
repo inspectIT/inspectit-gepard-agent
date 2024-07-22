@@ -4,6 +4,9 @@ import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
@@ -14,17 +17,17 @@ public class ConfigurationReceiver implements ConfigurationReceivedObserver {
   private final Logger logger = LoggerFactory.getLogger(ConfigurationReceiver.class);
   private final Instrumentation instrumentation;
 
-  private final ClassQueue classQueue;
+  private final InstrumentationCache instrumentationCache;
 
-  public ConfigurationReceiver(ClassQueue classQueue) {
-    this.classQueue = classQueue;
+  public ConfigurationReceiver(InstrumentationCache instrumentationCache) {
+    this.instrumentationCache = instrumentationCache;
     this.instrumentation = InstrumentationHolder.getInstrumentation();
   }
 
   @Override
   public void handleConfiguration(ConfigurationReceivedEvent event) {
-    Collections.addAll(
-        Arrays.asList(classQueue.getPendingClasses().toArray()),
-        instrumentation.getAllLoadedClasses());
+    // Make Map from instrumentation.getAllLoadedClasses()
+    Class<?>[] loadedClasses = instrumentation.getAllLoadedClasses();
+    instrumentationCache.addAll(Arrays.stream(loadedClasses).collect(Collectors.toSet()));
   }
 }

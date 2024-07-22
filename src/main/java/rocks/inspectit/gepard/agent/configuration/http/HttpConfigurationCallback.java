@@ -34,7 +34,6 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
   // TODO Auslagern, vllt Util-Klasse?
   private InspectitConfiguration serializeConfiguration(String body) {
     ObjectMapper mapper = new ObjectMapper();
-    log.info(body);
     try {
       return mapper.readValue(body, InspectitConfiguration.class);
     } catch (IOException e) {

@@ -21,26 +21,26 @@ public class BatchInstrumenter implements ClassDiscoveryListener, NamedRunnable 
    */
   private final Instrumentation instrumentation;
 
-  private final ClassQueue classQueue;
+  private final InstrumentationCache instrumentationCache;
 
-  private BatchInstrumenter(ClassQueue classQueue) {
-    this.classQueue = classQueue;
+  private BatchInstrumenter(InstrumentationCache instrumentationCache) {
+    this.instrumentationCache = instrumentationCache;
     this.instrumentation = InstrumentationHolder.getInstrumentation();
   }
 
-  public static BatchInstrumenter create(ClassQueue classQueue) {
-    BatchInstrumenter instrumenter = new BatchInstrumenter(classQueue);
+  public static BatchInstrumenter create(InstrumentationCache instrumentationCache) {
+    BatchInstrumenter instrumenter = new BatchInstrumenter(instrumentationCache);
     return instrumenter;
   }
 
   @Override
   public void onNewClassesDiscovered(Set<Class<?>> newClasses) {
-    classQueue.addAll(newClasses);
+    instrumentationCache.addAll(newClasses);
   }
 
   @Override
   public void run() {
-    log.info("Retransforming classes...");
+    // log.info("Retransforming classes...");
     try{
       Set<Class<?>> batch = getBatch(BATCH_SIZE);
       Iterator<Class<?>> batchIterator = batch.iterator();
@@ -56,6 +56,7 @@ public class BatchInstrumenter implements ClassDiscoveryListener, NamedRunnable 
       Class<?> clazz = batchIterator.next();
       batchIterator.remove();
       try {
+        log.info("Retransforming class {}", clazz.getName());
         instrumentation.retransformClasses(clazz);
       } catch (Throwable e) {
         log.error("Error while retransforming class {}", clazz.getName(), e);
@@ -69,12 +70,14 @@ public class BatchInstrumenter implements ClassDiscoveryListener, NamedRunnable 
   }
 
   public Set<Class<?>> getBatch(int batchSize) {
-    Set<Class<?>> batch = new HashSet<>();
-    Iterator<Class<?>> queueIterator = classQueue.getPendingClasses().iterator();
+    Set<Class<?>> batch = new HashSet<>();;
     int checkedClassesCount = 0;
+    Iterator<Class<?>> queueIterator = instrumentationCache.getKeyIterator();
+
     while (queueIterator.hasNext()) {
       Class<?> clazz = queueIterator.next();
       queueIterator.remove();
+      instrumentationCache.remove(clazz);
       checkedClassesCount++;
       if (ConfigurationResolver.shouldRetransform(clazz)) {
         batch.add(clazz);
@@ -85,12 +88,13 @@ public class BatchInstrumenter implements ClassDiscoveryListener, NamedRunnable 
       }
     }
 
-    if (!batch.isEmpty()) {
-      log.info(
+
+
+      log.debug(
           "Checked configuration of {} classes, {} classes left to check",
           checkedClassesCount,
-          classQueue.getPendingClasses().size());
-    }
+          instrumentationCache.getSize());
+
     return batch;
   }
 }

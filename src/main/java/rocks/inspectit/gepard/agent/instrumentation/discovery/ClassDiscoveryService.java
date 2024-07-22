@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.ClassQueue;
+import rocks.inspectit.gepard.agent.instrumentation.InstrumentationCache;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
 public class ClassDiscoveryService implements NamedRunnable {
@@ -18,11 +18,11 @@ public class ClassDiscoveryService implements NamedRunnable {
 
   private final Instrumentation instrumentation;
 
-  private final ClassQueue classQueue;
+  private final InstrumentationCache instrumentationCache;
 
-  public ClassDiscoveryService(ClassQueue classQueue) {
+  public ClassDiscoveryService(InstrumentationCache instrumentationCache) {
     this.instrumentation = InstrumentationHolder.getInstrumentation();
-    this.classQueue = classQueue;
+    this.instrumentationCache = instrumentationCache;
   }
 
   @Override
@@ -49,7 +49,7 @@ public class ClassDiscoveryService implements NamedRunnable {
       }
     }
     log.debug("Discovered {} new classes", newClasses.size());
-    classQueue.addAll(newClasses);
+    instrumentationCache.addAll(newClasses);
   }
 
   @Override
