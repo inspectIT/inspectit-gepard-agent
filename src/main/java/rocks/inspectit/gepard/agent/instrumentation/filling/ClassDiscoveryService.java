@@ -8,21 +8,24 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.InstrumentationCache;
+import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
+/**
+ * Constantly checks for newly loaded classes and fills them into the {@link PendingClassesCache}.
+ */
 public class ClassDiscoveryService implements NamedRunnable {
   private static final Logger log = LoggerFactory.getLogger(ClassDiscoveryService.class);
 
   private final Set<Class<?>> discoveredClasses;
 
-  private final InstrumentationCache instrumentationCache;
+  private final PendingClassesCache pendingClassesCache;
 
   private final Instrumentation instrumentation;
 
-  public ClassDiscoveryService(InstrumentationCache instrumentationCache) {
+  public ClassDiscoveryService(PendingClassesCache pendingClassesCache) {
     this.discoveredClasses = Collections.newSetFromMap(new WeakHashMap<>());
-    this.instrumentationCache = instrumentationCache;
+    this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = InstrumentationHolder.getInstrumentation();
   }
 
@@ -38,7 +41,7 @@ public class ClassDiscoveryService implements NamedRunnable {
 
   /**
    * Checks all loaded classes of the Instrumentation API and adds newly discovered classes to our
-   * {@code discoveredClasses}. Additionally, the {@code listener} will be informed about the newly
+   * {@code discoveredClasses}. Additionally, the {@link PendingClassesCache} will be filled with the newly
    * discovered classes.
    */
   void discoverClasses() {
@@ -50,7 +53,7 @@ public class ClassDiscoveryService implements NamedRunnable {
       }
     }
     log.debug("Discovered {} new classes", newClasses.size());
-    instrumentationCache.fill(newClasses);
+    pendingClassesCache.fill(newClasses);
   }
 
   @Override

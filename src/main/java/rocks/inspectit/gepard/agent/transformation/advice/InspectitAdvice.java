@@ -3,6 +3,8 @@ package rocks.inspectit.gepard.agent.transformation.advice;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
 
+/** Static code, which should be injected into target scopes (class methods) */
+@SuppressWarnings("unused")
 public class InspectitAdvice {
 
   @Advice.OnMethodEnter(suppress = Throwable.class)

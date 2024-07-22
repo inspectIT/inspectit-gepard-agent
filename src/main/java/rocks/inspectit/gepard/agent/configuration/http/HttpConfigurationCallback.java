@@ -1,14 +1,14 @@
 package rocks.inspectit.gepard.agent.configuration.http;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.internal.configuration.ConfigurationUtil;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
 
+/** Callback for configuration requests to the configuration server. */
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationCallback.class);
 
@@ -24,21 +24,11 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
         "Fetched configuration from configuration server and received status code {}",
         result.getCode());
 
-    if (result.getCode() != 200) return;
-
-    InspectitConfiguration configuration = serializeConfiguration(result.getBodyText());
-    configurationSubject.notifyListeners(configuration);
-  }
-
-  // TODO Auslagern, vllt Util-Klasse?
-  private InspectitConfiguration serializeConfiguration(String body) {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      return mapper.readValue(body, InspectitConfiguration.class);
-    } catch (IOException e) {
-      log.error("Failed to deserialize inspectit configuration", e);
-      // TODO Custom exception
-      throw new RuntimeException();
+    // Publish Event
+    if (result.getCode() == 200) {
+      String body = result.getBodyText();
+      InspectitConfiguration configuration = ConfigurationUtil.deserializeConfiguration(body);
+      configurationSubject.notifyListeners(configuration);
     }
   }
 

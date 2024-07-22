@@ -6,7 +6,7 @@ import java.lang.instrument.Instrumentation;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.InstrumentationCache;
+import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
@@ -22,15 +22,11 @@ public class BatchInstrumenter implements NamedRunnable {
    */
   private final Instrumentation instrumentation;
 
-  private final InstrumentationCache instrumentationCache;
+  private final PendingClassesCache pendingClassesCache;
 
-  private BatchInstrumenter(InstrumentationCache instrumentationCache) {
-    this.instrumentationCache = instrumentationCache;
+  public BatchInstrumenter(PendingClassesCache pendingClassesCache) {
+    this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = InstrumentationHolder.getInstrumentation();
-  }
-
-  public static BatchInstrumenter create(InstrumentationCache instrumentationCache) {
-    return new BatchInstrumenter(instrumentationCache);
   }
 
   @Override
@@ -44,11 +40,19 @@ public class BatchInstrumenter implements NamedRunnable {
     }
   }
 
+  /**
+   * Retrieves the next batch out of {@link PendingClassesCache}.
+   * Currently, the batch size is fixed to 1000.
+   *
+   * @param batchSize the size of the next batch
+   *
+   * @return the batch of retrieved pending classes
+   */
   @VisibleForTesting
   Set<Class<?>> getNextBatch(int batchSize) {
     Set<Class<?>> batch = new HashSet<>();
     int checkedClassesCount = 0;
-    Iterator<Class<?>> queueIterator = instrumentationCache.getKeyIterator();
+    Iterator<Class<?>> queueIterator = pendingClassesCache.getKeyIterator();
 
     while (queueIterator.hasNext()) {
       Class<?> clazz = queueIterator.next();
@@ -63,12 +67,18 @@ public class BatchInstrumenter implements NamedRunnable {
     log.debug(
         "Checked configuration of {} classes, {} classes left to check",
         checkedClassesCount,
-        instrumentationCache.getSize());
+        pendingClassesCache.getSize());
 
     return batch;
   }
 
-  private void retransformBatch(Iterator<Class<?>> batchIterator) {
+  /**
+   * Retransforms all classes of the provided iterator.
+   *
+   * @param batchIterator the batch of classes as iterator.
+   */
+  @VisibleForTesting
+  void retransformBatch(Iterator<Class<?>> batchIterator) {
     while (batchIterator.hasNext()) {
       Class<?> clazz = batchIterator.next();
       batchIterator.remove();

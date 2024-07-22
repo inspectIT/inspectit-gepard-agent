@@ -4,9 +4,15 @@ import net.bytebuddy.description.type.TypeDescription;
 import rocks.inspectit.gepard.agent.internal.configuration.ConfigurationHolder;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 
+/**
+ * Utility class to resolve the {@link InstrumentationConfiguration} and determine whether class
+ * byte code needs updates.
+ */
 public class ConfigurationResolver {
 
   /**
+   * Checks, if the provided class should be retransformed.
+   *
    * @param clazz the class object
    * @return True, if the provided class should be retransformed via {@code retransform()}
    */
@@ -18,6 +24,8 @@ public class ConfigurationResolver {
   }
 
   /**
+   * Checks, if the provided type needs instrumentation.
+   *
    * @param type the type description of the class, which should be instrumented
    * @return True, if the provided type should be instrumented
    */
@@ -36,7 +44,7 @@ public class ConfigurationResolver {
   }
 
   /**
-   * Check, if the class should be able to be instrumented. Currently, we don't instrument lambda-
+   * Checks, if the class should be able to be instrumented. Currently, we don't instrument lambda-
    * or array classes.
    *
    * @param clazz the class object

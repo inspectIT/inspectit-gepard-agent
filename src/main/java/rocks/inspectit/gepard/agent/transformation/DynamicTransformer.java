@@ -16,6 +16,10 @@ import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
+/**
+ * Modifies the original class byte code, if necessary. The {@link ConfigurationResolver} determines
+ * whether a transformation is needed.
+ */
 public class DynamicTransformer implements AgentBuilder.Transformer {
   private static final Logger log = LoggerFactory.getLogger(DynamicTransformer.class);
 
@@ -27,7 +31,7 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       JavaModule module,
       ProtectionDomain protectionDomain) {
     if (ConfigurationResolver.shouldInstrument(typeDescription)) {
-      log.info("Transforming type: {}", typeDescription.getName()); // TODO log.debug()
+      log.debug("Transforming type: {}", typeDescription.getName());
 
       // Currently, all methods of the type are instrumented
       // Just any() is not a valid matcher

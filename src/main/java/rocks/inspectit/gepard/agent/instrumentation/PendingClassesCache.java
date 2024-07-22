@@ -5,7 +5,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.*;
 import rocks.inspectit.gepard.agent.instrumentation.processing.BatchInstrumenter;
 
-public class InstrumentationCache {
+/** Stores and offers pending classes, which might need instrumentation updated. */
+public class PendingClassesCache {
 
   /**
    * The set of classes, which might need instrumentation updates. The {@link BatchInstrumenter}
@@ -13,7 +14,7 @@ public class InstrumentationCache {
    */
   private final Cache<Class<?>, Boolean> pendingClasses;
 
-  public InstrumentationCache() {
+  public PendingClassesCache() {
     this.pendingClasses = Caffeine.newBuilder().weakKeys().build();
   }
 

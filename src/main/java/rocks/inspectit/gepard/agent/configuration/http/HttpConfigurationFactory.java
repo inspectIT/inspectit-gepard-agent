@@ -6,6 +6,10 @@ import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.core5.net.URIBuilder;
 
+/**
+ * This factory should create different HTTP requests for the configuration server to fetch
+ * inspectit configurations.
+ */
 public class HttpConfigurationFactory {
 
   private HttpConfigurationFactory() {}
