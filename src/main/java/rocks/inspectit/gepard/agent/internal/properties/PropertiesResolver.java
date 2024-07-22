@@ -10,13 +10,13 @@ import java.util.Objects;
  */
 public class PropertiesResolver {
 
-  private static final String SERVER_URL_SYSTEM_PROPERTY = "inspectit.config.http.url";
+  public static final String SERVER_URL_SYSTEM_PROPERTY = "inspectit.config.http.url";
 
-  private static final String SERVER_URL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_URL";
+  public static final String SERVER_URL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_URL";
 
-  private static final String POLLING_INTERVAL_SYSTEM_PROPERTY =
+  public static final String POLLING_INTERVAL_SYSTEM_PROPERTY =
       "inspectit.config.http.polling-interval";
-  private static final String POLLING_INTERVAL_ENV_PROPERTY =
+  public static final String POLLING_INTERVAL_ENV_PROPERTY =
       "INSPECTIT_CONFIG_HTTP_POLLING_INTERVAL";
 
   private PropertiesResolver() {}

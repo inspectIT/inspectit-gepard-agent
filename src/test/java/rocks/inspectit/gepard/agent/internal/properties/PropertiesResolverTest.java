@@ -4,57 +4,114 @@ import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemPr
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver.*;
 
+import java.time.Duration;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class PropertiesResolverTest {
 
-  private static final String SERVER_URL_SYSTEM_PROPERTY = "inspectit.config.http.url";
-
-  private static final String SERVER_URL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_URL";
-
   private static final String TEST_URL = "https://inspectit.rocks/";
 
-  @Test
-  void resolverReturnsUrlIfSystemPropertyExists() throws Exception {
-    restoreSystemProperties(
-        () -> {
-          System.setProperty(SERVER_URL_SYSTEM_PROPERTY, TEST_URL);
+  private static final String INTERVAL = "PT1S";
 
-          String url = PropertiesResolver.getServerUrl();
+  @Nested
+  class ServerUrl {
 
-          assertEquals(TEST_URL, url);
-        });
+    @Test
+    void resolverReturnsUrlIfSystemPropertyExists() throws Exception {
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(SERVER_URL_SYSTEM_PROPERTY, TEST_URL);
+
+            String url = PropertiesResolver.getServerUrl();
+
+            assertEquals(TEST_URL, url);
+          });
+    }
+
+    @Test
+    void resolverReturnsUrlIfEnvironmentPropertyExists() throws Exception {
+      String url =
+          withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, TEST_URL)
+              .execute(PropertiesResolver::getServerUrl);
+
+      assertEquals(TEST_URL, url);
+    }
+
+    @Test
+    void resolverReturnsSystemPropertyIfSystemAndEnvPropertyExist() throws Exception {
+      String envTestUrl = TEST_URL + "1";
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(SERVER_URL_SYSTEM_PROPERTY, TEST_URL);
+
+            String url =
+                withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, envTestUrl)
+                    .execute(PropertiesResolver::getServerUrl);
+
+            assertEquals(TEST_URL, url);
+          });
+    }
+
+    @Test
+    void resolverReturnsEmptyStringIfNoPropertyExists() {
+      String url = PropertiesResolver.getServerUrl();
+
+      assertTrue(url.isEmpty());
+    }
   }
 
-  @Test
-  void resolverReturnsUrlIfEnvironmentPropertyExists() throws Exception {
-    String url =
-        withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, TEST_URL)
-            .execute(PropertiesResolver::getServerUrl);
+  @Nested
+  class PollingInterval {
 
-    assertEquals(TEST_URL, url);
-  }
+    @Test
+    void resolverReturnsUrlIfSystemPropertyExists() throws Exception {
+      Duration expected = Duration.parse(INTERVAL);
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(POLLING_INTERVAL_SYSTEM_PROPERTY, INTERVAL);
 
-  @Test
-  void resolverReturnsSystemPropertyIfSystemAndEnvPropertyExist() throws Exception {
-    String envTestUrl = TEST_URL + "1";
-    restoreSystemProperties(
-        () -> {
-          System.setProperty(SERVER_URL_SYSTEM_PROPERTY, TEST_URL);
+            Duration interval = PropertiesResolver.getPollingInterval();
 
-          String url =
-              withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, envTestUrl)
-                  .execute(PropertiesResolver::getServerUrl);
+            assertEquals(expected, interval);
+          });
+    }
 
-          assertEquals(TEST_URL, url);
-        });
-  }
+    @Test
+    void resolverReturnsUrlIfEnvironmentPropertyExists() throws Exception {
+      Duration expected = Duration.parse(INTERVAL);
+      Duration interval =
+          withEnvironmentVariable(POLLING_INTERVAL_ENV_PROPERTY, INTERVAL)
+              .execute(PropertiesResolver::getPollingInterval);
 
-  @Test
-  void resolverReturnsEmptyStringIfNoPropertyExists() {
-    String url = PropertiesResolver.getServerUrl();
+      assertEquals(expected, interval);
+    }
 
-    assertTrue(url.isEmpty());
+    @Test
+    void resolverReturnsSystemPropertyIfSystemAndEnvPropertyExist() throws Exception {
+      Duration expected = Duration.parse(INTERVAL);
+      String envTestInterval = "PT2S";
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(POLLING_INTERVAL_SYSTEM_PROPERTY, INTERVAL);
+
+            Duration interval =
+                withEnvironmentVariable(POLLING_INTERVAL_ENV_PROPERTY, envTestInterval)
+                    .execute(PropertiesResolver::getPollingInterval);
+
+            assertEquals(expected, interval);
+          });
+    }
+
+    @Test
+    void resolverReturnsEmptyStringIfNoPropertyExists() {
+      Duration expected = Duration.ofSeconds(10);
+
+      Duration interval = PropertiesResolver.getPollingInterval();
+
+      assertEquals(expected, interval);
+    }
   }
 }

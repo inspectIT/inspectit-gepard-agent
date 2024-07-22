@@ -102,14 +102,15 @@ dependencies {
     testImplementation("org.mock-server:mockserver-junit-jupiter:5.15.0")
     testImplementation("org.mockito:mockito-core:5.12.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
+    testImplementation("org.awaitility:awaitility:4.2.1")
+    // configure environmental variables
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
     testCompileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
     testCompileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junit}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
-    // configure environmental variables
-    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
 
     // Otel Java instrumentation that we use and extend during integration tests
     otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")

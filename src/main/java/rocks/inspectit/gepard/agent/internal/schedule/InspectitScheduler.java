@@ -38,18 +38,23 @@ public class InspectitScheduler {
    * @param runnable the runnable, which should be scheduled. Mostly a class, which implements the
    *     {@link Runnable} interface.
    * @param interval the interval, in which the runnable should be executed in milliseconds
+   * @return true, if the runnable was scheduled
    */
-  public void startRunnable(NamedRunnable runnable, Duration interval) {
+  public boolean startRunnable(NamedRunnable runnable, Duration interval) {
     String name = runnable.getName();
+    if (Objects.isNull(name) || name.isBlank())
+      throw new IllegalArgumentException("Illegal runnable name");
+
     if (isAlreadyScheduled(name)) {
       log.info("{} is already scheduled", name);
-      return;
+      return false;
     }
 
     log.info("Starting {} with interval of {} milliseconds", name, interval.toMillis());
     ScheduledFuture<?> future =
         executor.scheduleWithFixedDelay(runnable, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
     scheduledFutures.put(name, future);
+    return true;
   }
 
   /** Add hook, so every scheduled future will be cancelled at shutdown */

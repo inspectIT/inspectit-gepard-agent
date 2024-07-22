@@ -6,11 +6,15 @@ public class InstrumentationConfiguration {
 
   private List<Scope> scopes;
 
-  public List<Scope> getScopes() {
-    return scopes;
-  }
-
   public InstrumentationConfiguration() {
     this.scopes = List.of();
+  }
+
+  public InstrumentationConfiguration(List<Scope> scopes) {
+    this.scopes = scopes;
+  }
+
+  public List<Scope> getScopes() {
+    return scopes;
   }
 }

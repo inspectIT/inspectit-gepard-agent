@@ -6,6 +6,13 @@ public class Scope {
 
   private boolean enabled;
 
+  public Scope() {}
+
+  public Scope(String fqn, boolean enabled) {
+    this.fqn = fqn;
+    this.enabled = enabled;
+  }
+
   public String getFqn() {
     return fqn;
   }

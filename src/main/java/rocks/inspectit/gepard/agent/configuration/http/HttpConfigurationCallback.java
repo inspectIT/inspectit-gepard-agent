@@ -4,9 +4,9 @@ import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationUtil;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
+import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationUtil;
 
 /** Callback for configuration requests to the configuration server. */
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {

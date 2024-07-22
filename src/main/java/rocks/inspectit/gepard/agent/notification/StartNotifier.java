@@ -18,8 +18,8 @@ public class StartNotifier {
    *
    * @return true, if the notification was executed successfully
    */
-  public boolean sendNotification(String serverUrl) {
-    SimpleHttpRequest notification = createStartNotification(serverUrl);
+  public boolean sendNotification(String serverBaseUrl) {
+    SimpleHttpRequest notification = createStartNotification(serverBaseUrl);
 
     return HttpRequestSender.send(notification, new NotificationCallback());
   }
