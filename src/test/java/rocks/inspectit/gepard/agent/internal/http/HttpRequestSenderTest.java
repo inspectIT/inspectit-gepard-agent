@@ -21,7 +21,7 @@ import org.mockserver.model.HttpError;
 import rocks.inspectit.gepard.agent.MockServerTestBase;
 
 @ExtendWith(MockitoExtension.class)
-public class HttpRequestSenderTest extends MockServerTestBase {
+class HttpRequestSenderTest extends MockServerTestBase {
 
   @Mock private FutureCallback<SimpleHttpResponse> callback;
 

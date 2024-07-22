@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
-public class InspectitSchedulerTest {
+class InspectitSchedulerTest {
 
   private final InspectitScheduler scheduler = InspectitScheduler.getInstance();
 

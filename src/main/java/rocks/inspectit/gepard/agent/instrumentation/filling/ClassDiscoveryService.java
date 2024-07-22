@@ -1,6 +1,5 @@
 package rocks.inspectit.gepard.agent.instrumentation.filling;
 
-import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,10 +22,11 @@ public class ClassDiscoveryService implements NamedRunnable {
 
   private final Instrumentation instrumentation;
 
-  public ClassDiscoveryService(PendingClassesCache pendingClassesCache) {
+  public ClassDiscoveryService(
+      PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
     this.discoveredClasses = Collections.newSetFromMap(new WeakHashMap<>());
     this.pendingClassesCache = pendingClassesCache;
-    this.instrumentation = InstrumentationHolder.getInstrumentation();
+    this.instrumentation = instrumentation;
   }
 
   @Override

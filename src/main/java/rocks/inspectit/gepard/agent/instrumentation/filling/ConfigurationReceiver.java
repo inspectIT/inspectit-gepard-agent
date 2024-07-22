@@ -1,6 +1,5 @@
 package rocks.inspectit.gepard.agent.instrumentation.filling;
 
-import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.lang.instrument.Instrumentation;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -20,9 +19,10 @@ public class ConfigurationReceiver implements ConfigurationReceivedObserver {
 
   private final Instrumentation instrumentation;
 
-  public ConfigurationReceiver(PendingClassesCache pendingClassesCache) {
+  public ConfigurationReceiver(
+      PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
     this.pendingClassesCache = pendingClassesCache;
-    this.instrumentation = InstrumentationHolder.getInstrumentation();
+    this.instrumentation = instrumentation;
   }
 
   @Override

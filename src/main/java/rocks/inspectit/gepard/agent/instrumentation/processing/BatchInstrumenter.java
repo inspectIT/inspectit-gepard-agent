@@ -1,7 +1,6 @@
 package rocks.inspectit.gepard.agent.instrumentation.processing;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.lang.instrument.Instrumentation;
 import java.util.*;
 import org.slf4j.Logger;
@@ -16,17 +15,14 @@ public class BatchInstrumenter implements NamedRunnable {
   /** Hard coded batch size to transform classes */
   private static final int BATCH_SIZE = 1000;
 
-  /**
-   * The set of classes which might need instrumentation updates. This service works through this
-   * set in batches.
-   */
-  private final Instrumentation instrumentation;
-
   private final PendingClassesCache pendingClassesCache;
 
-  public BatchInstrumenter(PendingClassesCache pendingClassesCache) {
+  private final Instrumentation instrumentation;
+
+  public BatchInstrumenter(
+      PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
     this.pendingClassesCache = pendingClassesCache;
-    this.instrumentation = InstrumentationHolder.getInstrumentation();
+    this.instrumentation = instrumentation;
   }
 
   @Override
@@ -49,7 +45,7 @@ public class BatchInstrumenter implements NamedRunnable {
    */
   @VisibleForTesting
   Set<Class<?>> getNextBatch(int batchSize) {
-    Set<Class<?>> batch = new HashSet<>();
+    Set<Class<?>> classesToBeInstrumented = new HashSet<>();
     int checkedClassesCount = 0;
     Iterator<Class<?>> queueIterator = pendingClassesCache.getKeyIterator();
 
@@ -58,7 +54,7 @@ public class BatchInstrumenter implements NamedRunnable {
       queueIterator.remove();
       checkedClassesCount++;
 
-      if (ConfigurationResolver.shouldRetransform(clazz)) batch.add(clazz);
+      if (ConfigurationResolver.shouldRetransform(clazz)) classesToBeInstrumented.add(clazz);
 
       if (checkedClassesCount >= batchSize) break;
     }
@@ -68,7 +64,7 @@ public class BatchInstrumenter implements NamedRunnable {
         checkedClassesCount,
         pendingClassesCache.getSize());
 
-    return batch;
+    return classesToBeInstrumented;
   }
 
   /**

@@ -1,5 +1,7 @@
 package rocks.inspectit.gepard.agent.instrumentation;
 
+import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
+import java.lang.instrument.Instrumentation;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +17,12 @@ public class InstrumentationManager {
 
   private final PendingClassesCache pendingClassesCache;
 
-  private InstrumentationManager(PendingClassesCache pendingClassesCache) {
+  private final Instrumentation instrumentation;
+
+  private InstrumentationManager(
+      PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
     this.pendingClassesCache = pendingClassesCache;
+    this.instrumentation = instrumentation;
   }
 
   /**
@@ -26,7 +32,8 @@ public class InstrumentationManager {
    */
   public static InstrumentationManager create() {
     PendingClassesCache pendingClassesCache = new PendingClassesCache();
-    return new InstrumentationManager(pendingClassesCache);
+    Instrumentation instrumentation = InstrumentationHolder.getInstrumentation();
+    return new InstrumentationManager(pendingClassesCache, instrumentation);
   }
 
   /**
@@ -35,7 +42,8 @@ public class InstrumentationManager {
    */
   public void startClassDiscovery() {
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
-    ClassDiscoveryService discoveryService = new ClassDiscoveryService(pendingClassesCache);
+    ClassDiscoveryService discoveryService =
+        new ClassDiscoveryService(pendingClassesCache, instrumentation);
     Duration discoveryInterval = Duration.ofSeconds(30);
     scheduler.startRunnable(discoveryService, discoveryInterval);
   }
@@ -46,7 +54,8 @@ public class InstrumentationManager {
    */
   public void startBatchInstrumentation() {
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
-    BatchInstrumenter batchInstrumenter = new BatchInstrumenter(pendingClassesCache);
+    BatchInstrumenter batchInstrumenter =
+        new BatchInstrumenter(pendingClassesCache, instrumentation);
     Duration batchInterval = Duration.ofMillis(500);
     scheduler.startRunnable(batchInstrumenter, batchInterval);
   }
@@ -54,7 +63,8 @@ public class InstrumentationManager {
   /** Creates an observer, who listens to {@link ConfigurationReceivedEvent}s. */
   public void createConfigurationReceiver() {
     log.info("Creating ConfigurationReceiver...");
-    ConfigurationReceiver configurationReceiver = new ConfigurationReceiver(pendingClassesCache);
+    ConfigurationReceiver configurationReceiver =
+        new ConfigurationReceiver(pendingClassesCache, instrumentation);
     configurationReceiver.subscribeToConfigurationReceivedEvents();
   }
 }
