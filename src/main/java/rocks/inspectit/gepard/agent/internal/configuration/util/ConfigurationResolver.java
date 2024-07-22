@@ -10,6 +10,8 @@ import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation
  */
 public class ConfigurationResolver {
 
+  private ConfigurationResolver() {}
+
   /**
    * Checks, if the provided class should be retransformed.
    *

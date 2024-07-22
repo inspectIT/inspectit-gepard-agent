@@ -34,7 +34,7 @@ public class ClassDiscoveryService implements NamedRunnable {
     log.debug("Discovering new classes...");
     try {
       discoverClasses();
-    } catch (Throwable e) {
+    } catch (Exception e) {
       log.error("Error while discovering classes", e);
     }
   }

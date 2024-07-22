@@ -35,7 +35,7 @@ public class BatchInstrumenter implements NamedRunnable {
     try {
       Set<Class<?>> nextBatch = getNextBatch(BATCH_SIZE);
       retransformBatch(nextBatch.iterator());
-    } catch (Throwable e) {
+    } catch (Exception e) {
       log.error("Error while retransforming classes", e);
     }
   }
@@ -85,7 +85,7 @@ public class BatchInstrumenter implements NamedRunnable {
       log.debug("Retransforming class: {}", clazz.getName());
       try {
         instrumentation.retransformClasses(clazz);
-      } catch (Throwable e) {
+      } catch (Exception e) {
         log.error("Error while retransforming class: {}", clazz.getName(), e);
       }
     }

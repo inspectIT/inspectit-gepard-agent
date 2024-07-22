@@ -23,7 +23,7 @@ public class HttpConfigurationPoller implements NamedRunnable {
     boolean successful;
     try {
       successful = pollConfiguration();
-    } catch (Throwable e) {
+    } catch (Exception e) {
       log.error("Error while polling configuration", e);
       return;
     }

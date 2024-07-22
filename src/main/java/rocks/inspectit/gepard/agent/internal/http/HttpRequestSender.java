@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestSender {
   private static final Logger log = LoggerFactory.getLogger(HttpRequestSender.class);
 
+  private HttpRequestSender() {}
+
   /**
    * Executes the provided HTTP request as well as the callback function.
    *

@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.internal.configuration;
+package rocks.inspectit.gepard.agent.internal.configuration.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -6,6 +6,8 @@ import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotSer
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
 public class ConfigurationUtil {
+
+  private ConfigurationUtil() {}
 
   /**
    * Transform a raw configuration string into a {@link InspectitConfiguration} object.

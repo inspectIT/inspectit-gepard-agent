@@ -14,7 +14,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.jupiter.MockServerExtension;
 
 @ExtendWith(MockServerExtension.class)
-public class HttpConfigurationPollerTest {
+class HttpConfigurationPollerTest {
 
   private static ClientAndServer mockServer;
 

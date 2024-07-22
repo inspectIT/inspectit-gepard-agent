@@ -19,6 +19,8 @@ public class PropertiesResolver {
   private static final String POLLING_INTERVAL_ENV_PROPERTY =
       "INSPECTIT_CONFIG_HTTP_POLLING_INTERVAL";
 
+  private PropertiesResolver() {}
+
   /**
    * Get the configured configuration server url. If no url was configured, an empty string will be
    * returned.
