@@ -46,11 +46,22 @@ public class InspectitAgentExtension implements AgentExtension {
     ConfigurationManager configurationManager = ConfigurationManager.create();
     configurationManager.startHttpPolling();
 
+    addShutdownHook();
+
     return agentBuilder;
   }
 
   @Override
   public String extensionName() {
     return "inspectit-gepard";
+  }
+
+  private void addShutdownHook() {
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  log.info("Shutting down inspectIT Gepard agent extension...");
+                }));
   }
 }

@@ -60,7 +60,7 @@ public class InspectitScheduler {
                 () ->
                     scheduledFutures.forEach(
                         (name, future) -> {
-                          log.info("Shutting down {}", name);
+                          log.info("Shutting down {}...", name);
                           future.cancel(true);
                         })));
   }
