@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.configuration.internal;
+package rocks.inspectit.gepard.agent.internal.properties;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 
 class PropertiesResolverTest {
 
