@@ -25,7 +25,6 @@ public class ConfigurationManager {
       InspectitScheduler scheduler = InspectitScheduler.getInstance();
       HttpConfigurationPoller poller = new HttpConfigurationPoller(url);
       Duration pollingInterval = PropertiesResolver.getPollingInterval();
-
       scheduler.startRunnable(poller, pollingInterval);
     }
   }

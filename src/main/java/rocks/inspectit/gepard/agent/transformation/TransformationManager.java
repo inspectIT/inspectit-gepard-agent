@@ -13,6 +13,7 @@ public class TransformationManager {
   }
 
   public AgentBuilder modify(AgentBuilder agentBuilder) {
+    // In the future, we might add a white- or black-list for types
     return agentBuilder.type(any()).transform(new DynamicTransformer());
   }
 }

@@ -1,17 +1,14 @@
 package rocks.inspectit.gepard.agent.internal.configuration.util;
 
 import net.bytebuddy.description.type.TypeDescription;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.configuration.ConfigurationHolder;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 
 public class ConfigurationResolver {
-  private static final Logger logger = LoggerFactory.getLogger(ConfigurationResolver.class);
 
   /**
-   * @param clazz The original, uninstrumented Class object
-   * @return
+   * @param clazz the class object
+   * @return True, if the provided class should be retransformed via {@code retransform()}
    */
   public static boolean shouldRetransform(Class<?> clazz) {
     InstrumentationConfiguration configuration = getConfiguration();
@@ -22,7 +19,7 @@ public class ConfigurationResolver {
 
   /**
    * @param type the type description of the class, which should be instrumented
-   * @return
+   * @return True, if the provided type should be instrumented
    */
   public static boolean shouldInstrument(TypeDescription type) {
     String typeName = type.getName();
@@ -31,6 +28,9 @@ public class ConfigurationResolver {
         .anyMatch(scope -> scope.getFqn().equals(typeName) && scope.isEnabled());
   }
 
+  /**
+   * @return the current {@link InstrumentationConfiguration}
+   */
   private static InstrumentationConfiguration getConfiguration() {
     return ConfigurationHolder.getInstance().getConfiguration().getInstrumentation();
   }
@@ -39,8 +39,8 @@ public class ConfigurationResolver {
    * Check, if the class should be able to be instrumented. Currently, we don't instrument lambda-
    * or array classes.
    *
-   * @param clazz the class to check
-   * @return true, if this should be able to be instrumented
+   * @param clazz the class object
+   * @return True, if the provided class should NOT be able to be instrumented
    */
   private static boolean shouldIgnore(Class<?> clazz) {
     String className = clazz.getName();

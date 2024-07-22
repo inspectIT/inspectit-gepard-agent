@@ -26,7 +26,6 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
 
     if (result.getCode() != 200) return;
 
-    log.debug("Notifying about new inspectit configuration...");
     InspectitConfiguration configuration = serializeConfiguration(result.getBodyText());
     configurationSubject.notifyListeners(configuration);
   }

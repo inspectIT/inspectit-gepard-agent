@@ -28,19 +28,23 @@ public class InspectitAgentExtension implements AgentExtension {
   public AgentBuilder extend(AgentBuilder agentBuilder, ConfigProperties config) {
     log.info("Starting inspectIT Gepard agent extension ...");
 
+    // Notify configuration server about this agent
     NotificationManager notificationManager = NotificationManager.create();
     notificationManager.sendStartNotification();
 
-    ConfigurationManager configurationManager = ConfigurationManager.create();
-    configurationManager.startHttpPolling();
-
-    InstrumentationManager instrumentationManager = InstrumentationManager.create();
-    instrumentationManager.startClassDiscovery();
-    instrumentationManager.startBatchInstrumentation();
-    instrumentationManager.createConfigurationReceiver();
-
+    // Modify the OTel AgentBuilder with our transformer
     TransformationManager transformationManager = TransformationManager.create();
     agentBuilder = transformationManager.modify(agentBuilder);
+
+    // Set up instrumentation
+    InstrumentationManager instrumentationManager = InstrumentationManager.create();
+    instrumentationManager.createConfigurationReceiver();
+    instrumentationManager.startClassDiscovery();
+    instrumentationManager.startBatchInstrumentation();
+
+    // Start polling of the inspectit configuration
+    ConfigurationManager configurationManager = ConfigurationManager.create();
+    configurationManager.startHttpPolling();
 
     return agentBuilder;
   }

@@ -5,7 +5,7 @@ public class Scope {
   private String fqn;
 
   private boolean enabled;
-  
+
   public String getFqn() {
     return fqn;
   }

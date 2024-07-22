@@ -82,6 +82,7 @@ dependencies {
     // http client for server notification
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     /*
     Interfaces and SPIs that we implement. We use `compileOnly` dependency because during
@@ -118,9 +119,6 @@ dependencies {
     add("muzzleBootstrap", "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations-support:${versions.opentelemetryJavaagentAlpha}")
     add("muzzleTooling", "io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:${versions.opentelemetryJavaagentAlpha}")
     add("muzzleTooling", "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${versions.opentelemetryJavaagentAlpha}")
-
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
-
 }
 
 // Produces a copy of upstream javaagent with this extension jar included inside it

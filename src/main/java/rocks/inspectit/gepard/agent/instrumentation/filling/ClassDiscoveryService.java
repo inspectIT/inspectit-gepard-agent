@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.instrumentation.discovery;
+package rocks.inspectit.gepard.agent.instrumentation.filling;
 
 import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.lang.instrument.Instrumentation;
@@ -14,20 +14,21 @@ import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 public class ClassDiscoveryService implements NamedRunnable {
   private static final Logger log = LoggerFactory.getLogger(ClassDiscoveryService.class);
 
-  private final Set<Class<?>> discoveredClasses = Collections.newSetFromMap(new WeakHashMap<>());
-
-  private final Instrumentation instrumentation;
+  private final Set<Class<?>> discoveredClasses;
 
   private final InstrumentationCache instrumentationCache;
 
+  private final Instrumentation instrumentation;
+
   public ClassDiscoveryService(InstrumentationCache instrumentationCache) {
-    this.instrumentation = InstrumentationHolder.getInstrumentation();
+    this.discoveredClasses = Collections.newSetFromMap(new WeakHashMap<>());
     this.instrumentationCache = instrumentationCache;
+    this.instrumentation = InstrumentationHolder.getInstrumentation();
   }
 
   @Override
   public void run() {
-    log.info("Discovering new classes...");
+    log.debug("Discovering new classes...");
     try {
       discoverClasses();
     } catch (Throwable e) {
@@ -49,7 +50,7 @@ public class ClassDiscoveryService implements NamedRunnable {
       }
     }
     log.debug("Discovered {} new classes", newClasses.size());
-    instrumentationCache.addAll(newClasses);
+    instrumentationCache.fill(newClasses);
   }
 
   @Override

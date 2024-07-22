@@ -1,5 +1,6 @@
 package rocks.inspectit.gepard.agent.configuration.http;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -43,7 +44,8 @@ public class HttpConfigurationPoller implements NamedRunnable {
    *
    * @return true, if the configuration was polled successfully
    */
-  public boolean pollConfiguration() {
+  @VisibleForTesting
+  boolean pollConfiguration() {
     log.debug("Fetching configuration from server...");
     SimpleHttpRequest request = null;
     // TODO try-catch in eigene Methode auslagern

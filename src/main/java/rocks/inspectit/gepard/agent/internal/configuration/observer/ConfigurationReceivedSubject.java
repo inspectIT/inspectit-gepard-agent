@@ -9,9 +9,11 @@ public class ConfigurationReceivedSubject {
 
   private static ConfigurationReceivedSubject instance;
 
-  private final List<ConfigurationReceivedObserver> listeners = new ArrayList<>();
+  private final List<ConfigurationReceivedObserver> listeners;
 
-  private ConfigurationReceivedSubject() {}
+  private ConfigurationReceivedSubject() {
+    this.listeners = new ArrayList<>();
+  }
 
   public static ConfigurationReceivedSubject getInstance() {
     if (Objects.isNull(instance)) instance = new ConfigurationReceivedSubject();

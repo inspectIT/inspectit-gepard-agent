@@ -1,23 +1,20 @@
-package rocks.inspectit.gepard.agent.instrumentation;
+package rocks.inspectit.gepard.agent.instrumentation.filling;
 
 import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.lang.instrument.Instrumentation;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.instrumentation.InstrumentationCache;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 
 public class ConfigurationReceiver implements ConfigurationReceivedObserver {
-
-  private final Logger logger = LoggerFactory.getLogger(ConfigurationReceiver.class);
-  private final Instrumentation instrumentation;
+  private final Logger log = LoggerFactory.getLogger(ConfigurationReceiver.class);
 
   private final InstrumentationCache instrumentationCache;
+
+  private final Instrumentation instrumentation;
 
   public ConfigurationReceiver(InstrumentationCache instrumentationCache) {
     this.instrumentationCache = instrumentationCache;
@@ -26,8 +23,8 @@ public class ConfigurationReceiver implements ConfigurationReceivedObserver {
 
   @Override
   public void handleConfiguration(ConfigurationReceivedEvent event) {
-    // Make Map from instrumentation.getAllLoadedClasses()
-    Class<?>[] loadedClasses = instrumentation.getAllLoadedClasses();
-    instrumentationCache.addAll(Arrays.stream(loadedClasses).collect(Collectors.toSet()));
+    log.debug("Received new configuration. Filling instrumentation cache...");
+    Class<?>[] classes = instrumentation.getAllLoadedClasses();
+    instrumentationCache.fill(List.of(classes));
   }
 }
