@@ -2,7 +2,7 @@ package rocks.inspectit.gepard.agent.internal.configuration.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotSerializeConfigurationException;
+import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
 public class ConfigurationUtil {
@@ -20,7 +20,7 @@ public class ConfigurationUtil {
     try {
       return mapper.readValue(body, InspectitConfiguration.class);
     } catch (IOException e) {
-      throw new CouldNotSerializeConfigurationException(
+      throw new CouldNotDeserializeConfigurationException(
           "Failed to deserialize inspectit configuration: " + body, e);
     }
   }

@@ -3,7 +3,7 @@ package rocks.inspectit.gepard.agent.internal.configuration.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotSerializeConfigurationException;
+import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
 class ConfigurationUtilTest {
@@ -33,7 +33,7 @@ class ConfigurationUtilTest {
   void invalidStringThrowsException() {
     String body = "invalid";
     assertThrows(
-        CouldNotSerializeConfigurationException.class,
+        CouldNotDeserializeConfigurationException.class,
         () -> ConfigurationUtil.deserializeConfiguration(body));
   }
 }
