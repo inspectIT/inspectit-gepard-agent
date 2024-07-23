@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.internal.configuration;
+package rocks.inspectit.gepard.agent.resolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,7 +12,7 @@ import rocks.inspectit.gepard.agent.internal.configuration.observer.Configuratio
 
 class ConfigurationHolderTest {
 
-  private final ConfigurationHolder holder = ConfigurationHolder.getInstance();
+  private final ConfigurationHolder holder = ConfigurationHolder.create();
 
   @Test
   void configurationNotNull() {

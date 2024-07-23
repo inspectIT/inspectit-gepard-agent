@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.ConfigurationManager;
 import rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager;
 import rocks.inspectit.gepard.agent.notification.NotificationManager;
+import rocks.inspectit.gepard.agent.resolver.ConfigurationHolder;
+import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.transformation.TransformationManager;
 
 @SuppressWarnings("unused")
@@ -32,15 +34,20 @@ public class InspectitAgentExtension implements AgentExtension {
     NotificationManager notificationManager = NotificationManager.create();
     notificationManager.sendStartNotification();
 
+    // Create resolver to apply our configuration to classes, types etc.
+    ConfigurationHolder configurationHolder = ConfigurationHolder.create();
+    ConfigurationResolver configurationResolver = ConfigurationResolver.create(configurationHolder);
+
     // Modify the OTel AgentBuilder with our transformer
-    TransformationManager transformationManager = TransformationManager.create();
+    TransformationManager transformationManager =
+        TransformationManager.create(configurationResolver);
     agentBuilder = transformationManager.modify(agentBuilder);
 
     // Set up instrumentation
     InstrumentationManager instrumentationManager = InstrumentationManager.create();
     instrumentationManager.createConfigurationReceiver();
     instrumentationManager.startClassDiscovery();
-    instrumentationManager.startBatchInstrumentation();
+    instrumentationManager.startBatchInstrumentation(configurationResolver);
 
     // Start polling of the inspectit configuration
     ConfigurationManager configurationManager = ConfigurationManager.create();

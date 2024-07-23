@@ -9,12 +9,19 @@ import net.bytebuddy.dynamic.VisibilityBridgeStrategy;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
 import net.bytebuddy.dynamic.scaffold.MethodGraph;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
+@ExtendWith(MockitoExtension.class)
 class TransformationManagerTest {
+
+  @Mock private ConfigurationResolver resolver;
 
   @Test
   void agentBuilderDoNotEqual() {
-    TransformationManager manager = TransformationManager.create();
+    TransformationManager manager = TransformationManager.create(resolver);
 
     AgentBuilder agent = createAgentBuilder();
     AgentBuilder modifiedAgent = manager.modify(agent);

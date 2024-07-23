@@ -4,7 +4,6 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.http.HttpConfigurationPoller;
-import rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager;
 import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
 
@@ -15,7 +14,7 @@ public class ConfigurationManager {
   private ConfigurationManager() {}
 
   /**
-   * Factory method to create an {@link InstrumentationManager}
+   * Factory method to create an {@link ConfigurationManager}
    *
    * @return the created manager
    */

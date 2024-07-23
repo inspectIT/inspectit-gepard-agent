@@ -13,7 +13,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.utility.JavaModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
 /**
@@ -23,6 +23,12 @@ import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 public class DynamicTransformer implements AgentBuilder.Transformer {
   private static final Logger log = LoggerFactory.getLogger(DynamicTransformer.class);
 
+  private final ConfigurationResolver resolver;
+
+  public DynamicTransformer(ConfigurationResolver resolver) {
+    this.resolver = resolver;
+  }
+
   @Override
   public DynamicType.Builder<?> transform(
       DynamicType.Builder<?> builder,
@@ -30,7 +36,7 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       ClassLoader classLoader,
       JavaModule module,
       ProtectionDomain protectionDomain) {
-    if (ConfigurationResolver.shouldInstrument(typeDescription)) {
+    if (resolver.shouldInstrument(typeDescription)) {
       log.debug("Transforming type: {}", typeDescription.getName());
 
       // Currently, all methods of the type are instrumented

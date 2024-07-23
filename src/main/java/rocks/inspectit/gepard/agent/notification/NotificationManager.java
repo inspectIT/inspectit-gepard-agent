@@ -2,7 +2,6 @@ package rocks.inspectit.gepard.agent.notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager;
 import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 
 /**
@@ -22,7 +21,7 @@ public class NotificationManager {
   }
 
   /**
-   * Factory method to create an {@link InstrumentationManager}
+   * Factory method to create an {@link NotificationManager}
    *
    * @return the created manager
    */

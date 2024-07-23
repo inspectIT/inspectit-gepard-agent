@@ -19,7 +19,7 @@ public class HttpConfigurationPoller implements NamedRunnable {
   }
 
   public void run() {
-    log.info("Polling configuration...");
+    log.debug("Polling configuration...");
     boolean successful;
     try {
       successful = pollConfiguration();

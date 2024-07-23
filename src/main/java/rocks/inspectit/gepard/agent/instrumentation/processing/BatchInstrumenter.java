@@ -6,8 +6,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
-import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
+import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
 public class BatchInstrumenter implements NamedRunnable {
   private static final Logger log = LoggerFactory.getLogger(BatchInstrumenter.class);
@@ -19,10 +19,15 @@ public class BatchInstrumenter implements NamedRunnable {
 
   private final Instrumentation instrumentation;
 
+  private final ConfigurationResolver configurationResolver;
+
   public BatchInstrumenter(
-      PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
+      PendingClassesCache pendingClassesCache,
+      Instrumentation instrumentation,
+      ConfigurationResolver configurationResolver) {
     this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = instrumentation;
+    this.configurationResolver = configurationResolver;
   }
 
   @Override
@@ -54,7 +59,7 @@ public class BatchInstrumenter implements NamedRunnable {
       queueIterator.remove();
       checkedClassesCount++;
 
-      if (ConfigurationResolver.shouldRetransform(clazz)) classesToBeInstrumented.add(clazz);
+      if (configurationResolver.shouldRetransform(clazz)) classesToBeInstrumented.add(clazz);
 
       if (checkedClassesCount >= batchSize) break;
     }
