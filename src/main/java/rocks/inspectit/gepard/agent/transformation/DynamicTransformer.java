@@ -40,8 +40,7 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       log.debug("Transforming type: {}", typeDescription.getName());
 
       // Currently, all methods of the type are instrumented
-      // Just any() is not a valid matcher
-      ElementMatcher<? super MethodDescription> elementMatcher = isMethod().and(any());
+      ElementMatcher<? super MethodDescription> elementMatcher = isMethod();
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(elementMatcher));
     }
     return builder;
