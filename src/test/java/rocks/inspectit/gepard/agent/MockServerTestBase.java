@@ -14,11 +14,11 @@ public abstract class MockServerTestBase {
   protected static ClientAndServer mockServer;
 
   /** Inside the agent we only test for HTTP */
-  protected static final String SERVER_URL = "http://localhost:8080/api/v1";
+  protected static final String SERVER_URL = "http://localhost:8090/api/v1";
 
   @BeforeAll
   static void startServer() {
-    mockServer = ClientAndServer.startClientAndServer(8080);
+    mockServer = ClientAndServer.startClientAndServer(8090);
   }
 
   @AfterEach
