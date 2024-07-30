@@ -6,25 +6,25 @@ import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
-class ConfigurationUtilTest {
+class ConfigurationMapperTest {
 
   @Test
   void validStringIsDeserialized() {
     String body =
-        """
-                {
-                  "instrumentationConfiguration": {
-                    "scopes": [
-                      {
-                        "fqn": "com.example.Application",
-                        "enabled": true
+            """
+                    {
+                      "instrumentationConfiguration": {
+                        "scopes": [
+                          {
+                            "fqn": "com.example.Application",
+                            "enabled": true
+                          }
+                        ]
                       }
-                    ]
-                  }
-                }
-                """;
+                    }
+                    """;
 
-    InspectitConfiguration result = ConfigurationUtil.deserializeConfiguration(body);
+    InspectitConfiguration result = ConfigurationMapper.toObject(body);
 
     assertNotNull(result);
   }
@@ -33,7 +33,6 @@ class ConfigurationUtilTest {
   void invalidStringThrowsException() {
     String body = "invalid";
     assertThrows(
-        CouldNotDeserializeConfigurationException.class,
-        () -> ConfigurationUtil.deserializeConfiguration(body));
+        CouldNotDeserializeConfigurationException.class, () -> ConfigurationMapper.toObject(body));
   }
 }

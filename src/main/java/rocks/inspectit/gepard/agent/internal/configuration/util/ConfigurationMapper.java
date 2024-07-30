@@ -5,9 +5,12 @@ import java.io.IOException;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
-public class ConfigurationUtil {
+/**
+ * Utility class for mapping configuration strings to configuration objects.
+ */
+public class ConfigurationMapper {
 
-  private ConfigurationUtil() {}
+  private ConfigurationMapper() {}
 
   /**
    * Transform a raw configuration string into a {@link InspectitConfiguration} object.
@@ -15,7 +18,7 @@ public class ConfigurationUtil {
    * @param body the raw configuration string
    * @return the configuration object
    */
-  public static InspectitConfiguration deserializeConfiguration(String body) {
+  public static InspectitConfiguration toObject(String body) {
     ObjectMapper mapper = new ObjectMapper();
     try {
       return mapper.readValue(body, InspectitConfiguration.class);

@@ -2,6 +2,10 @@ package rocks.inspectit.gepard.agent.internal.configuration.model.instrumentatio
 
 import java.util.List;
 
+/**
+ * The Instrumentation Configuration contains all configuration related to instrumentation. e.g
+ * scopes, rules, actions.
+ */
 public class InstrumentationConfiguration {
 
   private List<Scope> scopes;

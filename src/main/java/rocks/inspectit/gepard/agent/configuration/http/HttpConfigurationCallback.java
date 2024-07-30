@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
-import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationUtil;
+import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 
 /** Callback for configuration requests to the configuration server. */
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
@@ -27,7 +27,7 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     // Publish Event
     if (result.getCode() == 200) {
       String body = result.getBodyText();
-      InspectitConfiguration configuration = ConfigurationUtil.deserializeConfiguration(body);
+      InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
       configurationSubject.notifyListeners(configuration);
     }
   }

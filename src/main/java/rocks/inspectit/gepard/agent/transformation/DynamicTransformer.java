@@ -1,6 +1,5 @@
 package rocks.inspectit.gepard.agent.transformation;
 
-import static net.bytebuddy.matcher.ElementMatchers.any;
 import static net.bytebuddy.matcher.ElementMatchers.isMethod;
 
 import java.security.ProtectionDomain;

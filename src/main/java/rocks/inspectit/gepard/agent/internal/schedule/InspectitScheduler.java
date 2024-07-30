@@ -79,4 +79,13 @@ public class InspectitScheduler {
   private boolean isAlreadyScheduled(String runnableName) {
     return scheduledFutures.containsKey(runnableName);
   }
+
+  /**
+   * Returns the number of scheduled futures.
+   *
+   * @return the number of scheduled futures
+   */
+  public int getNumberOfScheduledFutures() {
+    return scheduledFutures.size();
+  }
 }
