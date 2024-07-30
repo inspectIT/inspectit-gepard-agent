@@ -6,8 +6,12 @@ import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.config.ConfigurationResolver;
-import rocks.inspectit.gepard.agent.notify.NotificationManager;
+import rocks.inspectit.gepard.agent.configuration.ConfigurationManager;
+import rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager;
+import rocks.inspectit.gepard.agent.notification.NotificationManager;
+import rocks.inspectit.gepard.agent.resolver.ConfigurationHolder;
+import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.transformation.TransformationManager;
 
 @SuppressWarnings("unused")
 @AutoService(AgentExtension.class)
@@ -26,15 +30,30 @@ public class InspectitAgentExtension implements AgentExtension {
   public AgentBuilder extend(AgentBuilder agentBuilder, ConfigProperties config) {
     log.info("Starting inspectIT Gepard agent extension ...");
 
-    String url = ConfigurationResolver.getServerUrl();
-    if (url.isEmpty()) log.info("No configuration server url was provided");
-    else {
-      log.info("Sending start notification to configuration server with url: {}", url);
-      boolean successful = NotificationManager.sendStartNotification(url);
+    // Notify configuration server about this agent
+    NotificationManager notificationManager = NotificationManager.create();
+    notificationManager.sendStartNotification();
 
-      if (successful) log.info("Successfully notified configuration server about start");
-      else log.warn("Could not notify configuration server about start");
-    }
+    // Create resolver to apply our configuration to classes, types etc.
+    ConfigurationHolder configurationHolder = ConfigurationHolder.create();
+    ConfigurationResolver configurationResolver = ConfigurationResolver.create(configurationHolder);
+
+    // Modify the OTel AgentBuilder with our transformer
+    TransformationManager transformationManager =
+        TransformationManager.create(configurationResolver);
+    agentBuilder = transformationManager.modify(agentBuilder);
+
+    // Set up instrumentation
+    InstrumentationManager instrumentationManager = InstrumentationManager.create();
+    instrumentationManager.createConfigurationReceiver();
+    instrumentationManager.startClassDiscovery();
+    instrumentationManager.startBatchInstrumentation(configurationResolver);
+
+    // Start polling of the inspectit configuration
+    ConfigurationManager configurationManager = ConfigurationManager.create();
+    configurationManager.startHttpPolling();
+
+    addShutdownHook();
 
     return agentBuilder;
   }
@@ -42,5 +61,14 @@ public class InspectitAgentExtension implements AgentExtension {
   @Override
   public String extensionName() {
     return "inspectit-gepard";
+  }
+
+  private void addShutdownHook() {
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  log.info("Shutting down inspectIT Gepard agent extension...");
+                }));
   }
 }

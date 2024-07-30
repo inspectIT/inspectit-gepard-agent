@@ -1,0 +1,10 @@
+{
+  "instrumentationConfiguration": {
+    "scopes": [
+      {
+        "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
+        "enabled": true
+      }
+    ]
+  }
+}

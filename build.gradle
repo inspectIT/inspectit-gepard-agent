@@ -82,6 +82,7 @@ dependencies {
     // http client for server notification
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     /*
     Interfaces and SPIs that we implement. We use `compileOnly` dependency because during
@@ -98,17 +99,28 @@ dependencies {
     annotationProcessor deps.autoservice
 
     // All dependencies below are only for tests
-    testImplementation("org.mock-server:mockserver-junit-jupiter:5.15.0")
     testImplementation("org.mockito:mockito-core:5.12.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
+    testImplementation("org.awaitility:awaitility:4.2.1")
+    // configure environmental variables
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
     testCompileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
     testCompileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junit}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
-    // configure environmental variables
-    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
+
+    // IntegrationTesting
+    testImplementation("org.mock-server:mockserver-junit-jupiter:5.15.0")
+    testImplementation 'org.testcontainers:mockserver:1.20.0'
+    testImplementation 'org.testcontainers:junit-jupiter:1.20.0'
+    testImplementation 'org.mock-server:mockserver-netty:5.15.0'
+    testImplementation("com.squareup.okhttp3:okhttp:4.12.0")
+    testImplementation("io.opentelemetry.proto:opentelemetry-proto:1.3.2-alpha")
+    testImplementation("com.google.protobuf:protobuf-java-util:3.25.4")
+    // Reading Files from Resources easier
+    implementation 'commons-io:commons-io:2.16.1'
 
     // Otel Java instrumentation that we use and extend during integration tests
     otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
