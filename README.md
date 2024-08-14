@@ -49,6 +49,16 @@ You have the option to use a keystore for TLS:
 
 The repository was build upon this example project: https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/examples/extension
 
+## Docker
+
+To push a new Docker image, run the following commands:
+
+
+1. `./gradlew dockerTag`
+2. `docker login -u <user> -p <password>`
+3. `docker push inspectit/inspectit-gepard-agent:<version>`
+
+
 ### Why Gepard?
 Gepard is the German name for the animal cheetah as well as an acronym for: 
 
