@@ -3,6 +3,6 @@ FROM busybox
 
 COPY . .
 
-RUN ln /opentelemetry-javaagent.jar /javaagent.jar && chmod -R go+r /javaagent.jar
+RUN chmod go+r opentelemetry-javaagent.jar
 
 ENTRYPOINT ["sh", "/entrypoint.sh"]
