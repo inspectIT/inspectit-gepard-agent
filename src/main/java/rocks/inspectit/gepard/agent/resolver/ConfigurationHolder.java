@@ -15,7 +15,7 @@ public class ConfigurationHolder implements ConfigurationReceivedObserver {
   private static final Logger log = LoggerFactory.getLogger(ConfigurationHolder.class);
 
   /** Current inspectit configuration */
-  private InspectitConfiguration configuration;
+  private volatile InspectitConfiguration configuration;
 
   private ConfigurationHolder() {
     this.configuration = new InspectitConfiguration();
