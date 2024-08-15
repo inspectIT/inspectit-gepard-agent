@@ -4,6 +4,7 @@ import okhttp3.Request;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.output.WaitingConsumer;
+import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Tests the correct behavior of the agent, when receiving a scope with a basic fqn.
  * All Methods of the class "io.opentelemetry.smoketest.springboot.controller.WebController"
- * should be instrumented with the example InspectIT Advice, which just logs "HELLO GEPARD" and "BYE GEPARD".
+ * should be instrumented with the example {@link InspectitAdvice}, which just logs "HELLO GEPARD" and "BYE GEPARD".
  */
 public class ScopeTest extends SpringTestBase {
 

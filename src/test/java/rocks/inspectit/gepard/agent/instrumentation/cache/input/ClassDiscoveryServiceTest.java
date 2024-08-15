@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.instrumentation.filling;
+package rocks.inspectit.gepard.agent.instrumentation.cache.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 
 @ExtendWith(MockitoExtension.class)
 class ClassDiscoveryServiceTest {

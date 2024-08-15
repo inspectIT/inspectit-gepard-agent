@@ -1,9 +1,9 @@
-package rocks.inspectit.gepard.agent.instrumentation;
+package rocks.inspectit.gepard.agent.instrumentation.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.*;
-import rocks.inspectit.gepard.agent.instrumentation.processing.BatchInstrumenter;
+import rocks.inspectit.gepard.agent.instrumentation.cache.process.BatchInstrumenter;
 
 /** Stores and offers pending classes, which might need instrumentation updated. */
 public class PendingClassesCache {

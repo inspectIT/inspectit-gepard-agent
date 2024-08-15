@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.instrumentation.processing;
+package rocks.inspectit.gepard.agent.instrumentation.cache.process;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.process.BatchInstrumenter;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,11 +1,11 @@
-package rocks.inspectit.gepard.agent.instrumentation.processing;
+package rocks.inspectit.gepard.agent.instrumentation.cache.process;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.lang.instrument.Instrumentation;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 

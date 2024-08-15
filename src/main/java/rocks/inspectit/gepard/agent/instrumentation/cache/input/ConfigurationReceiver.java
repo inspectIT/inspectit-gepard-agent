@@ -1,10 +1,10 @@
-package rocks.inspectit.gepard.agent.instrumentation.filling;
+package rocks.inspectit.gepard.agent.instrumentation.cache.input;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 
