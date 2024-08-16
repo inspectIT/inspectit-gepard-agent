@@ -22,7 +22,8 @@ class ConfigurationResolverTest {
 
   private ConfigurationResolver resolver;
 
-  private final Class<?> TEST_CLASS = getClass();
+  private final TypeDescription TEST_TYPE =
+      TypeDescription.ForLoadedType.of(ConfigurationResolverTest.class);
 
   @BeforeEach
   void initialize() {
@@ -30,34 +31,13 @@ class ConfigurationResolverTest {
   }
 
   @Test
-  void classShouldNotBeRetransformed() {
-    InspectitConfiguration configuration = new InspectitConfiguration();
-    when(holder.getConfiguration()).thenReturn(configuration);
-
-    boolean shouldRetransform = resolver.shouldRetransform(TEST_CLASS);
-
-    assertFalse(shouldRetransform);
-  }
-
-  @Test
-  void classShouldBeRetransformed() {
-    InspectitConfiguration configuration = createConfiguration(true);
-    when(holder.getConfiguration()).thenReturn(configuration);
-
-    boolean shouldRetransform = resolver.shouldRetransform(TEST_CLASS);
-
-    assertTrue(shouldRetransform);
-  }
-
-  @Test
   void typeShouldNotBeInstrumented() {
     InspectitConfiguration configuration = new InspectitConfiguration();
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
-    boolean shouldInstrument = resolver.shouldInstrument(type);
+    boolean shouldRetransform = resolver.shouldInstrument(TEST_TYPE);
 
-    assertFalse(shouldInstrument);
+    assertFalse(shouldRetransform);
   }
 
   @Test
@@ -65,8 +45,7 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(true);
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
-    boolean shouldInstrument = resolver.shouldInstrument(type);
+    boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
 
     assertTrue(shouldInstrument);
   }
@@ -76,8 +55,7 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(false);
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
-    boolean shouldInstrument = resolver.shouldInstrument(type);
+    boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
 
     assertFalse(shouldInstrument);
   }
@@ -87,7 +65,7 @@ class ConfigurationResolverTest {
    * @return the inspectit configuration with the current class as scope
    */
   private InspectitConfiguration createConfiguration(boolean enabled) {
-    Scope scope = new Scope(TEST_CLASS.getName(), enabled);
+    Scope scope = new Scope(TEST_TYPE.getName(), enabled);
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

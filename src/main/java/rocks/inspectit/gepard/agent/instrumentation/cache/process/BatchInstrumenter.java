@@ -6,13 +6,14 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
+import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
 /**
- * Responsible for retransforming classes in batches. The batch size is fixed to 1000.
- * This is started by the {@link rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager}.
- * The classes to be retransformed are retrieved from the {@link PendingClassesCache}.
+ * Responsible for retransforming classes in batches. The batch size is fixed to 1000. This is
+ * started by the {@link rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager}. The
+ * classes to be retransformed are retrieved from the {@link PendingClassesCache}.
  */
 public class BatchInstrumenter implements NamedRunnable {
   private static final Logger log = LoggerFactory.getLogger(BatchInstrumenter.class);
@@ -26,13 +27,17 @@ public class BatchInstrumenter implements NamedRunnable {
 
   private final ConfigurationResolver configurationResolver;
 
+  private final InstrumentationState instrumentationState;
+
   public BatchInstrumenter(
       PendingClassesCache pendingClassesCache,
       Instrumentation instrumentation,
-      ConfigurationResolver configurationResolver) {
+      ConfigurationResolver configurationResolver,
+      InstrumentationState instrumentationState) {
     this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = instrumentation;
     this.configurationResolver = configurationResolver;
+    this.instrumentationState = instrumentationState;
   }
 
   @Override
@@ -51,11 +56,11 @@ public class BatchInstrumenter implements NamedRunnable {
    * to 1000.
    *
    * @param batchSize the size of the next batch
-   * @return the batch of retrieved pending classes
+   * @return the batch of classes, which should be retransformed
    */
   @VisibleForTesting
   Set<Class<?>> getNextBatch(int batchSize) {
-    Set<Class<?>> classesToBeInstrumented = new HashSet<>();
+    Set<Class<?>> classesToRetransform = new HashSet<>();
     int checkedClassesCount = 0;
     Iterator<Class<?>> queueIterator = pendingClassesCache.getKeyIterator();
 
@@ -64,7 +69,14 @@ public class BatchInstrumenter implements NamedRunnable {
       queueIterator.remove();
       checkedClassesCount++;
 
-      if (configurationResolver.shouldRetransform(clazz)) classesToBeInstrumented.add(clazz);
+      try {
+        boolean shouldInstrument = configurationResolver.shouldInstrument(clazz);
+        boolean isInstrumented = instrumentationState.isInstrumented(clazz);
+
+        if (shouldInstrument != isInstrumented) classesToRetransform.add(clazz);
+      } catch (Exception e) {
+        log.error("Could not check instrumentation status for {}", clazz.getName(), e);
+      }
 
       if (checkedClassesCount >= batchSize) break;
     }
@@ -74,7 +86,7 @@ public class BatchInstrumenter implements NamedRunnable {
         checkedClassesCount,
         pendingClassesCache.getSize());
 
-    return classesToBeInstrumented;
+    return classesToRetransform;
   }
 
   /**
