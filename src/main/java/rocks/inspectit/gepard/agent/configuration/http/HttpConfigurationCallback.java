@@ -28,7 +28,7 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     if (result.getCode() == 200) {
       String body = result.getBodyText();
       InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
-      configurationSubject.notifyListeners(configuration);
+      configurationSubject.notifyObservers(configuration);
     }
   }
 

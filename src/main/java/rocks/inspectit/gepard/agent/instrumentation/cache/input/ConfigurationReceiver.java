@@ -19,10 +19,18 @@ public class ConfigurationReceiver implements ConfigurationReceivedObserver {
 
   private final Instrumentation instrumentation;
 
-  public ConfigurationReceiver(
+  private ConfigurationReceiver(
       PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
     this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = instrumentation;
+  }
+
+  public static ConfigurationReceiver create(
+      PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
+    ConfigurationReceiver receiver =
+        new ConfigurationReceiver(pendingClassesCache, instrumentation);
+    receiver.subscribeToConfigurationReceivedEvents();
+    return receiver;
   }
 
   @Override

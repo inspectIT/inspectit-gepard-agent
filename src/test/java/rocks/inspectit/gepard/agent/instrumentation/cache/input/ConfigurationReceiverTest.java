@@ -22,7 +22,7 @@ class ConfigurationReceiverTest {
     Class<?>[] clazz = {getClass()};
     when(instrumentation.getAllLoadedClasses()).thenReturn(clazz);
     PendingClassesCache cache = new PendingClassesCache();
-    ConfigurationReceiver receiver = new ConfigurationReceiver(cache, instrumentation);
+    ConfigurationReceiver receiver = ConfigurationReceiver.create(cache, instrumentation);
     ConfigurationReceivedEvent event =
         new ConfigurationReceivedEvent(this, new InspectitConfiguration());
 
