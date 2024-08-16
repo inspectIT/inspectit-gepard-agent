@@ -2,6 +2,7 @@ package rocks.inspectit.gepard.agent.internal.instrumentation;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.Map;
 import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
@@ -9,10 +10,10 @@ import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrume
 public class InstrumentationState {
 
   /** Store for every instrumented class */
-  private final Cache<Class<?>, ClassInstrumentationConfiguration> activeInstrumentations;
+  private final Cache<InstrumentedType, ClassInstrumentationConfiguration> activeInstrumentations;
 
   private InstrumentationState() {
-    this.activeInstrumentations = Caffeine.newBuilder().weakKeys().build();
+    this.activeInstrumentations = Caffeine.newBuilder().build();
   }
 
   public static InstrumentationState create() {
@@ -20,34 +21,45 @@ public class InstrumentationState {
   }
 
   /**
-   * Checks, if the provided class type needs to be instrumented.
+   * Checks, if the provided class is already instrumented.
    *
    * @param clazz the class object
-   * @return true, if the provided type needs an instrumentation
+   * @return true, if the provided type is already instrumented.
    */
   public boolean isInstrumented(Class<?> clazz) {
-    ClassInstrumentationConfiguration activeConfig = activeInstrumentations.getIfPresent(clazz);
+    return activeInstrumentations.asMap().entrySet().stream()
+        .filter(entry -> entry.getKey().isEqualTo(clazz))
+        .map(Map.Entry::getValue)
+        .map(ClassInstrumentationConfiguration::isInstrumented)
+        .findAny()
+        .orElse(false);
+  }
+
+  public boolean isInstrumented(InstrumentedType instrumentedType) {
+    ClassInstrumentationConfiguration activeConfig =
+        activeInstrumentations.getIfPresent(instrumentedType);
 
     if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
     return false;
   }
 
   /**
-   * Adds the provided class type to the active instrumentations
+   * Adds the instrumented type to the active instrumentations
    *
-   * @param clazz the class object
+   * @param type the instrumented type
    */
-  public void addInstrumentation(Class<?> clazz) {
+  public void addInstrumentedType(InstrumentedType type) {
     ClassInstrumentationConfiguration newConfig = new ClassInstrumentationConfiguration(true);
-    activeInstrumentations.put(clazz, newConfig);
+    activeInstrumentations.put(type, newConfig);
   }
 
   /**
-   * Removes the provided class type from the active instrumentations
+   * Removes the type from the active instrumentations
    *
-   * @param clazz the class object
+   * @param type the uninstrumented type
    */
-  public void invalidateInstrumentation(Class<?> clazz) {
-    activeInstrumentations.invalidate(clazz);
+  public void invalidateInstrumentedType(InstrumentedType type) {
+    System.out.println("INVALIDATED");
+    activeInstrumentations.invalidate(type);
   }
 }

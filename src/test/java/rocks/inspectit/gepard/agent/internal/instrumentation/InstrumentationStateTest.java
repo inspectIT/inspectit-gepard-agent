@@ -3,14 +3,19 @@ package rocks.inspectit.gepard.agent.internal.instrumentation;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import net.bytebuddy.description.type.TypeDescription;
 import org.junit.jupiter.api.Test;
+
+// TODO Write more tests
 
 class InstrumentationStateTest {
 
   private static final Class<?> TEST_CLASS = InstrumentationStateTest.class;
 
+  private static final InstrumentedType TEST_TYPE = new InstrumentedType(TEST_CLASS.getName(), TEST_CLASS.getClassLoader());
+
   @Test
-  void typeIsNotInstrumented() {
+  void classIsNotInstrumented() {
     InstrumentationState state = InstrumentationState.create();
 
     boolean isInstrumented = state.isInstrumented(TEST_CLASS);
@@ -19,11 +24,20 @@ class InstrumentationStateTest {
   }
 
   @Test
+  void typeIsNotInstrumented() {
+    InstrumentationState state = InstrumentationState.create();
+
+    boolean isInstrumented = state.isInstrumented(TEST_TYPE);
+
+    assertFalse(isInstrumented);
+  }
+
+  @Test
   void typeIsInstrumented() {
     InstrumentationState state = InstrumentationState.create();
 
-    state.addInstrumentation(TEST_CLASS);
-    boolean isInstrumented = state.isInstrumented(TEST_CLASS);
+    state.addInstrumentedType(TEST_TYPE);
+    boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertTrue(isInstrumented);
   }
@@ -32,9 +46,9 @@ class InstrumentationStateTest {
   void typeIsDeinstrumented() {
     InstrumentationState state = InstrumentationState.create();
 
-    state.addInstrumentation(TEST_CLASS);
-    state.invalidateInstrumentation(TEST_CLASS);
-    boolean isInstrumented = state.isInstrumented(TEST_CLASS);
+    state.addInstrumentedType(TEST_TYPE);
+    state.invalidateInstrumentedType(TEST_TYPE);
+    boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertFalse(isInstrumented);
   }

@@ -70,6 +70,9 @@ public class BatchInstrumenter implements NamedRunnable {
       checkedClassesCount++;
 
       try {
+        if ("com.example.demo.GreetingController".equals(clazz.getName()))
+          System.out.println("GREET");
+
         boolean shouldInstrument = configurationResolver.shouldInstrument(clazz);
         boolean isInstrumented = instrumentationState.isInstrumented(clazz);
 
