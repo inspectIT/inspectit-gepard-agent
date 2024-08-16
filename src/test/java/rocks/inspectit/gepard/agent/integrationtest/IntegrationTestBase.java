@@ -32,10 +32,10 @@ import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
 
 
 /**
- * Base class for integration tests.
- * First starts the Observability Backend Mock and Configuration Server Mock as Testcontainers.
- * We can define a target application to test by extending this class and implementing the abstract methods.
- * The target application is also started as a Testcontainer and an agent is attached to it.
+ * Base class for integration tests. First starts the Observability Backend Mock and Configuration
+ * Server Mock as Testcontainers. We can define a target application to test by extending this class
+ * and implementing the abstract methods. The target application is also started as a Testcontainer
+ * and an agent is attached to it.
  */
 public abstract class IntegrationTestBase {
 

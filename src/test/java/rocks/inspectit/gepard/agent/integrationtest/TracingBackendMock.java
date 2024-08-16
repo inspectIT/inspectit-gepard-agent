@@ -12,8 +12,9 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
 
-/** This class is used to create a mock for a tracing backend.
- * We can write and retrieve traces there.
+/**
+ * This class is used to create a mock for a tracing backend. We can write and retrieve traces
+ * there.
  */
 public class TracingBackendMock {
 
@@ -26,9 +27,9 @@ public class TracingBackendMock {
 
   private final GenericContainer<?> server;
 
-
   private TracingBackendMock(Network network) {
-    server = new GenericContainer<>(MOCK_IMAGE)
+    server =
+        new GenericContainer<>(MOCK_IMAGE)
             .withNetwork(network)
             .withExposedPorts(8080)
             .waitingFor(Wait.forHttp("/health").forPort(8080))
