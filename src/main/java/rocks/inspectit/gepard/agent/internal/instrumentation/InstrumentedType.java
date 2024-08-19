@@ -36,7 +36,7 @@ public class InstrumentedType {
    * @return true, if the provided class objects references this type
    */
   public boolean isEqualTo(Class<?> clazz) {
-    if (classLoader == null)
+    if (withBootstrapClassLoader())
       return typeName.equals(clazz.getName()) && Objects.isNull(clazz.getClassLoader());
     return typeName.equals(clazz.getName()) && classLoader.equals(clazz.getClassLoader());
   }
@@ -44,7 +44,7 @@ public class InstrumentedType {
   @Override
   public boolean equals(Object other) {
     if (other instanceof InstrumentedType otherType) {
-      if (classLoader == null)
+      if (withBootstrapClassLoader())
         return typeName.equals(otherType.typeName) && Objects.isNull(otherType.classLoader);
       return typeName.equals(otherType.typeName) && classLoader.equals(otherType.classLoader);
     }
@@ -54,5 +54,12 @@ public class InstrumentedType {
   @Override
   public int hashCode() {
     return Objects.hash(typeName, classLoader);
+  }
+
+  /**
+   * @return true, if this instrumented type uses the bootstrap classLoader
+   */
+  private boolean withBootstrapClassLoader() {
+    return Objects.isNull(classLoader);
   }
 }
