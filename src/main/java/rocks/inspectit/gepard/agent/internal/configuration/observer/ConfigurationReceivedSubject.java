@@ -28,6 +28,10 @@ public class ConfigurationReceivedSubject {
     observers.add(observer);
   }
 
+  public void removeObserver(ConfigurationReceivedObserver observer) {
+    observers.remove(observer);
+  }
+
   /**
    * Notifies all observers about a newly received configuration.
    *

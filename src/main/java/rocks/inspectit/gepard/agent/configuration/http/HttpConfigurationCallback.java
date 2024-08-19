@@ -4,18 +4,18 @@ import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.configuration.ConfigurationPersistence;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 
 /** Callback for configuration requests to the configuration server. */
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationCallback.class);
 
-  private final ConfigurationReceivedSubject configurationSubject;
+  private final ConfigurationPersistence persistence;
 
-  public HttpConfigurationCallback() {
-    this.configurationSubject = ConfigurationReceivedSubject.getInstance();
+  public HttpConfigurationCallback(ConfigurationPersistence persistence) {
+    this.persistence = persistence;
   }
 
   @Override
@@ -28,7 +28,7 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     if (result.getCode() == 200) {
       String body = result.getBodyText();
       InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
-      configurationSubject.notifyObservers(configuration);
+      persistence.processConfiguration(configuration);
     }
   }
 

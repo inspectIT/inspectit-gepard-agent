@@ -51,9 +51,9 @@ public class InspectitAgentExtension implements AgentExtension {
     instrumentationManager.startClassDiscovery();
     instrumentationManager.startBatchInstrumentation(configurationResolver, instrumentationState);
 
-    // Start polling of the inspectit configuration
+    // Start loading the inspectit configuration
     ConfigurationManager configurationManager = ConfigurationManager.create();
-    configurationManager.startHttpPolling();
+    configurationManager.loadConfiguration();
 
     addShutdownHook();
 

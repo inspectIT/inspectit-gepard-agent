@@ -5,13 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockserver.model.HttpError;
 import rocks.inspectit.gepard.agent.MockServerTestBase;
+import rocks.inspectit.gepard.agent.configuration.ConfigurationPersistence;
 
 class HttpConfigurationPollerTest extends MockServerTestBase {
 
-  private final HttpConfigurationPoller poller = new HttpConfigurationPoller(SERVER_URL);
+  private static HttpConfigurationPoller poller;
+
+  @BeforeAll
+  static void beforeAll() {
+    ConfigurationPersistence persistence = ConfigurationPersistence.create();
+    poller = new HttpConfigurationPoller(SERVER_URL, persistence);
+  }
 
   @Test
   void configurationRequestIsSentSuccessfully() {

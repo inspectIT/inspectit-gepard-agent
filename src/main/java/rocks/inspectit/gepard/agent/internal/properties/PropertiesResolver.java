@@ -14,6 +14,12 @@ public class PropertiesResolver {
 
   public static final String SERVER_URL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_URL";
 
+  public static final String PERSISTENCE_FILE_SYSTEM_PROPERTY =
+      "inspectit.config.http.persistence-file";
+
+  public static final String PERSISTENCE_FILE_ENV_PROPERTY =
+      "INSPECTIT_CONFIG_HTTP_PERSISTENCE_FILE";
+
   public static final String POLLING_INTERVAL_SYSTEM_PROPERTY =
       "inspectit.config.http.polling-interval";
   public static final String POLLING_INTERVAL_ENV_PROPERTY =
@@ -36,8 +42,35 @@ public class PropertiesResolver {
   }
 
   /**
+   * Get the configured name of the configuration persistence file. If no file was configured, a
+   * default value is returned.
+   *
+   * @return the configured persistence file name
+   */
+  public static String getPersistenceFile() {
+    String persistenceFileSystemProperty = System.getProperty(PERSISTENCE_FILE_SYSTEM_PROPERTY);
+    if (Objects.nonNull(persistenceFileSystemProperty)) return persistenceFileSystemProperty;
+
+    String persistenceEnvProperty = System.getenv(PERSISTENCE_FILE_ENV_PROPERTY);
+    return Objects.nonNull(persistenceEnvProperty)
+        ? persistenceEnvProperty
+        : getDefaultPersistenceFile();
+  }
+
+  /**
+   * Get the default path of the configuration persistence file, which is the directory where the
+   * current agent jar is placed.
+   *
+   * @return the default persistence file name
+   */
+  private static String getDefaultPersistenceFile() {
+    // TODO optimize location
+    return "inspectit-gepard/last-http-config.json";
+  }
+
+  /**
    * Get the configured polling interval for the configuration server. If no interval was
-   * configured, the default interval of 30 seconds will be returned.
+   * configured, the default interval of 10 seconds will be returned.
    *
    * @return the configured polling interval
    */
