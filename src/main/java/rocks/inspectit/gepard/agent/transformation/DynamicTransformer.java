@@ -3,7 +3,6 @@ package rocks.inspectit.gepard.agent.transformation;
 import static net.bytebuddy.matcher.ElementMatchers.isMethod;
 
 import java.security.ProtectionDomain;
-import java.util.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
