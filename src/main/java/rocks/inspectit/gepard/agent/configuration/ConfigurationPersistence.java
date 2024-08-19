@@ -1,12 +1,16 @@
 package rocks.inspectit.gepard.agent.configuration;
 
 import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.file.ConfigurationFileReader;
 import rocks.inspectit.gepard.agent.configuration.file.ConfigurationFileWriter;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
 
 public class ConfigurationPersistence {
+  private static final Logger log = LoggerFactory.getLogger(ConfigurationPersistence.class);
 
   private final ConfigurationFileReader reader;
 
@@ -40,6 +44,7 @@ public class ConfigurationPersistence {
     InspectitConfiguration configuration = reader.readConfiguration();
 
     if (Objects.nonNull(configuration)) {
+      log.info("Local configuration was successfully loaded");
       // Temporary remove writer as observer, to prevent unnecessary write operation
       configurationSubject.removeObserver(writer);
       configurationSubject.notifyObservers(configuration);

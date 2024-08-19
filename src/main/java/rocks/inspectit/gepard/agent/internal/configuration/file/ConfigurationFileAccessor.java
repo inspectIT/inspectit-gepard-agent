@@ -40,7 +40,7 @@ public class ConfigurationFileAccessor {
       if (!Files.exists(path))
         throw new FileNotFoundException("Configuration file not found: " + path);
 
-      if (Files.isReadable(path))
+      if (!Files.isReadable(path))
         throw new AccessDeniedException("Configuration file is not readable: " + path);
 
       return Files.readAllBytes(path);

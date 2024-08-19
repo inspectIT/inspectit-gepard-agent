@@ -43,6 +43,7 @@ public class ConfigurationFileWriter implements ConfigurationReceivedObserver {
     String configString = ConfigurationMapper.toString(configuration);
     try {
       fileAccessor.writeFile(filePath, configString);
+      log.info("Local configuration was successfully updated");
     } catch (IOException e) {
       log.error("Could not write configuration file", e);
     }
