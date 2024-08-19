@@ -70,7 +70,7 @@ class BatchInstrumenterTest {
 
     BatchInstrumenter instrumenter =
         new BatchInstrumenter(cache, instrumentation, configurationResolver, instrumentationState);
-    instrumenter.retransformBatch(classes.iterator());
+    instrumenter.retransformBatch(classes);
 
     verify(instrumentation).retransformClasses(TEST_CLASS);
   }

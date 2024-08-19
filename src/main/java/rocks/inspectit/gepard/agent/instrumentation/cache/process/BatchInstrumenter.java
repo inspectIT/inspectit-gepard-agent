@@ -45,7 +45,7 @@ public class BatchInstrumenter implements NamedRunnable {
     log.debug("Instrumenting next batch...");
     try {
       Set<Class<?>> nextBatch = getNextBatch(BATCH_SIZE);
-      retransformBatch(nextBatch.iterator());
+      retransformBatch(nextBatch);
     } catch (Exception e) {
       log.error("Error while retransforming classes", e);
     }
@@ -92,10 +92,11 @@ public class BatchInstrumenter implements NamedRunnable {
   /**
    * Retransforms all classes of the provided iterator.
    *
-   * @param batchIterator the batch of classes as iterator.
+   * @param classBatch the batch of classes
    */
   @VisibleForTesting
-  void retransformBatch(Iterator<Class<?>> batchIterator) {
+  void retransformBatch(Set<Class<?>> classBatch) {
+    Iterator<Class<?>> batchIterator = classBatch.iterator();
     while (batchIterator.hasNext()) {
       Class<?> clazz = batchIterator.next();
       batchIterator.remove();
