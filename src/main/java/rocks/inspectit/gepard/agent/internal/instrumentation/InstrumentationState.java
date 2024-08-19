@@ -24,17 +24,26 @@ public class InstrumentationState {
    * Checks, if the provided class is already instrumented.
    *
    * @param clazz the class object
-   * @return true, if the provided type is already instrumented.
+   * @return true, if the provided class is already instrumented.
    */
   public boolean isInstrumented(Class<?> clazz) {
-    return activeInstrumentations.asMap().entrySet().stream()
-        .filter(entry -> entry.getKey().isEqualTo(clazz))
-        .map(Map.Entry::getValue)
-        .map(ClassInstrumentationConfiguration::isInstrumented)
-        .findAny()
-        .orElse(false);
+    ClassInstrumentationConfiguration activeConfig =
+        activeInstrumentations.asMap().entrySet().stream()
+            .filter(entry -> entry.getKey().isEqualTo(clazz))
+            .map(Map.Entry::getValue)
+            .findAny()
+            .orElse(null);
+
+    if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
+    return false;
   }
 
+  /**
+   * Checks, if the provided type is already instrumented.
+   *
+   * @param instrumentedType the class type
+   * @return true, if the provided type is already instrumented.
+   */
   public boolean isInstrumented(InstrumentedType instrumentedType) {
     ClassInstrumentationConfiguration activeConfig =
         activeInstrumentations.getIfPresent(instrumentedType);
@@ -59,7 +68,6 @@ public class InstrumentationState {
    * @param type the uninstrumented type
    */
   public void invalidateInstrumentedType(InstrumentedType type) {
-    System.out.println("INVALIDATED");
     activeInstrumentations.invalidate(type);
   }
 }

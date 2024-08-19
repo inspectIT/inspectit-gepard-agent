@@ -1,8 +1,8 @@
 package rocks.inspectit.gepard.agent.internal.instrumentation;
 
-import net.bytebuddy.agent.builder.AgentBuilder;
-
 import java.util.Objects;
+import javax.annotation.Nullable;
+import net.bytebuddy.agent.builder.AgentBuilder;
 
 /**
  * Stores the full name as well as the class loader of a specific type.<br>
@@ -16,11 +16,15 @@ import java.util.Objects;
  */
 public class InstrumentedType {
 
+  /** Fully qualified name of the type */
   private final String typeName;
 
+  /**
+   * The classLoader to load the type. Might be {@code null} to represent the bootstrap classLoader
+   */
   private final ClassLoader classLoader;
 
-  public InstrumentedType(final String typeName, final ClassLoader classLoader) {
+  public InstrumentedType(String typeName, @Nullable ClassLoader classLoader) {
     this.typeName = typeName;
     this.classLoader = classLoader;
   }
@@ -32,13 +36,18 @@ public class InstrumentedType {
    * @return true, if the provided class objects references this type
    */
   public boolean isEqualTo(Class<?> clazz) {
+    if (classLoader == null)
+      return typeName.equals(clazz.getName()) && Objects.isNull(clazz.getClassLoader());
     return typeName.equals(clazz.getName()) && classLoader.equals(clazz.getClassLoader());
   }
 
   @Override
   public boolean equals(Object other) {
-    if (other instanceof InstrumentedType otherType)
+    if (other instanceof InstrumentedType otherType) {
+      if (classLoader == null)
+        return typeName.equals(otherType.typeName) && Objects.isNull(otherType.classLoader);
       return typeName.equals(otherType.typeName) && classLoader.equals(otherType.classLoader);
+    }
     return false;
   }
 
