@@ -6,14 +6,16 @@ import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
+import java.io.IOException;
+
 class ConfigurationMapperTest {
 
   @Test
-  void validStringIsDeserialized() {
+  void validStringIsDeserialized() throws IOException {
     String body =
         """
                     {
-                      "instrumentationConfiguration": {
+                      "instrumentation": {
                         "scopes": [
                           {
                             "fqn": "com.example.Application",
