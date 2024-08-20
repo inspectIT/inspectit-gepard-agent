@@ -12,22 +12,39 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.utility.JavaModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
+import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
 /**
  * Modifies the original class byte code, if necessary. The {@link ConfigurationResolver} determines
- * whether a transformation is needed.
+ * whether a transformation is needed. The {@link InstrumentationState} will be updated after a
+ * transformation.
  */
 public class DynamicTransformer implements AgentBuilder.Transformer {
   private static final Logger log = LoggerFactory.getLogger(DynamicTransformer.class);
 
   private final ConfigurationResolver resolver;
 
-  public DynamicTransformer(ConfigurationResolver resolver) {
+  /** The instrumentation state of the agent */
+  private final InstrumentationState instrumentationState;
+
+  DynamicTransformer(ConfigurationResolver resolver, InstrumentationState instrumentationState) {
     this.resolver = resolver;
+    this.instrumentationState = instrumentationState;
   }
 
+  /**
+   * Injects or removes instrumentation code.
+   *
+   * <ul>
+   *   <li>If the type should be instrumented, we will inject instrumentation code.
+   *   <li>If the type should not be instrumented, we will not inject any code.
+   *   <li>If the type should be deinstrumented, we will also not inject any code, thus removing the
+   *       instrumentation.
+   * </ul>
+   */
   @Override
   public DynamicType.Builder<?> transform(
       DynamicType.Builder<?> builder,
@@ -35,13 +52,22 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       ClassLoader classLoader,
       JavaModule module,
       ProtectionDomain protectionDomain) {
+    InstrumentedType currentType = new InstrumentedType(typeDescription.getName(), classLoader);
     if (resolver.shouldInstrument(typeDescription)) {
-      log.debug("Transforming type: {}", typeDescription.getName());
+      log.debug("Adding transformation to {}", typeDescription.getName());
 
       // Currently, all methods of the type are instrumented
       ElementMatcher<? super MethodDescription> elementMatcher = isMethod();
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(elementMatcher));
+
+      // Mark type as instrumented
+      instrumentationState.addInstrumentedType(currentType);
+    } else if (instrumentationState.isInstrumented(currentType)) {
+      log.debug("Removing transformation from {}", typeDescription.getName());
+      // Mark type as uninstrumented or deinstrumented
+      instrumentationState.invalidateInstrumentedType(currentType);
     }
+
     return builder;
   }
 }

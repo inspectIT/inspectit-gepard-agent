@@ -14,6 +14,6 @@ public interface ConfigurationReceivedObserver extends EventListener {
    */
   default void subscribeToConfigurationReceivedEvents() {
     ConfigurationReceivedSubject subject = ConfigurationReceivedSubject.getInstance();
-    subject.addListener(this);
+    subject.addObserver(this);
   }
 }

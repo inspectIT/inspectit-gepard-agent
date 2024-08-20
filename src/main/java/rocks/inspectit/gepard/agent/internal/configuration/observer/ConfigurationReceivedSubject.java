@@ -6,17 +6,17 @@ import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 
 /**
- * Observer pattern subject, which notifies all registered listeners about {@link
+ * Observer pattern subject, which notifies all registered observers about {@link
  * ConfigurationReceivedEvent}s.
  */
 public class ConfigurationReceivedSubject {
 
   private static ConfigurationReceivedSubject instance;
 
-  private final List<ConfigurationReceivedObserver> listeners;
+  private final List<ConfigurationReceivedObserver> observers;
 
   private ConfigurationReceivedSubject() {
-    this.listeners = new ArrayList<>();
+    this.observers = new ArrayList<>();
   }
 
   public static ConfigurationReceivedSubject getInstance() {
@@ -24,19 +24,19 @@ public class ConfigurationReceivedSubject {
     return instance;
   }
 
-  public void addListener(ConfigurationReceivedObserver listener) {
-    listeners.add(listener);
+  public void addObserver(ConfigurationReceivedObserver observer) {
+    observers.add(observer);
   }
 
   /**
-   * Notifies all listeners about a newly received configuration.
+   * Notifies all observers about a newly received configuration.
    *
    * @param configuration the received configuration
    */
-  public void notifyListeners(InspectitConfiguration configuration) {
+  public void notifyObservers(InspectitConfiguration configuration) {
     ConfigurationReceivedEvent event = new ConfigurationReceivedEvent(this, configuration);
-    for (ConfigurationReceivedObserver listener : listeners) {
-      listener.handleConfiguration(event);
+    for (ConfigurationReceivedObserver observer : observers) {
+      observer.handleConfiguration(event);
     }
   }
 }

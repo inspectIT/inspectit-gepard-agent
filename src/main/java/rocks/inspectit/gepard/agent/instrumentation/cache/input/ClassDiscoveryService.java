@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.instrumentation.filling;
+package rocks.inspectit.gepard.agent.instrumentation.cache.input;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Collections;
@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
 /**
