@@ -1,6 +1,5 @@
 package rocks.inspectit.gepard.agent.internal.configuration.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
@@ -20,7 +19,7 @@ public class ConfigurationMapper {
    * @param body the raw configuration string
    * @return the configuration object
    */
-  public static InspectitConfiguration toObject(String body) {
+  public static InspectitConfiguration toObject(String body) throws IOException {
     try {
       return mapper.readValue(body, InspectitConfiguration.class);
     } catch (IOException e) {
@@ -35,10 +34,10 @@ public class ConfigurationMapper {
    * @param inspectitConfiguration the inspectit configuration
    * @return the configuration as JSON string
    */
-  public static String toString(InspectitConfiguration inspectitConfiguration) {
+  public static String toString(InspectitConfiguration inspectitConfiguration) throws IOException {
     try {
       return mapper.writeValueAsString(inspectitConfiguration);
-    } catch (JsonProcessingException e) {
+    } catch (IOException e) {
       throw new CouldNotSerializeConfigurationException(
           "Failed to serialize inspectit configuration: " + inspectitConfiguration, e);
     }

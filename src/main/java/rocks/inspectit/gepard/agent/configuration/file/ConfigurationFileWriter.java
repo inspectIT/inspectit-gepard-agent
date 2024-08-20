@@ -39,9 +39,8 @@ public class ConfigurationFileWriter implements ConfigurationReceivedObserver {
   @Override
   public void handleConfiguration(ConfigurationReceivedEvent event) {
     InspectitConfiguration configuration = event.getInspectitConfiguration();
-
-    String configString = ConfigurationMapper.toString(configuration);
     try {
+      String configString = ConfigurationMapper.toString(configuration);
       fileAccessor.writeFile(filePath, configString);
       log.info("Local configuration was successfully updated");
     } catch (IOException e) {

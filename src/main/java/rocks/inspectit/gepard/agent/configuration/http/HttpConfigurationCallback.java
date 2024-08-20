@@ -8,6 +8,8 @@ import rocks.inspectit.gepard.agent.configuration.ConfigurationPersistence;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 
+import java.io.IOException;
+
 /** Callback for configuration requests to the configuration server. */
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationCallback.class);
@@ -27,8 +29,12 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     // Publish Event
     if (result.getCode() == 200) {
       String body = result.getBodyText();
-      InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
-      persistence.processConfiguration(configuration);
+      try {
+        InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
+        persistence.processConfiguration(configuration);
+      } catch (IOException e) {
+          log.error("Could not process new configuration", e);
+      }
     }
   }
 

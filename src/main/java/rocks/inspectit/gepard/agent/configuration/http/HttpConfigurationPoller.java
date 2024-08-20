@@ -37,11 +37,12 @@ public class HttpConfigurationPoller implements NamedRunnable {
 
     if (successful) {
       log.info("Configuration was polled successfully");
-      isFirstAttempt = false;
     } else if (isFirstAttempt) {
       log.warn("Configuration polling failed - Trying to load local configuration...");
       persistence.loadLocalConfiguration();
     } else log.error("Configuration polling failed");
+
+    isFirstAttempt = false;
   }
 
   /**

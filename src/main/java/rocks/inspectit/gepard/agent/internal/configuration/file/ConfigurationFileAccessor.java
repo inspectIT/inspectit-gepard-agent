@@ -9,11 +9,8 @@ import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConfigurationFileAccessor {
-  private static final Logger log = LoggerFactory.getLogger(ConfigurationFileAccessor.class);
 
   private static ConfigurationFileAccessor instance;
 

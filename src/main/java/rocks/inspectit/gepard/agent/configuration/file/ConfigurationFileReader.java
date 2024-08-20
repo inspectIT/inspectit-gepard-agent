@@ -38,7 +38,7 @@ public class ConfigurationFileReader {
       String fileContent = new String(rawFileContent); // TODO Add encoding?
       return ConfigurationMapper.toObject(fileContent);
     } catch (IOException e) {
-      log.error("Could not read configuration file", e);
+      log.error("Could not read local configuration", e);
       return null;
     }
   }

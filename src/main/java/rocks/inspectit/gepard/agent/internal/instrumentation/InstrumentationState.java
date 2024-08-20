@@ -16,6 +16,11 @@ public class InstrumentationState {
     this.activeInstrumentations = Caffeine.newBuilder().build();
   }
 
+  /**
+   * Factory method to create an {@link InstrumentationState}
+   *
+   * @return the created state
+   */
   public static InstrumentationState create() {
     return new InstrumentationState();
   }
