@@ -1,5 +1,6 @@
 package rocks.inspectit.gepard.agent.internal.properties;
 
+import io.opentelemetry.javaagent.bootstrap.JavaagentFileHolder;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -63,9 +64,10 @@ public class PropertiesResolver {
    *
    * @return the default persistence file name
    */
+  @SuppressWarnings("ConstantConditions")
   private static String getDefaultPersistenceFile() {
-    // TODO optimize location
-    return "inspectit-gepard/last-http-config.json";
+    String suffix = "/inspectit-gepard/last-http-config.json";
+    return JavaagentFileHolder.getJavaagentFile().getParent() + suffix;
   }
 
   /**

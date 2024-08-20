@@ -2,11 +2,10 @@ package rocks.inspectit.gepard.agent.internal.configuration.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
-
-import java.io.IOException;
 
 class ConfigurationMapperTest {
 

@@ -9,8 +9,11 @@ import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigurationFileAccessor {
+  private static final Logger log = LoggerFactory.getLogger(ConfigurationFileAccessor.class);
 
   private static ConfigurationFileAccessor instance;
 
@@ -34,7 +37,7 @@ public class ConfigurationFileAccessor {
   public byte[] readFile(Path path) throws IOException {
     readLock.lock();
     try {
-      if (!Files.exists(path))
+      if (Files.notExists(path))
         throw new FileNotFoundException("Configuration file not found: " + path);
 
       if (!Files.isReadable(path))
@@ -49,8 +52,11 @@ public class ConfigurationFileAccessor {
   public void writeFile(Path path, String content) throws IOException {
     writeLock.lock();
     try {
-      if (!Files.exists(path))
-        throw new FileNotFoundException("Configuration file not found: " + path);
+      if (Files.notExists(path)) {
+        log.info("Creating local configuration file at {}", path);
+        Files.createDirectories(path.getParent());
+        Files.createFile(path);
+      }
 
       if (!Files.isWritable(path))
         throw new AccessDeniedException("Configuration file is not writable: " + path);
