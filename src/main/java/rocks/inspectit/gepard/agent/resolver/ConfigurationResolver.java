@@ -29,29 +29,39 @@ public class ConfigurationResolver {
   }
 
   /**
-   * Checks, if the provided class should be retransformed.
+   * Checks, if the provided class requires instrumentation.
    *
    * @param clazz the class object
-   * @return true, if the provided class should be retransformed via {@code retransform()}
+   * @return true, if the provided class should be instrumented
    */
-  public boolean shouldRetransform(Class<?> clazz) {
-    InstrumentationConfiguration configuration = getConfiguration();
-    return !shouldIgnore(clazz)
-        && configuration.getScopes().stream()
-            .anyMatch(scope -> scope.getFqn().equals(clazz.getName()));
+  public boolean shouldInstrument(Class<?> clazz) {
+    String className = clazz.getName();
+    return shouldInstrument(className);
   }
 
   /**
-   * Checks, if the provided type needs instrumentation.
+   * Checks, if the provided type requires instrumentation.
    *
-   * @param type the type description of the class, which should be instrumented
+   * @param type the class type description
    * @return true, if the provided type should be instrumented
    */
   public boolean shouldInstrument(TypeDescription type) {
     String typeName = type.getName();
+    return shouldInstrument(typeName);
+  }
+
+  /**
+   * Checks, if the provided class name requires instrumentation.
+   *
+   * @param fullyQualifiedName the full name of the class
+   * @return true, if the provided class should be instrumented
+   */
+  private boolean shouldInstrument(String fullyQualifiedName) {
     InstrumentationConfiguration configuration = getConfiguration();
-    return configuration.getScopes().stream()
-        .anyMatch(scope -> scope.getFqn().equals(typeName) && scope.isEnabled());
+
+    return !shouldIgnore(fullyQualifiedName)
+        && configuration.getScopes().stream()
+            .anyMatch(scope -> scope.getFqn().equals(fullyQualifiedName) && scope.isEnabled());
   }
 
   /**
@@ -62,15 +72,14 @@ public class ConfigurationResolver {
   }
 
   /**
-   * Checks, if the class should be able to be instrumented. Currently, we don't instrument lambda-
+   * Checks, if the type should be able to be instrumented. Currently, we don't instrument lambda-
    * or array classes.
    *
-   * @param clazz the class object
-   * @return true, if the provided class should NOT be able to be instrumented
+   * @param fullyQualifiedName the full name of the class
+   * @return true, if the provided type should NOT be able to be instrumented
    */
-  private boolean shouldIgnore(Class<?> clazz) {
-    String className = clazz.getName();
-    return className.contains("$$Lambda") || className.startsWith("[");
+  private boolean shouldIgnore(String fullyQualifiedName) {
+    return fullyQualifiedName.contains("$$Lambda") || fullyQualifiedName.startsWith("[");
   }
 
   public ElementMatcher.Junction<MethodDescription> getElementMatcherForType(TypeDescription type) {

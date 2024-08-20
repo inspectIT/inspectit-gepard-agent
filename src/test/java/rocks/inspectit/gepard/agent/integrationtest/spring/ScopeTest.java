@@ -9,13 +9,14 @@ import okhttp3.Request;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.output.WaitingConsumer;
+import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
 /**
  * Tests the correct behavior of the agent, when receiving a scope with a basic fqn. All Methods of
  * the class "io.opentelemetry.smoketest.springboot.controller.WebController" should be instrumented
- * with the example InspectIT Advice, which just logs "HELLO GEPARD" and "BYE GEPARD".
+ * with the example {@link InspectitAdvice}, which just logs "HELLO GEPARD" and "BYE GEPARD".
  */
-public class ScopeTest extends SpringTestBase {
+class ScopeTest extends SpringTestBase {
 
   @Test
   public void advice_is_executed() throws IOException, InterruptedException {
@@ -35,7 +36,6 @@ public class ScopeTest extends SpringTestBase {
     client.newCall(new Request.Builder().url(url).get().build()).execute();
   }
 
-  // also a lambda is passed to this method
   private void waitFor(String message, int times) {
     WaitingConsumer consumer = new WaitingConsumer();
 

@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Smoke test for Spring Boot application. Verifies if agent is able to load and produces traces.
  */
-public class SmokeTest extends SpringTestBase {
+class SmokeTest extends SpringTestBase {
 
   @Test
-  public void loadExtensionFromJar() throws IOException, InterruptedException {
+  void loadExtensionFromJar() throws IOException, InterruptedException {
     startTarget("/opentelemetry-extensions.jar");
     basicTracingWorks();
     stopTarget();

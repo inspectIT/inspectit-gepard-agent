@@ -5,10 +5,12 @@ import java.lang.instrument.Instrumentation;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.filling.ClassDiscoveryService;
-import rocks.inspectit.gepard.agent.instrumentation.filling.ConfigurationReceiver;
-import rocks.inspectit.gepard.agent.instrumentation.processing.BatchInstrumenter;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.input.ClassDiscoveryService;
+import rocks.inspectit.gepard.agent.instrumentation.cache.input.ConfigurationReceiver;
+import rocks.inspectit.gepard.agent.instrumentation.cache.process.BatchInstrumenter;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
+import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
@@ -53,19 +55,19 @@ public class InstrumentationManager {
    * Starts the scheduled instrumentation of pending class batched via {@link BatchInstrumenter}.
    * Currently, the instrumentation interval is fixed to 500 ms.
    */
-  public void startBatchInstrumentation(ConfigurationResolver configurationResolver) {
+  public void startBatchInstrumentation(
+      ConfigurationResolver configurationResolver, InstrumentationState instrumentationState) {
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
     BatchInstrumenter batchInstrumenter =
-        new BatchInstrumenter(pendingClassesCache, instrumentation, configurationResolver);
+        new BatchInstrumenter(
+            pendingClassesCache, instrumentation, configurationResolver, instrumentationState);
     Duration batchInterval = Duration.ofMillis(500);
     scheduler.startRunnable(batchInstrumenter, batchInterval);
   }
 
   /** Creates an observer, who listens to {@link ConfigurationReceivedEvent}s. */
   public void createConfigurationReceiver() {
-    log.info("Creating ConfigurationReceiver...");
-    ConfigurationReceiver configurationReceiver =
-        new ConfigurationReceiver(pendingClassesCache, instrumentation);
-    configurationReceiver.subscribeToConfigurationReceivedEvents();
+    log.info("Creating ConfigurationReceiver");
+    ConfigurationReceiver.create(pendingClassesCache, instrumentation);
   }
 }

@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.instrumentation.filling;
+package rocks.inspectit.gepard.agent.instrumentation.cache.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 
@@ -22,7 +22,7 @@ class ConfigurationReceiverTest {
     Class<?>[] clazz = {getClass()};
     when(instrumentation.getAllLoadedClasses()).thenReturn(clazz);
     PendingClassesCache cache = new PendingClassesCache();
-    ConfigurationReceiver receiver = new ConfigurationReceiver(cache, instrumentation);
+    ConfigurationReceiver receiver = ConfigurationReceiver.create(cache, instrumentation);
     ConfigurationReceivedEvent event =
         new ConfigurationReceivedEvent(this, new InspectitConfiguration());
 

@@ -25,7 +25,8 @@ class ConfigurationResolverTest {
 
   private ConfigurationResolver resolver;
 
-  private final Class<?> TEST_CLASS = getClass();
+  private final TypeDescription TEST_TYPE =
+      TypeDescription.ForLoadedType.of(ConfigurationResolverTest.class);
 
   private final String TEST_METHOD = "createConfiguration";
 
@@ -35,34 +36,13 @@ class ConfigurationResolverTest {
   }
 
   @Test
-  void classShouldNotBeRetransformed() {
-    InspectitConfiguration configuration = new InspectitConfiguration();
-    when(holder.getConfiguration()).thenReturn(configuration);
-
-    boolean shouldRetransform = resolver.shouldRetransform(TEST_CLASS);
-
-    assertFalse(shouldRetransform);
-  }
-
-  @Test
-  void classShouldBeRetransformed() {
-    InspectitConfiguration configuration = createConfiguration(true);
-    when(holder.getConfiguration()).thenReturn(configuration);
-
-    boolean shouldRetransform = resolver.shouldRetransform(TEST_CLASS);
-
-    assertTrue(shouldRetransform);
-  }
-
-  @Test
   void typeShouldNotBeInstrumented() {
     InspectitConfiguration configuration = new InspectitConfiguration();
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
-    boolean shouldInstrument = resolver.shouldInstrument(type);
+    boolean shouldRetransform = resolver.shouldInstrument(TEST_TYPE);
 
-    assertFalse(shouldInstrument);
+    assertFalse(shouldRetransform);
   }
 
   @Test
@@ -70,8 +50,7 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(true);
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
-    boolean shouldInstrument = resolver.shouldInstrument(type);
+    boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
 
     assertTrue(shouldInstrument);
   }
@@ -81,8 +60,7 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(false);
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
-    boolean shouldInstrument = resolver.shouldInstrument(type);
+    boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
 
     assertFalse(shouldInstrument);
   }
@@ -93,9 +71,8 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(true);
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
     ElementMatcher.Junction<MethodDescription> elementMatcher =
-        resolver.getElementMatcherForType(type);
+        resolver.getElementMatcherForType(TEST_TYPE);
 
     assertEquals(elementMatcher, ElementMatchers.isMethod());
   }
@@ -107,9 +84,8 @@ class ConfigurationResolverTest {
 
     ElementMatcher expectedMatcher = hasMethodName("create");
 
-    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
     ElementMatcher.Junction<MethodDescription> elementMatcher =
-        resolver.getElementMatcherForType(type);
+        resolver.getElementMatcherForType(TEST_TYPE);
 
     assertEquals(expectedMatcher, elementMatcher);
   }
@@ -119,14 +95,14 @@ class ConfigurationResolverTest {
    * @return the inspectit configuration with the current class as scope
    */
   private InspectitConfiguration createConfiguration(boolean enabled) {
-    Scope scope = new Scope(TEST_CLASS.getName(), enabled);
+    Scope scope = new Scope(TEST_TYPE.getName(), enabled);
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);
   }
 
   private InspectitConfiguration createConfiguration(boolean enabled, String methodName) {
-    Scope scope = new Scope(TEST_CLASS.getName(), methodName, enabled);
+    Scope scope = new Scope(TEST_TYPE.getName(), methodName, enabled);
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

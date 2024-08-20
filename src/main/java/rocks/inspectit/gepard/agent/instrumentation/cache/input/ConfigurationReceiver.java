@@ -1,10 +1,10 @@
-package rocks.inspectit.gepard.agent.instrumentation.filling;
+package rocks.inspectit.gepard.agent.instrumentation.cache.input;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 
@@ -19,10 +19,18 @@ public class ConfigurationReceiver implements ConfigurationReceivedObserver {
 
   private final Instrumentation instrumentation;
 
-  public ConfigurationReceiver(
+  private ConfigurationReceiver(
       PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
     this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = instrumentation;
+  }
+
+  public static ConfigurationReceiver create(
+      PendingClassesCache pendingClassesCache, Instrumentation instrumentation) {
+    ConfigurationReceiver receiver =
+        new ConfigurationReceiver(pendingClassesCache, instrumentation);
+    receiver.subscribeToConfigurationReceivedEvents();
+    return receiver;
   }
 
   @Override

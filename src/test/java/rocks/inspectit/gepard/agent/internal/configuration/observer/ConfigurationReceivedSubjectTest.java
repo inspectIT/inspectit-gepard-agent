@@ -16,7 +16,7 @@ class ConfigurationReceivedSubjectTest {
     observer.subscribeToConfigurationReceivedEvents();
 
     ConfigurationReceivedSubject subject = ConfigurationReceivedSubject.getInstance();
-    subject.notifyListeners(new InspectitConfiguration());
+    subject.notifyObservers(new InspectitConfiguration());
 
     assertTrue(wasNotified.get());
   }
