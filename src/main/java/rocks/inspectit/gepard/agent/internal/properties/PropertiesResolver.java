@@ -1,6 +1,7 @@
 package rocks.inspectit.gepard.agent.internal.properties;
 
 import io.opentelemetry.javaagent.bootstrap.JavaagentFileHolder;
+import java.io.File;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -60,14 +61,17 @@ public class PropertiesResolver {
 
   /**
    * Get the default path of the configuration persistence file, which is the directory where the
-   * current agent jar is placed.
+   * current agent jar is placed. If no agent jar location is found, a relative path is returned.
    *
    * @return the default persistence file name
    */
-  @SuppressWarnings("ConstantConditions")
   private static String getDefaultPersistenceFile() {
-    String suffix = "/inspectit-gepard/last-http-config.json";
-    return JavaagentFileHolder.getJavaagentFile().getParent() + suffix;
+    String suffix = "inspectit-gepard/last-http-config.json";
+    File agentFile = JavaagentFileHolder.getJavaagentFile();
+
+    if (Objects.nonNull(agentFile))
+      return JavaagentFileHolder.getJavaagentFile().getParent() + "/" + suffix;
+    return suffix;
   }
 
   /**
