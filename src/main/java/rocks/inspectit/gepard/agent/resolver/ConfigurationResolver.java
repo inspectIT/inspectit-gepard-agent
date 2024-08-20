@@ -1,7 +1,11 @@
 package rocks.inspectit.gepard.agent.resolver;
 
+import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
+import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 
 /**
  * Utility class to resolve the {@link InstrumentationConfiguration} and determine whether class
@@ -67,5 +71,15 @@ public class ConfigurationResolver {
   private boolean shouldIgnore(Class<?> clazz) {
     String className = clazz.getName();
     return className.contains("$$Lambda") || className.startsWith("[");
+  }
+
+  public ElementMatcher.Junction<MethodDescription> getElementMatcherForType(TypeDescription type) {
+    InstrumentationConfiguration configuration = getConfiguration();
+    Scope scope = configuration.getScopeByFqn(type.getName());
+    String methodName = scope.getMethod();
+    if (methodName == null) {
+      return ElementMatchers.isMethod();
+    }
+    return ElementMatchers.named(methodName);
   }
 }

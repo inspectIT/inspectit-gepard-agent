@@ -10,9 +10,9 @@ import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
 /**
- * Responsible for retransforming classes in batches. The batch size is fixed to 1000.
- * This is started by the {@link rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager}.
- * The classes to be retransformed are retrieved from the {@link PendingClassesCache}.
+ * Responsible for retransforming classes in batches. The batch size is fixed to 1000. This is
+ * started by the {@link rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager}. The
+ * classes to be retransformed are retrieved from the {@link PendingClassesCache}.
  */
 public class BatchInstrumenter implements NamedRunnable {
   private static final Logger log = LoggerFactory.getLogger(BatchInstrumenter.class);

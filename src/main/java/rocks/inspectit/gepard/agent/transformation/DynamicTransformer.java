@@ -1,7 +1,5 @@
 package rocks.inspectit.gepard.agent.transformation;
 
-import static net.bytebuddy.matcher.ElementMatchers.isMethod;
-
 import java.security.ProtectionDomain;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
@@ -39,7 +37,8 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       log.debug("Transforming type: {}", typeDescription.getName());
 
       // Currently, all methods of the type are instrumented
-      ElementMatcher<? super MethodDescription> elementMatcher = isMethod();
+      ElementMatcher.Junction<MethodDescription> elementMatcher =
+          resolver.getElementMatcherForType(typeDescription);
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(elementMatcher));
     }
     return builder;

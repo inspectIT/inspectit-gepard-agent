@@ -6,7 +6,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import io.opentelemetry.proto.trace.v1.Span;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,12 +29,11 @@ import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.utility.MountableFile;
 import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
 
-
 /**
- * Base class for integration tests.
- * First starts the Observability Backend Mock and Configuration Server Mock as Testcontainers.
- * We can define a target application to test by extending this class and implementing the abstract methods.
- * The target application is also started as a Testcontainer and an agent is attached to it.
+ * Base class for integration tests. First starts the Observability Backend Mock and Configuration
+ * Server Mock as Testcontainers. We can define a target application to test by extending this class
+ * and implementing the abstract methods. The target application is also started as a Testcontainer
+ * and an agent is attached to it.
  */
 public abstract class IntegrationTestBase {
 
@@ -124,6 +122,7 @@ public abstract class IntegrationTestBase {
   @AfterEach
   void reset() throws IOException {
     tracingBackendMock.reset();
+    configurationServerMock.reset();
   }
 
   protected void stopTarget() {

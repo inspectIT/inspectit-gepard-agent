@@ -1,11 +1,14 @@
 package rocks.inspectit.gepard.agent.resolver;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static net.bytebuddy.matcher.ElementMatchers.hasMethodName;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +26,8 @@ class ConfigurationResolverTest {
   private ConfigurationResolver resolver;
 
   private final Class<?> TEST_CLASS = getClass();
+
+  private final String TEST_METHOD = "createConfiguration";
 
   @BeforeEach
   void initialize() {
@@ -82,12 +87,46 @@ class ConfigurationResolverTest {
     assertFalse(shouldInstrument);
   }
 
+  @Test
+  void methodIsNullShouldReturnIsMethodMatcher() {
+
+    InspectitConfiguration configuration = createConfiguration(true);
+    when(holder.getConfiguration()).thenReturn(configuration);
+
+    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
+    ElementMatcher.Junction<MethodDescription> elementMatcher =
+        resolver.getElementMatcherForType(type);
+
+    assertEquals(elementMatcher, ElementMatchers.isMethod());
+  }
+
+  @Test
+  void methodIsSpecifiedShouldReturnMatcherForMethod() {
+    InspectitConfiguration configuration = createConfiguration(true, "create");
+    when(holder.getConfiguration()).thenReturn(configuration);
+
+    ElementMatcher expectedMatcher = hasMethodName("create");
+
+    TypeDescription type = new TypeDescription.ForLoadedType(TEST_CLASS);
+    ElementMatcher.Junction<MethodDescription> elementMatcher =
+        resolver.getElementMatcherForType(type);
+
+    assertEquals(expectedMatcher, elementMatcher);
+  }
+
   /**
    * @param enabled the status of the scope for this test class
    * @return the inspectit configuration with the current class as scope
    */
   private InspectitConfiguration createConfiguration(boolean enabled) {
     Scope scope = new Scope(TEST_CLASS.getName(), enabled);
+    InstrumentationConfiguration instrumentationConfiguration =
+        new InstrumentationConfiguration(List.of(scope));
+    return new InspectitConfiguration(instrumentationConfiguration);
+  }
+
+  private InspectitConfiguration createConfiguration(boolean enabled, String methodName) {
+    Scope scope = new Scope(TEST_CLASS.getName(), methodName, enabled);
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

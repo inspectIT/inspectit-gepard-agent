@@ -11,7 +11,7 @@ class ConfigurationMapperTest {
   @Test
   void validStringIsDeserialized() {
     String body =
-            """
+        """
                     {
                       "instrumentationConfiguration": {
                         "scopes": [

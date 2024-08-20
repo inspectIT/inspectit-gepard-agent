@@ -21,4 +21,8 @@ public class InstrumentationConfiguration {
   public List<Scope> getScopes() {
     return scopes;
   }
+
+  public Scope getScopeByFqn(String fqn) {
+    return scopes.stream().filter(scope -> scope.getFqn().equals(fqn)).findFirst().orElse(null);
+  }
 }

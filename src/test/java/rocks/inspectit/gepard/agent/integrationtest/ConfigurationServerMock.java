@@ -3,21 +3,22 @@ package rocks.inspectit.gepard.agent.integrationtest;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
+import java.io.File;
+import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.mockserver.client.MockServerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 
-import java.io.File;
-import java.io.IOException;
-
-/** This Class is used to setup a configuration server mock for the agent integration tests.
-*  It utilizes the MockServerContainer from the testcontainers library to create a mock server
-*  The Expectations can be configured by calling the configServerSetup method.
-*   This should be done before the target container where the agent is running is started. (e.g. in every test method)
+/**
+ * This Class is used to setup a configuration server mock for the agent integration tests. It
+ * utilizes the MockServerContainer from the testcontainers library to create a mock server The
+ * Expectations can be configured by calling the configServerSetup method. This should be done
+ * before the target container where the agent is running is started. (e.g. in every test method)
  */
 public class ConfigurationServerMock {
 
@@ -37,23 +38,23 @@ public class ConfigurationServerMock {
     serverClient = new MockServerClient(server.getHost(), server.getServerPort());
   }
 
-    public static ConfigurationServerMock create(Network network) {
-        return new ConfigurationServerMock(network);
-    }
+  public static ConfigurationServerMock create(Network network) {
+    return new ConfigurationServerMock(network);
+  }
 
-    public void start() {
-        server.start();
-    }
+  public void start() {
+    server.start();
+  }
 
-    public void stop() {
-        server.stop();
-    }
+  public void stop() {
+    server.stop();
+  }
 
-    public void configServerSetup(String config_path) throws IOException {
+  public void configServerSetup(String config_path) throws IOException {
 
     ClassLoader loader = getClass().getClassLoader();
-      File file = new File(loader.getResource(config_path).getFile());
-      String body = FileUtils.readFileToString(file, "UTF-8");
+    File file = new File(loader.getResource(config_path).getFile());
+    String body = FileUtils.readFileToString(file, "UTF-8");
 
     serverClient
         .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
@@ -62,5 +63,13 @@ public class ConfigurationServerMock {
     serverClient
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
         .respond(response().withStatusCode(200));
+  }
+
+  public void reset() {
+    serverClient.reset();
+  }
+
+  public Container<MockServerContainer> getServer() {
+    return server;
   }
 }

@@ -8,6 +8,8 @@ public class Scope {
 
   private String fqn;
 
+  private String method;
+
   private boolean enabled;
 
   public Scope() {}
@@ -17,8 +19,18 @@ public class Scope {
     this.enabled = enabled;
   }
 
+  public Scope(String fqn, String method, boolean enabled) {
+    this.fqn = fqn;
+    this.method = method;
+    this.enabled = enabled;
+  }
+
   public String getFqn() {
     return fqn;
+  }
+
+  public String getMethod() {
+    return method;
   }
 
   public boolean isEnabled() {
