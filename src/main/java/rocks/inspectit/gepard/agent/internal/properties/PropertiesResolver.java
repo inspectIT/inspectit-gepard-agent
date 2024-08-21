@@ -69,8 +69,7 @@ public class PropertiesResolver {
     String suffix = "inspectit-gepard/last-http-config.json";
     File agentFile = JavaagentFileHolder.getJavaagentFile();
 
-    if (Objects.nonNull(agentFile))
-      return JavaagentFileHolder.getJavaagentFile().getParent() + "/" + suffix;
+    if (Objects.nonNull(agentFile)) return agentFile.getParent() + "/" + suffix;
     return suffix;
   }
 

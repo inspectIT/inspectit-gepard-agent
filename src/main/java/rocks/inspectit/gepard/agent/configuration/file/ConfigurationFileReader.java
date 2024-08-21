@@ -35,7 +35,7 @@ public class ConfigurationFileReader {
   public InspectitConfiguration readConfiguration() {
     try {
       byte[] rawFileContent = fileAccessor.readFile(filePath);
-      String fileContent = new String(rawFileContent); // TODO Add encoding?
+      String fileContent = new String(rawFileContent);
       return ConfigurationMapper.toObject(fileContent);
     } catch (IOException e) {
       log.error("Could not read local configuration", e);

@@ -1,5 +1,6 @@
 package rocks.inspectit.gepard.agent.configuration;
 
+import java.io.IOException;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +8,7 @@ import rocks.inspectit.gepard.agent.configuration.file.ConfigurationFileReader;
 import rocks.inspectit.gepard.agent.configuration.file.ConfigurationFileWriter;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
+import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 
 public class ConfigurationPersistence {
   private static final Logger log = LoggerFactory.getLogger(ConfigurationPersistence.class);
@@ -57,6 +59,25 @@ public class ConfigurationPersistence {
    * @param configuration the new configuration
    */
   public void processConfiguration(InspectitConfiguration configuration) {
-    configurationSubject.notifyObservers(configuration);
+    if (configurationIsSame(configuration)) log.info("Configuration has not changed");
+    else configurationSubject.notifyObservers(configuration);
+  }
+
+  // TODO Remove this method and check for changes in the configuration server
+  /**
+   * Temporary method to check, whether the configuration has changed.
+   *
+   * @return true, if the new configuration differs from the current one
+   */
+  private boolean configurationIsSame(InspectitConfiguration configuration) {
+    InspectitConfiguration currentConfig = reader.readConfiguration();
+    try {
+        String current = ConfigurationMapper.toString(currentConfig);
+        String update = ConfigurationMapper.toString(configuration);
+        return current.equals(update);
+    } catch (IOException e) {
+        log.error("Could not compare configurations", e);
+        throw new RuntimeException(e);
+    }
   }
 }

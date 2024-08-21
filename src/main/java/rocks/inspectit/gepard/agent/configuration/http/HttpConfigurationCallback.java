@@ -29,7 +29,6 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     if (result.getCode() == 200) {
       String body = result.getBodyText();
       try {
-        // ToDo Only process, if changes were made
         InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
         persistence.processConfiguration(configuration);
       } catch (IOException e) {

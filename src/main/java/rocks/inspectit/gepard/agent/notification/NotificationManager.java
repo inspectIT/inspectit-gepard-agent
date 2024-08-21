@@ -42,9 +42,6 @@ public class NotificationManager {
     else {
       log.info("Sending start notification to configuration server with url: {}", serverBaseUrl);
       successful = startNotifier.sendNotification(serverBaseUrl);
-
-      if (successful) log.info("Successfully notified configuration server about start");
-      else log.warn("Could not notify configuration server about start");
     }
     return successful;
   }
