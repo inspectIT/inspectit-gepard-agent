@@ -17,11 +17,8 @@ public class ScopeTest extends SpringTestBase {
     String logs = target.getLogs();
     stopTarget();
 
-    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 2);
-    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 2);
+    assertLogs(logs, 2);
 
-    assertTrue(loggedHelloGepardTwice);
-    assertTrue(loggedByeGepardTwice);
   }
 
   @Test
@@ -35,11 +32,7 @@ public class ScopeTest extends SpringTestBase {
     String logs = target.getLogs();
     stopTarget();
 
-    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 1);
-    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 1);
-
-    assertTrue(loggedHelloGepardTwice);
-    assertTrue(loggedByeGepardTwice);
+    assertLogs(logs, 1);
   }
 
   @Test
@@ -53,11 +46,20 @@ public class ScopeTest extends SpringTestBase {
     String logs = target.getLogs();
     stopTarget();
 
-    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 2);
-    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 2);
+    assertLogs(logs, 2);
+  }
 
-    assertTrue(loggedHelloGepardTwice);
-    assertTrue(loggedByeGepardTwice);
+  @Test
+  void emptyConfigurationDoesntInstrument() throws Exception {
+    configurationServerMock.configServerSetup("integrationtest/configurations/empty-configuration.json");
+    startTarget("/opentelemetry-extensions.jar");
+    sendRequestToTarget();
+
+    Thread.sleep(2000);
+    String logs = target.getLogs();
+    stopTarget();
+
+    assertLogs(logs, 0);
   }
 
   private void sendRequestToTarget() throws Exception {
@@ -79,5 +81,14 @@ public class ScopeTest extends SpringTestBase {
       }
     }
     return count == times;
+  }
+
+
+  private void assertLogs(String logs, int i) {
+    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", i);
+    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", i);
+
+    assertTrue(loggedHelloGepardTwice);
+    assertTrue(loggedByeGepardTwice);
   }
 }
