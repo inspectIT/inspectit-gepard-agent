@@ -8,39 +8,3 @@
     ]
   }
 }
-
-
-Picked up JAVA_TOOL_OPTIONS: -javaagent:/opentelemetry-javaagent.jar
-[otel.javaagent 2024-08-22 09:35:30:323 +0000] [main] INFO io.opentelemetry.javaagent.tooling.VersionLogger - opentelemetry-javaagent - version: 2.5.0
-09:35:34.184 [            main] INFO  r.i.g.agent.InspectitAgentExtension - Starting inspectIT Gepard agent extension ...
-09:35:34.200 [            main] INFO  r.i.g.a.n.NotificationManager - Sending start notification to configuration server with url: http://config-server:1080/api/v1
-09:35:34.397 [            main] INFO  r.i.g.a.i.http.HttpClientHolder - No keystore found. Using default SSL context
-09:35:35.506 [httpclient-dispatch-1] INFO  r.i.g.a.n.http.NotificationCallback - Notified configuration server and received status code 200
-09:35:35.506 [            main] INFO  r.i.g.a.n.NotificationManager - Successfully notified configuration server about start
-09:35:35.648 [            main] INFO  r.i.g.a.i.InstrumentationManager - Creating ConfigurationReceiver
-09:35:35.660 [            main] INFO  r.i.g.a.i.s.InspectitScheduler - Starting class-discovery with interval of 30000 milliseconds
-09:35:35.710 [            main] INFO  r.i.g.a.i.s.InspectitScheduler - Starting batch-instrumentation with interval of 500 milliseconds
-09:35:35.719 [            main] INFO  r.i.g.a.c.ConfigurationManager - Starting configuration polling from configuration server with url: http://config-server:1080/api/v1
-09:35:35.720 [            main] INFO  r.i.g.a.i.s.InspectitScheduler - Starting configuration-polling with interval of 10000 milliseconds
-09:35:35.803 [httpclient-dispatch-1] INFO  r.i.g.a.c.h.HttpConfigurationCallback - Fetched configuration from configuration server and received status code 200
-09:35:35.806 [inspectit-thread-2] INFO  r.i.g.a.c.h.HttpConfigurationPoller - Configuration was polled successfully
-
-.   ____          _            __ _ _
-/\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
-\\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-'  |____| .__|_| |_|_| |_\__, | / / / /
-=========|_|==============|___/=/_/_/_/
-:: Spring Boot ::        (v2.3.2.RELEASE)
-
-INFO  [main] org.springframework.boot.StartupInfoLogger: Starting SpringbootApplication on 89e161d238ea with PID 1 (/app/classes started by root in /) trace_id=
-INFO  [main] org.springframework.boot.SpringApplication: No active profile set, falling back to default profiles: default trace_id=
-INFO  [main] org.springframework.boot.StartupInfoLogger: Started SpringbootApplication in 5.522 seconds (JVM running for 15.22) trace_id=
-Started in 15227ms
-09:35:45.832 [inspectit-thread-1] INFO  r.i.g.a.c.h.HttpConfigurationPoller - Configuration was polled successfully
-09:35:45.827 [httpclient-dispatch-1] INFO  r.i.g.a.c.h.HttpConfigurationCallback - Fetched configuration from configuration server and received status code 200
-HELLO GEPARD from: io.opentelemetry.smoketest.springboot.controller.WebController in method: greeting
-INFO  [http-nio-8080-exec-2] io.opentelemetry.smoketest.springboot.controller.WebController: HTTP request received trace_id=d160c0c5fbbe0e4b57f80e79ab8d9f64
-HELLO GEPARD from: io.opentelemetry.smoketest.springboot.controller.WebController in method: withSpan
-BYE GEPARD from: io.opentelemetry.smoketest.springboot.controller.WebController in method: withSpan
-BYE GEPARD from: io.opentelemetry.smoketest.springboot.controller.WebController in method: greeting
