@@ -3,7 +3,7 @@
     "scopes": [
       {
         "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
-        "methods": ["greeting"],
+        "methods": ["greeting", "withSpan"],
         "enabled": true
       }
     ]

@@ -1,5 +1,6 @@
 package rocks.inspectit.gepard.agent.resolver;
 
+import static net.bytebuddy.matcher.ElementMatchers.anyOf;
 import static net.bytebuddy.matcher.ElementMatchers.hasMethodName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -78,11 +79,24 @@ class ConfigurationResolverTest {
   }
 
   @Test
-  void methodIsSpecifiedShouldReturnMatcherForMethod() {
-    InspectitConfiguration configuration = createConfiguration(true, "create");
+  void methodIsSpecifiedShouldReturnMatcherForOneMethod() {
+    InspectitConfiguration configuration = createConfiguration(true, List.of("create"));
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    ElementMatcher expectedMatcher = hasMethodName("create");
+    ElementMatcher<MethodDescription> expectedMatcher = hasMethodName("create");
+
+    ElementMatcher.Junction<MethodDescription> elementMatcher =
+        resolver.getElementMatcherForType(TEST_TYPE);
+
+    assertEquals(expectedMatcher, elementMatcher);
+  }
+
+  @Test
+  void multipleMethodsAreSpecifiedReturnMatcherForMultipleMethods() {
+    InspectitConfiguration configuration = createConfiguration(true, List.of("create", "initialize"));
+    when(holder.getConfiguration()).thenReturn(configuration);
+
+    ElementMatcher<MethodDescription> expectedMatcher = anyOf("create","initialize");
 
     ElementMatcher.Junction<MethodDescription> elementMatcher =
         resolver.getElementMatcherForType(TEST_TYPE);
@@ -101,8 +115,8 @@ class ConfigurationResolverTest {
     return new InspectitConfiguration(instrumentationConfiguration);
   }
 
-  private InspectitConfiguration createConfiguration(boolean enabled, String methodName) {
-    Scope scope = new Scope(TEST_TYPE.getName(), methodName, enabled);
+  private InspectitConfiguration createConfiguration(boolean enabled, List<String> methodNames) {
+    Scope scope = new Scope(TEST_TYPE.getName(), methodNames, enabled);
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

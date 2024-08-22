@@ -73,4 +73,16 @@ class ScopeTest extends SpringTestBase {
     waitFor("BYE GEPARD", 1);
     stopTarget();
   }
+
+  @Test
+  void adviceIsExecutedInMultipleMethods() throws IOException, InterruptedException {
+    configurationServerMock.configServerSetup(
+        "integrationtest/configurations/scope-with-multiple-methods.json");
+    startTarget("/opentelemetry-extensions.jar");
+    sendRequestToTarget();
+    // Now two methods should be instrumented, so we expect two log entries.
+    waitFor("HELLO GEPARD", 2);
+    waitFor("BYE GEPARD", 2);
+    stopTarget();
+  }
 }
