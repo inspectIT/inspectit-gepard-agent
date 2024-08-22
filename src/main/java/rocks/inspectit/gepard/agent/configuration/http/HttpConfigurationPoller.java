@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.configuration.ConfigurationPersistence;
+import rocks.inspectit.gepard.agent.configuration.persistence.ConfigurationPersistence;
 import rocks.inspectit.gepard.agent.internal.http.HttpRequestSender;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 

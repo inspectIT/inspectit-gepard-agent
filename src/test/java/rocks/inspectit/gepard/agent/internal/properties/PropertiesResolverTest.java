@@ -16,6 +16,8 @@ class PropertiesResolverTest {
 
   private static final String INTERVAL = "PT1S";
 
+  private static final String PERSISTENCE_FILE = "/path/to/file.json";
+
   @Nested
   class ServerUrl {
 
@@ -112,6 +114,54 @@ class PropertiesResolverTest {
       Duration interval = PropertiesResolver.getPollingInterval();
 
       assertEquals(expected, interval);
+    }
+  }
+
+  @Nested
+  class PersistenceFile {
+
+    @Test
+    void resolverReturnsFileIfSystemPropertyExists() throws Exception {
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(PERSISTENCE_FILE_SYSTEM_PROPERTY, PERSISTENCE_FILE);
+
+            String file = PropertiesResolver.getPersistenceFile();
+
+            assertEquals(PERSISTENCE_FILE, file);
+          });
+    }
+
+    @Test
+    void resolverReturnsFileIfEnvironmentPropertyExists() throws Exception {
+      String file =
+          withEnvironmentVariable(PERSISTENCE_FILE_ENV_PROPERTY, PERSISTENCE_FILE)
+              .execute(PropertiesResolver::getPersistenceFile);
+
+      assertEquals(PERSISTENCE_FILE, file);
+    }
+
+    @Test
+    void resolverReturnsSystemPropertyIfSystemAndEnvPropertyExist() throws Exception {
+      String envTestFile = PERSISTENCE_FILE + "1";
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(PERSISTENCE_FILE_SYSTEM_PROPERTY, PERSISTENCE_FILE);
+
+            String file =
+                withEnvironmentVariable(PERSISTENCE_FILE_ENV_PROPERTY, envTestFile)
+                    .execute(PropertiesResolver::getPersistenceFile);
+
+            assertEquals(PERSISTENCE_FILE, file);
+          });
+    }
+
+    @Test
+    void resolverReturnsDefaultFileIfNoPropertyExists() {
+      String expected = "inspectit-gepard/last-http-config.json";
+      String file = PropertiesResolver.getPersistenceFile();
+
+      assertEquals(expected, file);
     }
   }
 }

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockserver.model.HttpError;
 import rocks.inspectit.gepard.agent.MockServerTestBase;
-import rocks.inspectit.gepard.agent.configuration.ConfigurationPersistence;
 
 class HttpConfigurationPollerTest extends MockServerTestBase {
 
@@ -17,8 +16,7 @@ class HttpConfigurationPollerTest extends MockServerTestBase {
 
   @BeforeAll
   static void beforeAll() {
-    ConfigurationPersistence persistence = ConfigurationPersistence.create();
-    poller = new HttpConfigurationPoller(SERVER_URL, persistence);
+    poller = new HttpConfigurationPoller(SERVER_URL, null);
   }
 
   @Test
