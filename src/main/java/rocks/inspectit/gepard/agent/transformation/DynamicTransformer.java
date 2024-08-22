@@ -54,10 +54,10 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
     if (resolver.shouldInstrument(typeDescription)) {
       log.debug("Adding transformation to {}", typeDescription.getName());
 
-      // Currently, all methods of the type are instrumented
-      ElementMatcher.Junction<MethodDescription> elementMatcher =
-          resolver.getElementMatcherForType(typeDescription);
-      builder = builder.visit(Advice.to(InspectitAdvice.class).on(elementMatcher));
+      ElementMatcher.Junction<MethodDescription> methodMatcher =
+          resolver.buildMethodMatcher(typeDescription);
+
+      builder = builder.visit(Advice.to(InspectitAdvice.class).on(methodMatcher));
 
       // Mark type as instrumented
       instrumentationState.addInstrumentedType(currentType);

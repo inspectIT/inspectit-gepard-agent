@@ -1,88 +1,83 @@
 package rocks.inspectit.gepard.agent.integrationtest.spring;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import okhttp3.Call;
 import okhttp3.Request;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.output.WaitingConsumer;
-import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
-/**
- * Tests the correct behavior of the agent, when receiving a scope with a basic fqn. All Methods of
- * the class "io.opentelemetry.smoketest.springboot.controller.WebController" should be instrumented
- * with the example {@link InspectitAdvice}, which just logs "HELLO GEPARD" and "BYE GEPARD".
- */
-class ScopeTest extends SpringTestBase {
+public class ScopeTest extends SpringTestBase {
 
   @Test
-  public void advice_is_executed() throws IOException, InterruptedException {
+  void scopeWithoutMethodInstrumentsAllMethods() throws Exception {
     configurationServerMock.configServerSetup("integrationtest/configurations/simple-scope.json");
     startTarget("/opentelemetry-extensions.jar");
-    // Two methods are instrumented, so we expect two log entries.
-    // This spins up two threads, waiting for the log entries.
-    waitFor("HELLO GEPARD", 2);
-    waitFor("BYE GEPARD", 2);
-    // Send a request to the target to trigger the advice.
     sendRequestToTarget();
+    Thread.sleep(2000);
+    String logs = target.getLogs();
     stopTarget();
-  }
 
-  private void sendRequestToTarget() throws IOException {
-    String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
-    client.newCall(new Request.Builder().url(url).get().build()).execute();
-  }
+    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 2);
+    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 2);
 
-  private void waitFor(String message, int times) {
-    WaitingConsumer consumer = new WaitingConsumer();
-
-    target.followOutput(consumer);
-
-    // We need to create a new thread to wait for the logs, as the consumer is blocking.
-    Thread newThread =
-        new Thread(
-            () -> {
-              int loggedTimes = 0;
-
-              while (loggedTimes < times) {
-                try {
-                  consumer.waitUntil(
-                      frame -> frame.getUtf8String().contains(message), 60, TimeUnit.SECONDS);
-                  loggedTimes++;
-                } catch (TimeoutException e) {
-                  Assertions.fail("Did not log 'HELLO GEPARD' within 60 seconds");
-                }
-              }
-
-              assertEquals(times, loggedTimes);
-            });
-    newThread.start();
+    assertTrue(loggedHelloGepardTwice);
+    assertTrue(loggedByeGepardTwice);
   }
 
   @Test
-  public void advice_is_executed_only_in_greeting() throws IOException, InterruptedException {
+  void scopeWithOneMethodInstrumentsOneMethod() throws Exception {
     configurationServerMock.configServerSetup(
         "integrationtest/configurations/scope-with-method.json");
     startTarget("/opentelemetry-extensions.jar");
     sendRequestToTarget();
-    // Now only one method should be instrumented, so we expect only one log entry.
-    waitFor("HELLO GEPARD", 1);
-    waitFor("BYE GEPARD", 1);
+
+    Thread.sleep(2000);
+    String logs = target.getLogs();
     stopTarget();
+
+    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 1);
+    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 1);
+
+    assertTrue(loggedHelloGepardTwice);
+    assertTrue(loggedByeGepardTwice);
   }
 
   @Test
-  void adviceIsExecutedInMultipleMethods() throws IOException, InterruptedException {
+  void scopeWithTwoMethodsInstrumentsTwoMethods() throws Exception {
     configurationServerMock.configServerSetup(
         "integrationtest/configurations/scope-with-multiple-methods.json");
     startTarget("/opentelemetry-extensions.jar");
     sendRequestToTarget();
-    // Now two methods should be instrumented, so we expect two log entries.
-    waitFor("HELLO GEPARD", 2);
-    waitFor("BYE GEPARD", 2);
+
+    Thread.sleep(2000);
+    String logs = target.getLogs();
     stopTarget();
+
+    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 2);
+    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 2);
+
+    assertTrue(loggedHelloGepardTwice);
+    assertTrue(loggedByeGepardTwice);
+  }
+
+  private void sendRequestToTarget() throws Exception {
+    String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+    Call call = client.newCall(new Request.Builder().url(url).get().build());
+    // Wait for instrumentation
+    Thread.sleep(5000);
+    call.execute();
+  }
+
+  private boolean containsTimes(String logs, String message, int times) {
+    int count = 0;
+    int index = 0;
+    while (index != -1) {
+      index = logs.indexOf(message, index);
+      if (index != -1) {
+        count++;
+        index += message.length();
+      }
+    }
+    return count == times;
   }
 }

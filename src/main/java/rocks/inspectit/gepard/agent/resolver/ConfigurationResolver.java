@@ -1,13 +1,12 @@
 package rocks.inspectit.gepard.agent.resolver;
 
+import java.util.*;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
-
-import java.util.*;
 
 /**
  * Utility class to resolve the {@link InstrumentationConfiguration} and determine whether class
@@ -53,6 +52,25 @@ public class ConfigurationResolver {
   }
 
   /**
+   * Builds a matcher for the methods of the provided type, based on the configured scope.
+   *
+   * @param typeDescription
+   * @return the matcher for the methods of the provided type
+   */
+  public ElementMatcher.Junction<MethodDescription> buildMethodMatcher(
+      TypeDescription typeDescription) {
+    InstrumentationConfiguration configuration = getConfiguration();
+    Scope scope = configuration.getScopeByFqn(typeDescription.getName());
+    List<String> methodNames = scope.getMethods();
+
+    if (Objects.isNull(methodNames) || methodNames.isEmpty()) {
+      return ElementMatchers.isMethod();
+    }
+
+    return ElementMatchers.namedOneOf(methodNames.toArray(new String[0]));
+  }
+
+  /**
    * Checks, if the provided class name requires instrumentation.
    *
    * @param fullyQualifiedName the full name of the class
@@ -82,15 +100,5 @@ public class ConfigurationResolver {
    */
   private boolean shouldIgnore(String fullyQualifiedName) {
     return fullyQualifiedName.contains("$$Lambda") || fullyQualifiedName.startsWith("[");
-  }
-
-  public ElementMatcher.Junction<MethodDescription> getElementMatcherForType(TypeDescription type) {
-    InstrumentationConfiguration configuration = getConfiguration();
-    Scope scope = configuration.getScopeByFqn(type.getName());
-    List<String> methodNames = scope.getMethods();
-    if (Objects.isNull(methodNames) ||methodNames.isEmpty()) {
-      return ElementMatchers.isMethod();
-    }
-    return ElementMatchers.anyOf(methodNames);
   }
 }

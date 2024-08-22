@@ -9,7 +9,6 @@ import org.apache.commons.io.FileUtils;
 import org.mockserver.client.MockServerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.Container;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
@@ -67,9 +66,5 @@ public class ConfigurationServerMock {
 
   public void reset() {
     serverClient.reset();
-  }
-
-  public Container<MockServerContainer> getServer() {
-    return server;
   }
 }
