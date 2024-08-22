@@ -32,7 +32,8 @@ public class ConfigurationPersistence implements ConfigurationReceivedObserver {
    * @param writer the file writer
    * @return the created persistence object
    */
-  public static ConfigurationPersistence create(ConfigurationFileReader reader, ConfigurationFileWriter writer) {
+  public static ConfigurationPersistence create(
+      ConfigurationFileReader reader, ConfigurationFileWriter writer) {
     ConfigurationPersistence persistence = new ConfigurationPersistence(reader, writer);
     persistence.subscribeToConfigurationReceivedEvents();
     return persistence;

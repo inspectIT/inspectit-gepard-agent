@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
-import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationFileWriterTest {
