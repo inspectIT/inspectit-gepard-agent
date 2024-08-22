@@ -122,9 +122,11 @@ public abstract class IntegrationTestBase {
   @AfterEach
   void reset() throws IOException {
     tracingBackendMock.reset();
+    configurationServerMock.reset();
   }
 
   protected void stopTarget() {
+
     target.stop();
   }
 

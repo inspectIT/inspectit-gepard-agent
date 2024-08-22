@@ -1,11 +1,14 @@
 package rocks.inspectit.gepard.agent.resolver;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static net.bytebuddy.matcher.ElementMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,14 +63,58 @@ class ConfigurationResolverTest {
     assertFalse(shouldInstrument);
   }
 
+  @Test
+  void methodIsNullShouldReturnIsMethodMatcher() {
+
+    InspectitConfiguration configuration = createConfiguration(true);
+    when(holder.getConfiguration()).thenReturn(configuration);
+
+    ElementMatcher.Junction<MethodDescription> elementMatcher =
+        resolver.buildMethodMatcher(TEST_TYPE);
+
+    assertEquals(elementMatcher, ElementMatchers.isMethod());
+  }
+
+  @Test
+  void methodIsSpecifiedShouldReturnMatcherForOneMethod() {
+    InspectitConfiguration configuration = createConfiguration(true, List.of("create"));
+    when(holder.getConfiguration()).thenReturn(configuration);
+
+    ElementMatcher<MethodDescription> expectedMatcher = namedOneOf("create");
+
+    ElementMatcher.Junction<MethodDescription> elementMatcher =
+        resolver.buildMethodMatcher(TEST_TYPE);
+
+    assertEquals(expectedMatcher, elementMatcher);
+  }
+
+  @Test
+  void multipleMethodsAreSpecifiedReturnMatcherForMultipleMethods() {
+    InspectitConfiguration configuration =
+        createConfiguration(true, List.of("create", "initialize"));
+    when(holder.getConfiguration()).thenReturn(configuration);
+
+    ElementMatcher<MethodDescription> expectedMatcher = namedOneOf("create", "initialize");
+
+    ElementMatcher.Junction<MethodDescription> elementMatcher =
+        resolver.buildMethodMatcher(TEST_TYPE);
+
+    assertEquals(expectedMatcher, elementMatcher);
+  }
+
   /**
    * @param enabled the status of the scope for this test class
+   * @param methodNames the method names to be instrumented
    * @return the inspectit configuration with the current class as scope
    */
-  private InspectitConfiguration createConfiguration(boolean enabled) {
-    Scope scope = new Scope(TEST_TYPE.getName(), enabled);
+  private InspectitConfiguration createConfiguration(boolean enabled, List<String> methodNames) {
+    Scope scope = new Scope(TEST_TYPE.getName(), methodNames, enabled);
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);
+  }
+
+  private InspectitConfiguration createConfiguration(boolean enabled) {
+    return createConfiguration(enabled, null);
   }
 }

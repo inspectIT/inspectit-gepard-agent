@@ -1,29 +1,63 @@
 package rocks.inspectit.gepard.agent.integrationtest.spring;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import okhttp3.Call;
 import okhttp3.Request;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.output.WaitingConsumer;
-import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
-/**
- * Tests the correct behavior of the agent, when receiving a scope with a basic fqn. All Methods of
- * the class "io.opentelemetry.smoketest.springboot.controller.WebController" should be instrumented
- * with the example {@link InspectitAdvice}, which just logs "HELLO GEPARD" and "BYE GEPARD".
- */
-class ScopeTest extends SpringTestBase {
+public class ScopeTest extends SpringTestBase {
 
   @Test
-  void adviceIsExecuted() throws Exception {
+  void scopeWithoutMethodInstrumentsAllMethods() throws Exception {
     configurationServerMock.configServerSetup("integrationtest/configurations/simple-scope.json");
     startTarget("/opentelemetry-extensions.jar");
     sendRequestToTarget();
-    waitFor("HELLO GEPARD");
-    waitFor("BYE GEPARD");
+    Thread.sleep(2000);
+    String logs = target.getLogs();
     stopTarget();
+
+    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 2);
+    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 2);
+
+    assertTrue(loggedHelloGepardTwice);
+    assertTrue(loggedByeGepardTwice);
+  }
+
+  @Test
+  void scopeWithOneMethodInstrumentsOneMethod() throws Exception {
+    configurationServerMock.configServerSetup(
+        "integrationtest/configurations/scope-with-method.json");
+    startTarget("/opentelemetry-extensions.jar");
+    sendRequestToTarget();
+
+    Thread.sleep(2000);
+    String logs = target.getLogs();
+    stopTarget();
+
+    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 1);
+    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 1);
+
+    assertTrue(loggedHelloGepardTwice);
+    assertTrue(loggedByeGepardTwice);
+  }
+
+  @Test
+  void scopeWithTwoMethodsInstrumentsTwoMethods() throws Exception {
+    configurationServerMock.configServerSetup(
+        "integrationtest/configurations/scope-with-multiple-methods.json");
+    startTarget("/opentelemetry-extensions.jar");
+    sendRequestToTarget();
+
+    Thread.sleep(2000);
+    String logs = target.getLogs();
+    stopTarget();
+
+    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", 2);
+    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", 2);
+
+    assertTrue(loggedHelloGepardTwice);
+    assertTrue(loggedByeGepardTwice);
   }
 
   private void sendRequestToTarget() throws Exception {
@@ -34,19 +68,16 @@ class ScopeTest extends SpringTestBase {
     call.execute();
   }
 
-  private void waitFor(String message) {
-    WaitingConsumer consumer = new WaitingConsumer();
-
-    target.followOutput(consumer);
-
-    boolean logged = false;
-
-    try {
-      consumer.waitUntil(frame -> frame.getUtf8String().contains(message), 60, TimeUnit.SECONDS);
-      logged = true;
-    } catch (TimeoutException e) {
-      Assertions.fail("Did not log 'BYE GEPARD' within 60 seconds");
+  private boolean containsTimes(String logs, String message, int times) {
+    int count = 0;
+    int index = 0;
+    while (index != -1) {
+      index = logs.indexOf(message, index);
+      if (index != -1) {
+        count++;
+        index += message.length();
+      }
     }
-    Assertions.assertTrue(logged);
+    return count == times;
   }
 }

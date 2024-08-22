@@ -1,7 +1,12 @@
 package rocks.inspectit.gepard.agent.resolver;
 
+import java.util.*;
+import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
+import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 
 /**
  * Utility class to resolve the {@link InstrumentationConfiguration} and determine whether class
@@ -44,6 +49,25 @@ public class ConfigurationResolver {
   public boolean shouldInstrument(TypeDescription type) {
     String typeName = type.getName();
     return shouldInstrument(typeName);
+  }
+
+  /**
+   * Builds a matcher for the methods of the provided type, based on the configured scope.
+   *
+   * @param typeDescription
+   * @return the matcher for the methods of the provided type
+   */
+  public ElementMatcher.Junction<MethodDescription> buildMethodMatcher(
+      TypeDescription typeDescription) {
+    InstrumentationConfiguration configuration = getConfiguration();
+    Scope scope = configuration.getScopeByFqn(typeDescription.getName());
+    List<String> methodNames = scope.getMethods();
+
+    if (Objects.isNull(methodNames) || methodNames.isEmpty()) {
+      return ElementMatchers.isMethod();
+    }
+
+    return ElementMatchers.namedOneOf(methodNames.toArray(new String[0]));
   }
 
   /**

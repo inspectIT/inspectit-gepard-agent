@@ -63,4 +63,8 @@ public class ConfigurationServerMock {
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
         .respond(response().withStatusCode(200));
   }
+
+  public void reset() {
+    serverClient.reset();
+  }
 }
