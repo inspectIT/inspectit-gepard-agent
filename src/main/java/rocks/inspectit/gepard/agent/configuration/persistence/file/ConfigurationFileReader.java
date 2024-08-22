@@ -11,17 +11,8 @@ public class ConfigurationFileReader {
 
   private final ConfigurationFileAccessor fileAccessor;
 
-  private ConfigurationFileReader(ConfigurationFileAccessor fileAccessor) {
+  public ConfigurationFileReader(ConfigurationFileAccessor fileAccessor) {
     this.fileAccessor = fileAccessor;
-  }
-
-  /**
-   * Factory method to create a {@link ConfigurationFileReader}
-   *
-   * @return the created reader
-   */
-  public static ConfigurationFileReader create(ConfigurationFileAccessor fileAccessor) {
-    return new ConfigurationFileReader(fileAccessor);
   }
 
   public InspectitConfiguration readConfiguration() {

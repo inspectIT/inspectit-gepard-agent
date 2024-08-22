@@ -59,8 +59,8 @@ public class ConfigurationManager {
     Path persistenceFilePath = Path.of(persistenceFile);
     ConfigurationFileAccessor fileAccessor = ConfigurationFileAccessor.create(persistenceFilePath);
 
-    ConfigurationFileReader reader = ConfigurationFileReader.create(fileAccessor);
-    ConfigurationFileWriter writer = ConfigurationFileWriter.create(fileAccessor);
-    return new ConfigurationPersistence(reader, writer);
+    ConfigurationFileReader reader = new ConfigurationFileReader(fileAccessor);
+    ConfigurationFileWriter writer = new ConfigurationFileWriter(fileAccessor);
+    return ConfigurationPersistence.create(reader, writer);
   }
 }

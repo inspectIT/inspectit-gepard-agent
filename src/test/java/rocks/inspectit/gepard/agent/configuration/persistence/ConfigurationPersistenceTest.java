@@ -34,7 +34,7 @@ public class ConfigurationPersistenceTest {
 
   @BeforeEach
   void setUp() {
-    persistence = new ConfigurationPersistence(reader, writer);
+    persistence = ConfigurationPersistence.create(reader, writer);
     subject.addObserver(observer);
   }
 
@@ -56,6 +56,8 @@ public class ConfigurationPersistenceTest {
     verify(observer).handleConfiguration(eventCaptor.capture());
     assertEquals(
         event.getInspectitConfiguration(), eventCaptor.getValue().getInspectitConfiguration());
+    // writer should not be notified to prevent unnecessary write operation
+    verifyNoInteractions(writer);
   }
 
   @Test
@@ -64,21 +66,18 @@ public class ConfigurationPersistenceTest {
 
     persistence.loadLocalConfiguration();
 
-    verify(observer, never()).handleConfiguration(any());
+    verifyNoInteractions(observer);
+    verifyNoInteractions(writer);
   }
 
   @Test
   void newConfigurationNotifiesObservers() {
-    InspectitConfiguration config = createConfiguration();
-    ConfigurationReceivedEvent event = new ConfigurationReceivedEvent(this, config);
+    InspectitConfiguration configuration = createConfiguration();
+    ConfigurationReceivedEvent event = new ConfigurationReceivedEvent(this, configuration);
 
-    persistence.processConfiguration(config);
+    persistence.handleConfiguration(event);
 
-    ArgumentCaptor<ConfigurationReceivedEvent> eventCaptor =
-        ArgumentCaptor.forClass(ConfigurationReceivedEvent.class);
-    verify(observer).handleConfiguration(eventCaptor.capture());
-    assertEquals(
-        event.getInspectitConfiguration(), eventCaptor.getValue().getInspectitConfiguration());
+    verify(writer).writeConfiguration(configuration);
   }
 
   private static InspectitConfiguration createConfiguration() {

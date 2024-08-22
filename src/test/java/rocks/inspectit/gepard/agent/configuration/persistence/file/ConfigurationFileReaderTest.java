@@ -22,7 +22,7 @@ public class ConfigurationFileReaderTest {
 
   @BeforeEach
   void setUp() {
-    reader = ConfigurationFileReader.create(fileAccessor);
+    reader = new ConfigurationFileReader(fileAccessor);
   }
 
   @Test

@@ -26,24 +26,22 @@ public class ConfigurationFileWriterTest {
 
   @BeforeEach
   void setUp() {
-    writer = ConfigurationFileWriter.create(fileAccessor);
+    writer = new ConfigurationFileWriter(fileAccessor);
   }
 
   @Test
   void configurationIsWrittenToFile() throws IOException {
-    ConfigurationReceivedEvent event = new ConfigurationReceivedEvent(this, createConfiguration());
+    InspectitConfiguration configuration = createConfiguration();
     String expectedString = expectedString();
 
-    writer.handleConfiguration(event);
+    writer.writeConfiguration(configuration);
 
     verify(fileAccessor).writeFile(expectedString);
   }
 
   @Test
   void nullIsNotWrittenToFile() throws IOException {
-    ConfigurationReceivedEvent event = new ConfigurationReceivedEvent(this, null);
-
-    assertThrows(IllegalArgumentException.class, () -> writer.handleConfiguration(event));
+    assertThrows(IllegalArgumentException.class, () -> writer.writeConfiguration(null));
 
     verify(fileAccessor, never()).writeFile(anyString());
   }

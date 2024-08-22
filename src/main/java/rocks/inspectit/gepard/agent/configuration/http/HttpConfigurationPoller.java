@@ -51,7 +51,7 @@ public class HttpConfigurationPoller implements NamedRunnable {
   @VisibleForTesting
   boolean pollConfiguration() {
     SimpleHttpRequest request = createConfigurationRequest();
-    HttpConfigurationCallback callback = new HttpConfigurationCallback(persistence);
+    HttpConfigurationCallback callback = new HttpConfigurationCallback();
 
     return HttpRequestSender.send(request, callback);
   }

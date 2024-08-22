@@ -7,16 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.persistence.ConfigurationPersistence;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
+import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 
 /** Callback for configuration requests to the configuration server. */
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationCallback.class);
 
-  private final ConfigurationPersistence persistence;
+  private final ConfigurationReceivedSubject configurationSubject;
 
-  public HttpConfigurationCallback(ConfigurationPersistence persistence) {
-    this.persistence = persistence;
+  public HttpConfigurationCallback() {
+    this.configurationSubject = ConfigurationReceivedSubject.getInstance();
   }
 
   @Override
@@ -30,7 +31,7 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
       String body = result.getBodyText();
       try {
         InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
-        persistence.processConfiguration(configuration);
+        configurationSubject.notifyObservers(configuration);
       } catch (IOException e) {
         log.error("Could not process new configuration", e);
       }

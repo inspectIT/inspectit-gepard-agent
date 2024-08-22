@@ -8,29 +8,21 @@ import rocks.inspectit.gepard.agent.internal.configuration.observer.Configuratio
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 
-public class ConfigurationFileWriter implements ConfigurationReceivedObserver {
+public class ConfigurationFileWriter {
   private static final Logger log = LoggerFactory.getLogger(ConfigurationFileWriter.class);
 
   private final ConfigurationFileAccessor fileAccessor;
 
-  private ConfigurationFileWriter(ConfigurationFileAccessor fileAccessor) {
+  public ConfigurationFileWriter(ConfigurationFileAccessor fileAccessor) {
     this.fileAccessor = fileAccessor;
   }
 
   /**
-   * Factory method to create a {@link ConfigurationFileWriter}
+   * Writes new configuration into the persistence file.
    *
-   * @return the created writer
+   * @param configuration the new configuration
    */
-  public static ConfigurationFileWriter create(ConfigurationFileAccessor fileAccessor) {
-    ConfigurationFileWriter writer = new ConfigurationFileWriter(fileAccessor);
-    writer.subscribeToConfigurationReceivedEvents();
-    return writer;
-  }
-
-  @Override
-  public void handleConfiguration(ConfigurationReceivedEvent event) {
-    InspectitConfiguration configuration = event.getInspectitConfiguration();
+  public void writeConfiguration(InspectitConfiguration configuration) {
     try {
       String configString = ConfigurationMapper.toString(configuration);
       fileAccessor.writeFile(configString);
