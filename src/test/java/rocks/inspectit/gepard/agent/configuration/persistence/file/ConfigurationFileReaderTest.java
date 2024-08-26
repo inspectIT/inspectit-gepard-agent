@@ -12,11 +12,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationFileReaderTest {
 
-  @Mock private ConfigurationFileAccessor fileAccessor;
+  @Mock private FileAccessor fileAccessor;
 
   private ConfigurationFileReader reader;
 

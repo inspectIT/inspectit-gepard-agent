@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.http.HttpConfigurationPoller;
 import rocks.inspectit.gepard.agent.configuration.persistence.ConfigurationPersistence;
-import rocks.inspectit.gepard.agent.configuration.persistence.file.ConfigurationFileAccessor;
 import rocks.inspectit.gepard.agent.configuration.persistence.file.ConfigurationFileReader;
 import rocks.inspectit.gepard.agent.configuration.persistence.file.ConfigurationFileWriter;
+import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
 import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
 
@@ -57,10 +57,10 @@ public class ConfigurationManager {
   private ConfigurationPersistence createConfigurationPersistence() {
     String persistenceFile = PropertiesResolver.getPersistenceFile();
     Path persistenceFilePath = Path.of(persistenceFile);
-    ConfigurationFileAccessor fileAccessor = ConfigurationFileAccessor.create(persistenceFilePath);
+    FileAccessor configFileAccessor = FileAccessor.create(persistenceFilePath);
 
-    ConfigurationFileReader reader = new ConfigurationFileReader(fileAccessor);
-    ConfigurationFileWriter writer = new ConfigurationFileWriter(fileAccessor);
+    ConfigurationFileReader reader = new ConfigurationFileReader(configFileAccessor);
+    ConfigurationFileWriter writer = new ConfigurationFileWriter(configFileAccessor);
     return ConfigurationPersistence.create(reader, writer);
   }
 }

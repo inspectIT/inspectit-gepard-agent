@@ -5,14 +5,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
+import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
 
+/**
+ * Writes into the agent configuration persistence file. After every configuration update, the
+ * persistence file should be updated as well.
+ */
 public class ConfigurationFileWriter {
   private static final Logger log = LoggerFactory.getLogger(ConfigurationFileWriter.class);
 
-  private final ConfigurationFileAccessor fileAccessor;
+  private final FileAccessor configFileAccessor;
 
-  public ConfigurationFileWriter(ConfigurationFileAccessor fileAccessor) {
-    this.fileAccessor = fileAccessor;
+  public ConfigurationFileWriter(FileAccessor configFileAccessor) {
+    this.configFileAccessor = configFileAccessor;
   }
 
   /**
@@ -23,7 +28,7 @@ public class ConfigurationFileWriter {
   public void writeConfiguration(InspectitConfiguration configuration) {
     try {
       String configString = ConfigurationMapper.toString(configuration);
-      fileAccessor.writeFile(configString);
+      configFileAccessor.writeFile(configString);
       log.info("Local configuration was successfully updated");
     } catch (IOException e) {
       log.error("Could not write configuration file", e);

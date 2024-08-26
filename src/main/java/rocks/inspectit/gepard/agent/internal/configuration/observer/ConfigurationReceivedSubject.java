@@ -24,10 +24,20 @@ public class ConfigurationReceivedSubject {
     return instance;
   }
 
+  /**
+   * Adds new observer, which will be notified about events
+   *
+   * @param observer the new observer
+   */
   public void addObserver(ConfigurationReceivedObserver observer) {
     observers.add(observer);
   }
 
+  /**
+   * Removes the specified observer, so it will no longer be notified about events
+   *
+   * @param observer the observer to remove
+   */
   public void removeObserver(ConfigurationReceivedObserver observer) {
     observers.remove(observer);
   }

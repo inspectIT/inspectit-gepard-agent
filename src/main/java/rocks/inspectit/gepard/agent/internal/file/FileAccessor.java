@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.configuration.persistence.file;
+package rocks.inspectit.gepard.agent.internal.file;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.ConfigurationManager;
 
-public class ConfigurationFileAccessor {
-  private static final Logger log = LoggerFactory.getLogger(ConfigurationFileAccessor.class);
+public class FileAccessor {
+  private static final Logger log = LoggerFactory.getLogger(FileAccessor.class);
 
   private final Path filePath;
 
@@ -21,7 +21,7 @@ public class ConfigurationFileAccessor {
 
   private final Lock writeLock;
 
-  private ConfigurationFileAccessor(Path filePath, ReadWriteLock readWriteLock) {
+  private FileAccessor(Path filePath, ReadWriteLock readWriteLock) {
     this.filePath = filePath;
     this.readLock = readWriteLock.readLock();
     this.writeLock = readWriteLock.writeLock();
@@ -33,9 +33,9 @@ public class ConfigurationFileAccessor {
    * @param filePath the path of the accessible file
    * @return the created accessor
    */
-  public static ConfigurationFileAccessor create(Path filePath) {
+  public static FileAccessor create(Path filePath) {
     ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    return new ConfigurationFileAccessor(filePath, readWriteLock);
+    return new FileAccessor(filePath, readWriteLock);
   }
 
   /**

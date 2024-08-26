@@ -10,6 +10,10 @@ import rocks.inspectit.gepard.agent.internal.configuration.observer.Configuratio
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
 
+/**
+ * Responsible for accessing the persisted agent configuration as well as keeping the configuration
+ * file up to date.
+ */
 public class ConfigurationPersistence implements ConfigurationReceivedObserver {
   private static final Logger log = LoggerFactory.getLogger(ConfigurationPersistence.class);
 
@@ -17,12 +21,9 @@ public class ConfigurationPersistence implements ConfigurationReceivedObserver {
 
   private final ConfigurationFileWriter writer;
 
-  private final ConfigurationReceivedSubject configurationSubject;
-
   private ConfigurationPersistence(ConfigurationFileReader reader, ConfigurationFileWriter writer) {
     this.reader = reader;
     this.writer = writer;
-    this.configurationSubject = ConfigurationReceivedSubject.getInstance();
   }
 
   /**
@@ -39,19 +40,26 @@ public class ConfigurationPersistence implements ConfigurationReceivedObserver {
     return persistence;
   }
 
-  /** Tries to load the locally persisted configuration. */
+  /** Tries to load the locally persisted configuration into the agent. */
   public void loadLocalConfiguration() {
     InspectitConfiguration configuration = reader.readConfiguration();
 
     if (Objects.nonNull(configuration)) {
       log.info("Local configuration was successfully loaded");
       // Temporary remove this as observer, to prevent unnecessary write operation
+      ConfigurationReceivedSubject configurationSubject =
+          ConfigurationReceivedSubject.getInstance();
       configurationSubject.removeObserver(this);
       configurationSubject.notifyObservers(configuration);
       configurationSubject.addObserver(this);
     }
   }
 
+  /**
+   * Updates the configuration persistence file with new configuration.
+   *
+   * @param event the event with new configuration
+   */
   @Override
   public void handleConfiguration(ConfigurationReceivedEvent event) {
     InspectitConfiguration configuration = event.getInspectitConfiguration();

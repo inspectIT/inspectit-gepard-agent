@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.configuration.persistence.file;
+package rocks.inspectit.gepard.agent.internal.file;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,20 +7,20 @@ import java.io.IOException;
 import java.nio.file.*;
 import org.junit.jupiter.api.*;
 
-class ConfigurationFileAccessorTest {
+class FileAccessorTest {
 
   private static final String CONTENT = "{\"key\": \"value\"}";
 
   private Path tempFilePath;
 
-  private ConfigurationFileAccessor fileAccessor;
+  private FileAccessor fileAccessor;
 
   @BeforeEach
   void setUp() throws IOException {
     tempFilePath = Files.createTempFile("test-config", ".json");
     tempFilePath.toFile().deleteOnExit();
 
-    fileAccessor = ConfigurationFileAccessor.create(tempFilePath);
+    fileAccessor = FileAccessor.create(tempFilePath);
   }
 
   @AfterEach
