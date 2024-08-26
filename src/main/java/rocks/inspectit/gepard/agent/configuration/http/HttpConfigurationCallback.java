@@ -13,12 +13,6 @@ import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMap
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationCallback.class);
 
-  private final ConfigurationReceivedSubject configurationSubject;
-
-  public HttpConfigurationCallback() {
-    this.configurationSubject = ConfigurationReceivedSubject.getInstance();
-  }
-
   @Override
   public void completed(SimpleHttpResponse result) {
     log.info(
@@ -30,6 +24,7 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
       String body = result.getBodyText();
       try {
         InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
+        ConfigurationReceivedSubject configurationSubject = ConfigurationReceivedSubject.getInstance();
         configurationSubject.notifyObservers(configuration);
       } catch (IOException e) {
         log.error("Could not process new configuration", e);
