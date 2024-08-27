@@ -16,7 +16,7 @@ class StartNotifierTest extends MockServerTestBase {
   void notificationIsSentSuccessfully() {
     mockServer
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
-        .respond(response().withStatusCode(200));
+        .respond(response().withStatusCode(201));
 
     boolean successful = notifier.sendNotification(SERVER_URL);
 
