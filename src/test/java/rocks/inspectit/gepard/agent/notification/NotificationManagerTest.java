@@ -19,7 +19,7 @@ class NotificationManagerTest extends MockServerTestBase {
   void sendsStartNotificationIfServerUrlWasProvided() throws Exception {
     mockServer
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
-        .respond(response().withStatusCode(200));
+        .respond(response().withStatusCode(201));
 
     withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, SERVER_URL)
         .execute(
@@ -53,7 +53,7 @@ class NotificationManagerTest extends MockServerTestBase {
   void sendsNoStartNotificationWithoutProvidedServerUrl() {
     mockServer
         .when(request().withMethod("POST").withPath("/api/v1/connections"))
-        .respond(response().withStatusCode(200));
+        .respond(response().withStatusCode(201));
 
     manager = NotificationManager.create();
 
