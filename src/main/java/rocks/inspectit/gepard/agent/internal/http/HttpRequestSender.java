@@ -26,13 +26,28 @@ public class HttpRequestSender {
    */
   public static boolean send(
       SimpleHttpRequest request, FutureCallback<SimpleHttpResponse> callback) {
+    return send(request, callback, 200);
+  }
+
+  /**
+   * Executes the provided HTTP request as well as the callback function.
+   *
+   * @param request the HTTP request
+   * @param callback the callback function
+   * @param expectedStatusCode the expected status code
+   * @return True, if the HTTP request returned the status code equals the expected status code
+   */
+  public static boolean send(
+      SimpleHttpRequest request,
+      FutureCallback<SimpleHttpResponse> callback,
+      int expectedStatusCode) {
     if (Objects.isNull(request)) return false;
 
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
     Future<SimpleHttpResponse> future = client.execute(request, callback);
 
     HttpResponse response = handleFuture(future);
-    return Objects.nonNull(response) && 200 == response.getCode();
+    return Objects.nonNull(response) && expectedStatusCode == response.getCode();
   }
 
   private static HttpResponse handleFuture(Future<SimpleHttpResponse> future) {
