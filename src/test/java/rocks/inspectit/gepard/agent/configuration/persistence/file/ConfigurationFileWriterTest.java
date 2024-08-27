@@ -54,6 +54,6 @@ public class ConfigurationFileWriterTest {
   }
 
   private static String expectedString() {
-    return "{\"instrumentation\":{\"scopes\":[{\"fqn\":\"com.example.Application\",\"enabled\":true}]}}";
+    return "{\"instrumentation\":{\"scopes\":[{\"fqn\":\"com.example.Application\",\"methods\":null,\"enabled\":true}]}}";
   }
 }

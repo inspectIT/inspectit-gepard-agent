@@ -57,7 +57,7 @@ class ConfigurationMapperTest {
   }
 
   private static String expectedString() {
-    return "{\"instrumentation\":{\"scopes\":[{\"fqn\":\"com.example.Application\",\"enabled\":true}]}}";
+    return "{\"instrumentation\":{\"scopes\":[{\"fqn\":\"com.example.Application\",\"methods\":null,\"enabled\":true}]}}";
   }
 
   private static InspectitConfiguration expectedConfig() {
