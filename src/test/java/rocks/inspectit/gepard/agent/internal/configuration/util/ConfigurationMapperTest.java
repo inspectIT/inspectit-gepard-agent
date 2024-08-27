@@ -31,6 +31,15 @@ class ConfigurationMapperTest {
   }
 
   @Test
+  void emptyObjectIsSerialized() throws IOException {
+    String emptyObject = "{}";
+
+    InspectitConfiguration result = ConfigurationMapper.toObject(emptyObject);
+
+    assertNotNull(result);
+  }
+
+  @Test
   void nullAsStringThrowsException() {
     assertThrows(IllegalArgumentException.class, () -> ConfigurationMapper.toObject(null));
   }

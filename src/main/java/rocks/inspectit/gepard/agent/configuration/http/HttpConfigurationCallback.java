@@ -24,7 +24,8 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
       String body = result.getBodyText();
       try {
         InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
-        ConfigurationReceivedSubject configurationSubject = ConfigurationReceivedSubject.getInstance();
+        ConfigurationReceivedSubject configurationSubject =
+            ConfigurationReceivedSubject.getInstance();
         configurationSubject.notifyObservers(configuration);
       } catch (IOException e) {
         log.error("Could not process new configuration", e);
