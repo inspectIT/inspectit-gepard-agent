@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.configuration.persistence.ConfigurationPersistence;
 import rocks.inspectit.gepard.agent.internal.http.HttpRequestSender;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 
@@ -14,8 +15,14 @@ public class HttpConfigurationPoller implements NamedRunnable {
 
   private final String serverUrl;
 
-  public HttpConfigurationPoller(String serverUrl) {
+  private final ConfigurationPersistence persistence;
+
+  /** Flag to mark first polling attempt */
+  private boolean isFirstAttempt = true;
+
+  public HttpConfigurationPoller(String serverUrl, ConfigurationPersistence persistence) {
     this.serverUrl = serverUrl;
+    this.persistence = persistence;
   }
 
   public void run() {
@@ -25,11 +32,15 @@ public class HttpConfigurationPoller implements NamedRunnable {
       successful = pollConfiguration();
     } catch (Exception e) {
       log.error("Error while polling configuration", e);
-      return;
+      successful = false;
     }
 
-    if (successful) log.info("Configuration was polled successfully");
-    else log.error("Configuration polling failed");
+    if (!successful && isFirstAttempt) {
+      log.info("Trying to load local configuration...");
+      persistence.loadLocalConfiguration();
+    }
+
+    isFirstAttempt = false;
   }
 
   /**
@@ -40,8 +51,9 @@ public class HttpConfigurationPoller implements NamedRunnable {
   @VisibleForTesting
   boolean pollConfiguration() {
     SimpleHttpRequest request = createConfigurationRequest();
+    HttpConfigurationCallback callback = new HttpConfigurationCallback();
 
-    return HttpRequestSender.send(request, new HttpConfigurationCallback());
+    return HttpRequestSender.send(request, callback);
   }
 
   /**

@@ -1,23 +1,21 @@
 package rocks.inspectit.gepard.agent.internal.configuration.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 
 /** Model of an inspectit gepard configuration. */
 public class InspectitConfiguration {
 
+  private InstrumentationConfiguration instrumentation;
+
   public InspectitConfiguration() {
-    this.instrumentationConfiguration = new InstrumentationConfiguration();
+    this.instrumentation = new InstrumentationConfiguration();
   }
 
-  public InspectitConfiguration(InstrumentationConfiguration instrumentationConfiguration) {
-    this.instrumentationConfiguration = instrumentationConfiguration;
+  public InspectitConfiguration(InstrumentationConfiguration instrumentation) {
+    this.instrumentation = instrumentation;
   }
-
-  @JsonProperty("instrumentationConfiguration")
-  private InstrumentationConfiguration instrumentationConfiguration;
 
   public InstrumentationConfiguration getInstrumentation() {
-    return instrumentationConfiguration;
+    return instrumentation;
   }
 }

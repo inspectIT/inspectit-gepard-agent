@@ -1,5 +1,6 @@
 package rocks.inspectit.gepard.agent.configuration.http;
 
+import java.io.IOException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.slf4j.Logger;
@@ -12,12 +13,6 @@ import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMap
 public class HttpConfigurationCallback implements FutureCallback<SimpleHttpResponse> {
   private static final Logger log = LoggerFactory.getLogger(HttpConfigurationCallback.class);
 
-  private final ConfigurationReceivedSubject configurationSubject;
-
-  public HttpConfigurationCallback() {
-    this.configurationSubject = ConfigurationReceivedSubject.getInstance();
-  }
-
   @Override
   public void completed(SimpleHttpResponse result) {
     log.info(
@@ -27,8 +22,14 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     // Publish Event
     if (result.getCode() == 200) {
       String body = result.getBodyText();
-      InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
-      configurationSubject.notifyObservers(configuration);
+      try {
+        InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
+        ConfigurationReceivedSubject configurationSubject =
+            ConfigurationReceivedSubject.getInstance();
+        configurationSubject.notifyObservers(configuration);
+      } catch (IOException e) {
+        log.error("Could not process new configuration", e);
+      }
     }
   }
 

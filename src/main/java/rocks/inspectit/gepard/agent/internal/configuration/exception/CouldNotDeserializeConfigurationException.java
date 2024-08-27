@@ -1,7 +1,9 @@
 package rocks.inspectit.gepard.agent.internal.configuration.exception;
 
-/** Exception for errors during the serialization of a configuration string */
-public class CouldNotDeserializeConfigurationException extends RuntimeException {
+import java.io.IOException;
+
+/** Exception for errors during the deserialization of a configuration string */
+public class CouldNotDeserializeConfigurationException extends IOException {
 
   public CouldNotDeserializeConfigurationException(String message, Throwable cause) {
     super(message, cause);
