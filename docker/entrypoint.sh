@@ -1,5 +1,5 @@
 rm -rf agent/*
 # Copy agent jar into shared volume
-cp opentelemetry-javaagent.jar agent/opentelemetry-javaagent.jar
+cp inspectit-gepard-agent.jar agent/inspectit-gepard-agent.jar
 # Keep the container running
 while true; do sleep 2; done;

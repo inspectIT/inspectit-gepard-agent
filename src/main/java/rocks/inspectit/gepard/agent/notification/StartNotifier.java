@@ -20,7 +20,7 @@ public class StartNotifier {
    */
   public boolean sendNotification(String serverBaseUrl) {
     SimpleHttpRequest notification = createStartNotification(serverBaseUrl);
-    return HttpRequestSender.send(notification, new NotificationCallback(), 201);
+    return HttpRequestSender.send(notification, new NotificationCallback());
   }
 
   /**

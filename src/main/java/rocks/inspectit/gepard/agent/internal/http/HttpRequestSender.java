@@ -1,5 +1,6 @@
 package rocks.inspectit.gepard.agent.internal.http;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -15,6 +16,10 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestSender {
   private static final Logger log = LoggerFactory.getLogger(HttpRequestSender.class);
 
+  /** Status codes which are considered successful. */
+  private static final List<Integer> successfulStatusCodes =
+      List.of(200, 201, 202, 203, 204, 205, 206, 207, 208, 226);
+
   private HttpRequestSender() {}
 
   /**
@@ -22,32 +27,17 @@ public class HttpRequestSender {
    *
    * @param request the HTTP request
    * @param callback the callback function
-   * @return True, if the HTTP request returned the status code 200
+   * @return True, if the HTTP request returned a status code in {@link successfulStatusCodes}
    */
   public static boolean send(
       SimpleHttpRequest request, FutureCallback<SimpleHttpResponse> callback) {
-    return send(request, callback, 200);
-  }
-
-  /**
-   * Executes the provided HTTP request as well as the callback function.
-   *
-   * @param request the HTTP request
-   * @param callback the callback function
-   * @param expectedStatusCode the expected status code
-   * @return True, if the HTTP request returned the status code equals the expected status code
-   */
-  public static boolean send(
-      SimpleHttpRequest request,
-      FutureCallback<SimpleHttpResponse> callback,
-      int expectedStatusCode) {
     if (Objects.isNull(request)) return false;
 
     CloseableHttpAsyncClient client = HttpClientHolder.getClient();
     Future<SimpleHttpResponse> future = client.execute(request, callback);
 
     HttpResponse response = handleFuture(future);
-    return Objects.nonNull(response) && expectedStatusCode == response.getCode();
+    return Objects.nonNull(response) && successfulStatusCodes.contains(response.getCode());
   }
 
   private static HttpResponse handleFuture(Future<SimpleHttpResponse> future) {
