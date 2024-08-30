@@ -22,8 +22,10 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     // Publish Event
     if (result.getCode() == 200) {
       String body = result.getBodyText();
+
       try {
         InspectitConfiguration configuration = ConfigurationMapper.toObject(body);
+
         ConfigurationReceivedSubject configurationSubject =
             ConfigurationReceivedSubject.getInstance();
         configurationSubject.notifyObservers(configuration);

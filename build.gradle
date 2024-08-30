@@ -136,7 +136,7 @@ dependencies {
 // The location of extension directory inside agent jar is hard-coded in the agent source code
 tasks.register('extendedAgent', Jar) {
     dependsOn(configurations.otel)
-    archiveFileName = "opentelemetry-javaagent.jar"
+    archiveFileName = "inspectit-gepard-agent.jar"
     from zipTree(configurations.otel.singleFile)
     from(tasks.shadowJar.archiveFile) {
         into "extensions"
@@ -178,7 +178,7 @@ tasks {
     dockerPrepare.dependsOn(extendedAgent)
 
     docker {
-        Provider<Directory> agentJar = layout.buildDirectory.dir("/libs/opentelemetry-javaagent.jar")
+        Provider<Directory> agentJar = layout.buildDirectory.dir("/libs/inspectit-gepard-agent.jar")
 
         name "inspectit/inspectit-gepard-agent"
         tag 'versioned', "hub.docker.com/${name}:${version}"

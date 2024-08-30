@@ -27,7 +27,7 @@ public class ConfigurationFileReader {
       String fileContent = configFileAccessor.readFile();
       return ConfigurationMapper.toObject(fileContent);
     } catch (IOException e) {
-      log.error("Could not read local configuration", e);
+      log.warn("No local configuration file found.");
       return null;
     }
   }
