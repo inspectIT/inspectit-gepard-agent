@@ -3,6 +3,7 @@ name: Master Branch Continuous Release
 on:
   push:
     branches:
+    - master
     - feature/vhvapm-547
 
 env:
@@ -28,10 +29,8 @@ jobs:
           build-scan-terms-of-service-url: 'https://gradle.com/terms-of-service'
           build-scan-terms-of-service-agree: 'yes'
 
-      # TODO: Include tests before merging to master
-
-      #- name: Test
-      #  run: ./gradlew test
+      - name: Test
+        run: ./gradlew test
 
       - name: Build
         run: ./gradlew extendedAgent -x test
