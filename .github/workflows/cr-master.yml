@@ -36,6 +36,11 @@ jobs:
       - name: Build
         run: ./gradlew extendedAgent -x test
 
+      - uses: actions/upload-artifact@master
+        with:
+          name: build
+          path: build/
+
   build-image:
     runs-on: ubuntu-latest
     needs: build-agent
@@ -70,6 +75,11 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: actions/download-artifact@master
+        with:
+          name: build
+          path: /
 
       - name: Build and push by digest
         id: build
