@@ -1,7 +1,7 @@
 # lightweight base image
 FROM busybox
 
-COPY ./build/libs/inspectit-gepard-agent.jar .
+COPY ./inspectit-gepard-agent.jar .
 COPY ./docker/entrypoint.sh /entrypoint.sh
 
 RUN chmod go+r inspectit-gepard-agent.jar
