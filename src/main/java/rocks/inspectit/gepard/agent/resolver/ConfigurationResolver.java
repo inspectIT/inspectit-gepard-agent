@@ -52,25 +52,6 @@ public class ConfigurationResolver {
   }
 
   /**
-   * Builds a matcher for the methods of the provided type, based on the configured scope.
-   *
-   * @param typeDescription
-   * @return the matcher for the methods of the provided type
-   */
-  public ElementMatcher.Junction<MethodDescription> buildMethodMatcher(
-      TypeDescription typeDescription) {
-    InstrumentationConfiguration configuration = getConfiguration();
-    Scope scope = configuration.getScopeByFqn(typeDescription.getName());
-    List<String> methodNames = scope.getMethods();
-
-    if (Objects.isNull(methodNames) || methodNames.isEmpty()) {
-      return ElementMatchers.isMethod();
-    }
-
-    return ElementMatchers.namedOneOf(methodNames.toArray(new String[0]));
-  }
-
-  /**
    * Checks, if the provided class name requires instrumentation.
    *
    * @param fullyQualifiedName the full name of the class
@@ -82,6 +63,35 @@ public class ConfigurationResolver {
     return !shouldIgnore(fullyQualifiedName)
         && configuration.getScopes().stream()
             .anyMatch(scope -> scope.getFqn().equals(fullyQualifiedName) && scope.isEnabled());
+  }
+
+  /**
+   * Builds a matcher for the methods of the provided type, based on the configured scope.
+   *
+   * @param typeDescription the type to build the method matcher for
+   * @return a matcher for the methods of the provided type
+   */
+  public ElementMatcher.Junction<MethodDescription> buildMethodMatcher(
+      TypeDescription typeDescription) {
+
+    // Get the configuration and retrieve all matching scopes
+    List<Scope> scopes = getConfiguration().getAllScopeWithFqn(typeDescription.getName());
+
+    // Collect method names from the scopes, skipping null or empty method lists
+    List<String> methodNames =
+        scopes.stream()
+            .map(Scope::getMethods) // Map Scope to its methods list
+            .filter(Objects::nonNull) // Filter out null method lists
+            .flatMap(Collection::stream) // Flatten the list of methods
+            .toList();
+
+    // If no method names were found, match any method
+    if (methodNames.isEmpty()) {
+      return ElementMatchers.isMethod();
+    }
+
+    // Otherwise, match by method names
+    return ElementMatchers.namedOneOf(methodNames.toArray(String[]::new));
   }
 
   /**

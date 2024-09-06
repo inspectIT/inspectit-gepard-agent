@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class InstrumentationConfiguration {
 
-  private List<Scope> scopes;
+  private final List<Scope> scopes;
 
   public InstrumentationConfiguration() {
     this.scopes = List.of();
@@ -22,7 +22,7 @@ public class InstrumentationConfiguration {
     return scopes;
   }
 
-  public Scope getScopeByFqn(String fqn) {
-    return scopes.stream().filter(scope -> scope.getFqn().equals(fqn)).findFirst().orElse(null);
+  public List<Scope> getAllScopeWithFqn(String fqn) {
+    return scopes.stream().filter(scope -> scope.getFqn().equals(fqn)).toList();
   }
 }
