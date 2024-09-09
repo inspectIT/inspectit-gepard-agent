@@ -56,7 +56,7 @@ public class ConfigurationResolver {
    * @return a matcher for the methods of the provided type
    */
   public ElementMatcher.Junction<MethodDescription> getMethodMatcher(
-          TypeDescription typeDescription) {
+      TypeDescription typeDescription) {
 
     return scopeResolver.buildMethodMatcher(typeDescription);
   }
@@ -70,5 +70,4 @@ public class ConfigurationResolver {
   private boolean shouldInstrument(String fullyQualifiedName) {
     return scopeResolver.shouldInstrument(fullyQualifiedName);
   }
-
 }

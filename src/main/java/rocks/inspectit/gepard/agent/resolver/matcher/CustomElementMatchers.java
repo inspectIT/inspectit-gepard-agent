@@ -18,8 +18,8 @@ public class CustomElementMatchers {
 
   /**
    * Creates an {@link ElementMatcher} matching items with the given name settings. Currently, there
-   * are no nameSettings available, so we will just use the methodName. Will be enhanced, as soon as the
-   * name settings are available.
+   * are no nameSettings available, so we will just use the methodName. Will be enhanced, as soon as
+   * the name settings are available.
    */
   public static <T extends NamedElement> ElementMatcher.Junction<T> nameIs(String methodName) {
     return new NameMatcher<>(new StringMatcher(methodName, StringMatcher.Mode.EQUALS_FULLY));

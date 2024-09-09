@@ -86,14 +86,13 @@ class ConfigurationResolverTest {
     ElementMatcher.Junction<MethodDescription> elementMatcher =
         resolver.getMethodMatcher(TEST_TYPE);
 
-    assertMatcherMatches(elementMatcher, "create");;
+    assertMatcherMatches(elementMatcher, "create");
   }
 
   @Test
   void multipleMethodsAreSpecifiedReturnMatcherForMultipleMethods() throws NoSuchMethodException {
     Scope scope = createScope(true, List.of("create", "use"));
-    InspectitConfiguration configuration =
-        createConfiguration(List.of(scope));
+    InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
     ElementMatcher.Junction<MethodDescription> elementMatcher =
@@ -132,7 +131,9 @@ class ConfigurationResolverTest {
     return new InspectitConfiguration(instrumentationConfiguration);
   }
 
-  /** Create a new scope
+  /**
+   * Create a new scope
+   *
    * @param enabled the status of the scope for this test class
    * @param methodNames the method names to be instrumented
    * @return the scope with the current class as scope
@@ -145,7 +146,7 @@ class ConfigurationResolverTest {
     return createScope(enabled, null);
   }
 
-  private void assertMatcherMatches (
+  private void assertMatcherMatches(
       ElementMatcher.Junction<MethodDescription> matcher, String methodName)
       throws NoSuchMethodException {
     MethodDescription methodDescription =

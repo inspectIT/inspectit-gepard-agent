@@ -13,8 +13,8 @@ import rocks.inspectit.gepard.agent.resolver.matcher.CustomElementMatchers;
 import rocks.inspectit.gepard.agent.resolver.matcher.MethodMatcherChainBuilder;
 
 /**
- * This class is used to resolve the {@link Scope} based on the {@link Scope} List, contained
- * in the {@link InstrumentationConfiguration}.
+ * This class is used to resolve the {@link Scope} based on the {@link Scope} List, contained in the
+ * {@link InstrumentationConfiguration}.
  */
 public class ScopeResolver {
 
