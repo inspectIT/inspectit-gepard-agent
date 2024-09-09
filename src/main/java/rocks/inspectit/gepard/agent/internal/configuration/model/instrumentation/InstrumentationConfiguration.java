@@ -22,7 +22,7 @@ public class InstrumentationConfiguration {
     return scopes;
   }
 
-  public List<Scope> getAllScopeWithFqn(String fqn) {
+  public List<Scope> getAllMatchingScopes(String fqn) {
     return scopes.stream().filter(scope -> scope.getFqn().equals(fqn)).toList();
   }
 }

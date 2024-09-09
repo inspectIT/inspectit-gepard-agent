@@ -55,7 +55,7 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       log.debug("Adding transformation to {}", typeDescription.getName());
 
       ElementMatcher.Junction<MethodDescription> methodMatcher =
-          resolver.buildMethodMatcher(typeDescription);
+          resolver.getMethodMatcher(typeDescription);
 
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(methodMatcher));
 
