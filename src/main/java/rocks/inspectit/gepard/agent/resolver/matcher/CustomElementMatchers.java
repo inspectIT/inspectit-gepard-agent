@@ -22,6 +22,11 @@ public class CustomElementMatchers {
    * the name settings are available.
    */
   public static <T extends NamedElement> ElementMatcher.Junction<T> nameIs(String methodName) {
+
+    if(methodName.isEmpty()){
+      return null;
+    }
+
     return new NameMatcher<>(new StringMatcher(methodName, StringMatcher.Mode.EQUALS_FULLY));
   }
 }

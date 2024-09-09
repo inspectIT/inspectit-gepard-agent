@@ -10,7 +10,7 @@ import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationHolder;
 import rocks.inspectit.gepard.agent.resolver.matcher.CustomElementMatchers;
-import rocks.inspectit.gepard.agent.resolver.matcher.MethodMatcherChainBuilder;
+import rocks.inspectit.gepard.agent.resolver.matcher.MatcherChainBuilder;
 
 /**
  * This class is used to resolve the {@link Scope} based on the {@link Scope} List, contained in the
@@ -100,8 +100,8 @@ public class ScopeResolver {
    */
   private ElementMatcher.Junction<MethodDescription> buildMatcherForMethods(
       List<String> methodNames) {
-    MethodMatcherChainBuilder<MethodDescription> matcherChainBuilder =
-        new MethodMatcherChainBuilder<>();
+    MatcherChainBuilder<MethodDescription> matcherChainBuilder =
+        new MatcherChainBuilder<>();
     methodNames.forEach(
         methodName -> matcherChainBuilder.or(CustomElementMatchers.nameIs(methodName)));
     return matcherChainBuilder.build();

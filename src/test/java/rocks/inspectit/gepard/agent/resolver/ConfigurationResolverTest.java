@@ -136,7 +136,7 @@ class ConfigurationResolverTest {
    *
    * @param enabled the status of the scope for this test class
    * @param methodNames the method names to be instrumented
-   * @return the scope with the current class as scope
+   * @return the scope with the current class as fqn
    */
   private Scope createScope(boolean enabled, List<String> methodNames) {
     return new Scope(TEST_TYPE.getName(), methodNames, enabled);
