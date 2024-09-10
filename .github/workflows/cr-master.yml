@@ -1,3 +1,19 @@
+# This workflow is triggered on pushes to the master branch.
+# It builds the agent and creates a multi-arch image for it.
+# The image is then pushed to Docker Hub.
+#
+# The workflow consists of three jobs:
+# 1. build-agent: Builds the agent and uploads the resulting JAR as an artifact.
+# 2. build-image: Builds a Docker image for multiple platforms with the matrix strategy.
+# 3. merge: Merges the images for the different platforms into a manifest list and pushes it to Docker Hub.
+
+# To make the build faster, we use a matrix strategy to build the image for multiple platforms in parallel.
+# The build of the first job is copied over to the image build jobs, so that the application build is only done once.
+# QUEMU is used to emulate the different platforms on the GitHub runner.
+
+# For more information about how to build multi-arch images and advanced settings with Docker Buildx in GitHub actions, see:
+# https://docs.docker.com/build/ci/github-actions/multi-platform/
+
 name: Master Branch Continuous Release
 
 on:
