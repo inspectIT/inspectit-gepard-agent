@@ -19,6 +19,9 @@ plugins {
     id "pl.allegro.tech.build.axion-release" version "1.17.2"
 
     id "com.palantir.docker" version "0.36.0"
+
+    id 'jacoco'
+
 }
 
 group 'rocks.inspectit.gepard.agent'
@@ -167,6 +170,9 @@ tasks {
         systemProperty 'io.opentelemetry.smoketest.agentPath', configurations.otel.singleFile.absolutePath
         systemProperty 'io.opentelemetry.smoketest.extendedAgentPath', tasks.extendedAgent.archiveFile.get().asFile.absolutePath
         systemProperty 'io.opentelemetry.smoketest.extensionPath', tasks.shadowJar.archiveFile.get().asFile.absolutePath
+
+        finalizedBy jacocoTestReport
+
     }
 
     compileJava {
@@ -185,4 +191,6 @@ tasks {
         dockerfile file('docker/Dockerfile')
         files 'docker/entrypoint.sh', agentJar.get().asFile
     }
+
+    jacocoTestReport.dependsOn(test)
 }

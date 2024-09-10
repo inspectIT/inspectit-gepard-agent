@@ -1,5 +1,5 @@
 {
-  "instrumentationConfiguration": {
+  "instrumentation": {
     "scopes": []
   }
 }

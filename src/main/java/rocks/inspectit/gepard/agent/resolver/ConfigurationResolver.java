@@ -1,12 +1,10 @@
 package rocks.inspectit.gepard.agent.resolver;
 
-import java.util.*;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.agent.resolver.scope.ScopeResolver;
 
 /**
  * Utility class to resolve the {@link InstrumentationConfiguration} and determine whether class
@@ -14,10 +12,10 @@ import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation
  */
 public class ConfigurationResolver {
 
-  private final ConfigurationHolder holder;
+  private final ScopeResolver scopeResolver;
 
   private ConfigurationResolver(ConfigurationHolder holder) {
-    this.holder = holder;
+    this.scopeResolver = new ScopeResolver(holder);
   }
 
   /**
@@ -52,22 +50,15 @@ public class ConfigurationResolver {
   }
 
   /**
-   * Builds a matcher for the methods of the provided type, based on the configured scope.
+   * Gets a matcher for the methods of the provided type, based on the configured scope.
    *
-   * @param typeDescription
-   * @return the matcher for the methods of the provided type
+   * @param typeDescription the type to build the method matcher for
+   * @return a matcher for the methods of the provided type
    */
-  public ElementMatcher.Junction<MethodDescription> buildMethodMatcher(
+  public ElementMatcher.Junction<MethodDescription> getMethodMatcher(
       TypeDescription typeDescription) {
-    InstrumentationConfiguration configuration = getConfiguration();
-    Scope scope = configuration.getScopeByFqn(typeDescription.getName());
-    List<String> methodNames = scope.getMethods();
 
-    if (Objects.isNull(methodNames) || methodNames.isEmpty()) {
-      return ElementMatchers.isMethod();
-    }
-
-    return ElementMatchers.namedOneOf(methodNames.toArray(new String[0]));
+    return scopeResolver.buildMethodMatcher(typeDescription);
   }
 
   /**
@@ -77,28 +68,6 @@ public class ConfigurationResolver {
    * @return true, if the provided class should be instrumented
    */
   private boolean shouldInstrument(String fullyQualifiedName) {
-    InstrumentationConfiguration configuration = getConfiguration();
-
-    return !shouldIgnore(fullyQualifiedName)
-        && configuration.getScopes().stream()
-            .anyMatch(scope -> scope.getFqn().equals(fullyQualifiedName) && scope.isEnabled());
-  }
-
-  /**
-   * @return the current {@link InstrumentationConfiguration}
-   */
-  private InstrumentationConfiguration getConfiguration() {
-    return holder.getConfiguration().getInstrumentation();
-  }
-
-  /**
-   * Checks, if the type should be able to be instrumented. Currently, we don't instrument lambda-
-   * or array classes.
-   *
-   * @param fullyQualifiedName the full name of the class
-   * @return true, if the provided type should NOT be able to be instrumented
-   */
-  private boolean shouldIgnore(String fullyQualifiedName) {
-    return fullyQualifiedName.contains("$$Lambda") || fullyQualifiedName.startsWith("[");
+    return scopeResolver.shouldInstrument(fullyQualifiedName);
   }
 }

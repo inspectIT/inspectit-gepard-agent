@@ -12,13 +12,12 @@ public class ScopeTest extends SpringTestBase {
   void scopeWithoutMethodInstrumentsAllMethods() throws Exception {
     configurationServerMock.configServerSetup("integrationtest/configurations/simple-scope.json");
     startTarget("/opentelemetry-extensions.jar");
-    sendRequestToTarget();
+    sendRequestToTarget("/greeting");
     Thread.sleep(2000);
     String logs = target.getLogs();
     stopTarget();
 
     assertLogs(logs, 2);
-
   }
 
   @Test
@@ -26,7 +25,7 @@ public class ScopeTest extends SpringTestBase {
     configurationServerMock.configServerSetup(
         "integrationtest/configurations/scope-with-method.json");
     startTarget("/opentelemetry-extensions.jar");
-    sendRequestToTarget();
+    sendRequestToTarget("/greeting");
 
     Thread.sleep(2000);
     String logs = target.getLogs();
@@ -40,7 +39,7 @@ public class ScopeTest extends SpringTestBase {
     configurationServerMock.configServerSetup(
         "integrationtest/configurations/scope-with-multiple-methods.json");
     startTarget("/opentelemetry-extensions.jar");
-    sendRequestToTarget();
+    sendRequestToTarget("/greeting");
 
     Thread.sleep(2000);
     String logs = target.getLogs();
@@ -51,9 +50,10 @@ public class ScopeTest extends SpringTestBase {
 
   @Test
   void emptyConfigurationDoesntInstrument() throws Exception {
-    configurationServerMock.configServerSetup("integrationtest/configurations/empty-configuration.json");
+    configurationServerMock.configServerSetup(
+        "integrationtest/configurations/empty-configuration.json");
     startTarget("/opentelemetry-extensions.jar");
-    sendRequestToTarget();
+    sendRequestToTarget("/greeting");
 
     Thread.sleep(2000);
     String logs = target.getLogs();
@@ -62,8 +62,22 @@ public class ScopeTest extends SpringTestBase {
     assertLogs(logs, 0);
   }
 
-  private void sendRequestToTarget() throws Exception {
-    String url = String.format("http://localhost:%d/greeting", target.getMappedPort(8080));
+  @Test
+  void multipleScopesInstrumentAllSelectedMethods() throws Exception {
+    configurationServerMock.configServerSetup(
+        "integrationtest/configurations/multiple-scopes.json");
+    startTarget("/opentelemetry-extensions.jar");
+    sendRequestToTarget("/greeting");
+    sendRequestToTarget("/front");
+
+    String logs = target.getLogs();
+    stopTarget();
+
+    assertLogs(logs, 4);
+  }
+
+  private void sendRequestToTarget(String path) throws Exception {
+    String url = String.format("http://localhost:%d%s", target.getMappedPort(8080), path);
     Call call = client.newCall(new Request.Builder().url(url).get().build());
     // Wait for instrumentation
     Thread.sleep(5000);
@@ -82,7 +96,6 @@ public class ScopeTest extends SpringTestBase {
     }
     return count == times;
   }
-
 
   private void assertLogs(String logs, int i) {
     boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", i);

@@ -20,5 +20,6 @@ class InspectitAgentExtensionTest {
             .toList();
 
     assertEquals(1, extensions.size());
+    assertEquals("inspectit-gepard", extensions.get(0).extensionName());
   }
 }

@@ -1,8 +1,8 @@
 package rocks.inspectit.gepard.agent.resolver;
 
-import static net.bytebuddy.matcher.ElementMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static rocks.inspectit.gepard.agent.testutils.CustomAssertions.assertMethodDescriptionMatcherMatches;
 
 import java.util.List;
 import net.bytebuddy.description.method.MethodDescription;
@@ -45,7 +45,8 @@ class ConfigurationResolverTest {
 
   @Test
   void typeShouldBeInstrumented() {
-    InspectitConfiguration configuration = createConfiguration(true);
+    Scope scope = createScope(true);
+    InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
     boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
@@ -55,7 +56,8 @@ class ConfigurationResolverTest {
 
   @Test
   void typeShouldBeDeinstrumented() {
-    InspectitConfiguration configuration = createConfiguration(false);
+    Scope scope = createScope(false);
+    InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
     boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
@@ -66,55 +68,93 @@ class ConfigurationResolverTest {
   @Test
   void methodIsNullShouldReturnIsMethodMatcher() {
 
-    InspectitConfiguration configuration = createConfiguration(true);
+    Scope scope = createScope(true);
+    InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
     ElementMatcher.Junction<MethodDescription> elementMatcher =
-        resolver.buildMethodMatcher(TEST_TYPE);
+        resolver.getMethodMatcher(TEST_TYPE);
 
     assertEquals(elementMatcher, ElementMatchers.isMethod());
   }
 
   @Test
-  void methodIsSpecifiedShouldReturnMatcherForOneMethod() {
-    InspectitConfiguration configuration = createConfiguration(true, List.of("create"));
+  void methodIsSpecifiedShouldReturnMatcherForOneMethod() throws NoSuchMethodException {
+    Scope scope = createScope(true, List.of("create"));
+    InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    ElementMatcher<MethodDescription> expectedMatcher = namedOneOf("create");
-
     ElementMatcher.Junction<MethodDescription> elementMatcher =
-        resolver.buildMethodMatcher(TEST_TYPE);
+        resolver.getMethodMatcher(TEST_TYPE);
 
-    assertEquals(expectedMatcher, elementMatcher);
+    System.out.println(TEST_TYPE.getClass());
+
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
   }
 
   @Test
-  void multipleMethodsAreSpecifiedReturnMatcherForMultipleMethods() {
-    InspectitConfiguration configuration =
-        createConfiguration(true, List.of("create", "initialize"));
+  void multipleMethodsAreSpecifiedReturnMatcherForMultipleMethods() throws NoSuchMethodException {
+    Scope scope = createScope(true, List.of("create", "use"));
+    InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    ElementMatcher<MethodDescription> expectedMatcher = namedOneOf("create", "initialize");
+    ElementMatcher.Junction<MethodDescription> elementMatcher =
+        resolver.getMethodMatcher(TEST_TYPE);
+
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "use");
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
+  }
+
+  @Test
+  void multipleScopesAreSpecifiedAndOneIsWholeClassCreatesMatcherForAllMethods()
+      throws NoSuchMethodException {
+
+    Scope methodedScope = createScope(true, List.of("create"));
+    Scope fullClassScope = createScope(true);
+
+    InspectitConfiguration configuration =
+        createConfiguration(List.of(methodedScope, fullClassScope));
+
+    when(holder.getConfiguration()).thenReturn(configuration);
 
     ElementMatcher.Junction<MethodDescription> elementMatcher =
-        resolver.buildMethodMatcher(TEST_TYPE);
+        resolver.getMethodMatcher(TEST_TYPE);
 
-    assertEquals(expectedMatcher, elementMatcher);
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "use");
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
   }
 
   /**
-   * @param enabled the status of the scope for this test class
-   * @param methodNames the method names to be instrumented
+   * @param scopes a list of scopes to be added to the configuration
    * @return the inspectit configuration with the current class as scope
    */
-  private InspectitConfiguration createConfiguration(boolean enabled, List<String> methodNames) {
-    Scope scope = new Scope(TEST_TYPE.getName(), methodNames, enabled);
+  private InspectitConfiguration createConfiguration(List<Scope> scopes) {
     InstrumentationConfiguration instrumentationConfiguration =
-        new InstrumentationConfiguration(List.of(scope));
+        new InstrumentationConfiguration(scopes);
     return new InspectitConfiguration(instrumentationConfiguration);
   }
 
-  private InspectitConfiguration createConfiguration(boolean enabled) {
-    return createConfiguration(enabled, null);
+  /**
+   * Create a new scope
+   *
+   * @param enabled the status of the scope for this test class
+   * @param methodNames the method names to be instrumented
+   * @return the scope with the current class as fqn
+   */
+  private Scope createScope(boolean enabled, List<String> methodNames) {
+    return new Scope(TEST_TYPE.getName(), methodNames, enabled);
+  }
+
+  private Scope createScope(boolean enabled) {
+    return createScope(enabled, null);
+  }
+
+  // Mock methods for the matcher test. Has to be public to be visible.
+  public void create() {
+    System.out.println("create");
+  }
+
+  public void use() {
+    System.out.println("use");
   }
 }
