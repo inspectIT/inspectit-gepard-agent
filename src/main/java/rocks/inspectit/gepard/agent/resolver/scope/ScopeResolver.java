@@ -18,7 +18,7 @@ import rocks.inspectit.gepard.agent.resolver.matcher.MatcherChainBuilder;
  */
 public class ScopeResolver {
 
-  ConfigurationHolder holder;
+  private final ConfigurationHolder holder;
 
   public ScopeResolver(ConfigurationHolder holder) {
     this.holder = holder;
@@ -50,7 +50,7 @@ public class ScopeResolver {
 
     List<Scope> scopes = getAllMatchingScopes(typeDescription.getName());
 
-    if (containsWholeClassScope(scopes)) {
+    if (containsAllMethodsScope(scopes)) {
       return ElementMatchers.isMethod();
     }
 
@@ -65,7 +65,7 @@ public class ScopeResolver {
    * @param scope the scope to check
    * @return true if the scope contains method definitions
    */
-  private boolean isWholeClassScope(Scope scope) {
+  private boolean isAllMethodsScope(Scope scope) {
     return scope.getMethods() == null || scope.getMethods().isEmpty();
   }
 
@@ -75,8 +75,8 @@ public class ScopeResolver {
    * @param scopes the list of scopes to check
    * @return true if the list of scopes contains at least one whole class scope
    */
-  private boolean containsWholeClassScope(List<Scope> scopes) {
-    return scopes.stream().anyMatch(this::isWholeClassScope);
+  private boolean containsAllMethodsScope(List<Scope> scopes) {
+    return scopes.stream().anyMatch(this::isAllMethodsScope);
   }
 
   /**
@@ -100,8 +100,7 @@ public class ScopeResolver {
    */
   private ElementMatcher.Junction<MethodDescription> buildMatcherForMethods(
       List<String> methodNames) {
-    MatcherChainBuilder<MethodDescription> matcherChainBuilder =
-        new MatcherChainBuilder<>();
+    MatcherChainBuilder<MethodDescription> matcherChainBuilder = new MatcherChainBuilder<>();
     methodNames.forEach(
         methodName -> matcherChainBuilder.or(CustomElementMatchers.nameIs(methodName)));
     return matcherChainBuilder.build();
@@ -127,6 +126,12 @@ public class ScopeResolver {
     return holder.getConfiguration().getInstrumentation().getScopes();
   }
 
+  /**
+   * Returns all scopes, which match the provided fully qualified name.
+   *
+   * @param fqn the fully qualified name to match
+   * @return the list of matching scopes
+   */
   private List<Scope> getAllMatchingScopes(String fqn) {
     return holder.getConfiguration().getInstrumentation().getAllMatchingScopes(fqn);
   }

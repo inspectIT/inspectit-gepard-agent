@@ -2,6 +2,7 @@ package rocks.inspectit.gepard.agent.resolver;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static rocks.inspectit.gepard.agent.testutils.CustomAssertions.assertMethodDescriptionMatcherMatches;
 
 import java.util.List;
 import net.bytebuddy.description.method.MethodDescription;
@@ -86,7 +87,9 @@ class ConfigurationResolverTest {
     ElementMatcher.Junction<MethodDescription> elementMatcher =
         resolver.getMethodMatcher(TEST_TYPE);
 
-    assertMatcherMatches(elementMatcher, "create");
+    System.out.println(TEST_TYPE.getClass());
+
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
   }
 
   @Test
@@ -98,8 +101,8 @@ class ConfigurationResolverTest {
     ElementMatcher.Junction<MethodDescription> elementMatcher =
         resolver.getMethodMatcher(TEST_TYPE);
 
-    assertMatcherMatches(elementMatcher, "use");
-    assertMatcherMatches(elementMatcher, "create");
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "use");
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
   }
 
   @Test
@@ -117,8 +120,8 @@ class ConfigurationResolverTest {
     ElementMatcher.Junction<MethodDescription> elementMatcher =
         resolver.getMethodMatcher(TEST_TYPE);
 
-    assertMatcherMatches(elementMatcher, "use");
-    assertMatcherMatches(elementMatcher, "create");
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "use");
+    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
   }
 
   /**
@@ -144,15 +147,6 @@ class ConfigurationResolverTest {
 
   private Scope createScope(boolean enabled) {
     return createScope(enabled, null);
-  }
-
-  private void assertMatcherMatches(
-      ElementMatcher.Junction<MethodDescription> matcher, String methodName)
-      throws NoSuchMethodException {
-    MethodDescription methodDescription =
-        new MethodDescription.ForLoadedMethod(
-            ConfigurationResolverTest.class.getMethod(methodName));
-    assertTrue(matcher.matches(methodDescription));
   }
 
   // Mock methods for the matcher test. Has to be public to be visible.

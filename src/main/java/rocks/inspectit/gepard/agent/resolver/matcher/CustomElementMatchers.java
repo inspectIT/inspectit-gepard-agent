@@ -23,7 +23,7 @@ public class CustomElementMatchers {
    */
   public static <T extends NamedElement> ElementMatcher.Junction<T> nameIs(String methodName) {
 
-    if(methodName.isEmpty()){
+    if (methodName.isEmpty()) {
       return null;
     }
 
