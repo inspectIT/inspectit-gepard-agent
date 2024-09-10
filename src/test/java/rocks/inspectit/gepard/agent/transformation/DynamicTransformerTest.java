@@ -20,7 +20,7 @@ class DynamicTransformerTest {
   @Mock DynamicType.Builder<?> builder = mock(DynamicType.Builder.class);
 
   @Test
-  void testTransformTransformsOnShouldInstrumentFalse() {
+  void testTransformTransformsOnShouldInstrumentTrue() {
 
     Class<?> TEST_CLASS = DynamicTransformerTest.class;
 
