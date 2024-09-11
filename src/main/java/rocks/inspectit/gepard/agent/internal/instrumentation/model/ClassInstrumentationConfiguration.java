@@ -14,6 +14,15 @@ public record ClassInstrumentationConfiguration(Set<InstrumentationScope> active
   public static final ClassInstrumentationConfiguration NO_INSTRUMENTATION =
       new ClassInstrumentationConfiguration(Collections.emptySet());
 
+  /**
+   * Checks, if this configuration induces bytecode changes to the target class.
+   *
+   * @return true, if this configuration expects instrumentation
+   */
+  public boolean isActive() {
+    return !activeScopes.isEmpty();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (o instanceof ClassInstrumentationConfiguration otherConfig)
@@ -24,14 +33,5 @@ public record ClassInstrumentationConfiguration(Set<InstrumentationScope> active
   @Override
   public int hashCode() {
     return Objects.hash(activeScopes);
-  }
-
-  /**
-   * Checks, if this configuration induces bytecode changes to the target class.
-   *
-   * @return true, if this configuration expects instrumentation
-   */
-  public boolean isActive() {
-    return !activeScopes.isEmpty();
   }
 }

@@ -16,6 +16,8 @@ import net.bytebuddy.matcher.StringMatcher;
  */
 public class CustomElementMatchers {
 
+  private CustomElementMatchers() {}
+
   /**
    * Creates an {@link ElementMatcher} matching items with the given name settings. Currently, there
    * are no nameSettings available, so we will just use the methodName. Will be enhanced, as soon as

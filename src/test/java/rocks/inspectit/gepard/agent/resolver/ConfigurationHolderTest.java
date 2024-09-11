@@ -3,6 +3,7 @@ package rocks.inspectit.gepard.agent.resolver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
@@ -33,7 +34,7 @@ class ConfigurationHolderTest {
   }
 
   private InspectitConfiguration createConfiguration() {
-    Scope scope = new Scope("com.example.Application", true);
+    Scope scope = new Scope(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

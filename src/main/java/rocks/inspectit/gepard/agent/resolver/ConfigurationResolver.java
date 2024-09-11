@@ -31,47 +31,43 @@ public class ConfigurationResolver {
   }
 
   /**
-   * @param clazz
-   * @return
+   * Gets the current instrumentation configuration for the specified class.
+   *
+   * @param clazz the class
+   * @return The active configuration or {@link
+   *     ClassInstrumentationConfiguration#NO_INSTRUMENTATION}
    */
-  public ClassInstrumentationConfiguration getActiveConfiguration(Class<?> clazz) {
+  public ClassInstrumentationConfiguration getClassInstrumentationConfiguration(Class<?> clazz) {
     String className = clazz.getName();
-    Set<InstrumentationScope> activeScopes = scopeResolver.getActiveScopes(className);
-
-    if (activeScopes.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
-    return new ClassInstrumentationConfiguration(activeScopes);
-  }
-
-  public ClassInstrumentationConfiguration getActiveConfiguration(TypeDescription typeDescription) {
-    String className = typeDescription.getName();
-    Set<InstrumentationScope> activeScopes = scopeResolver.getActiveScopes(className);
-
-    // TODO Das sollte eigtl nicht passieren können?
-    if (activeScopes.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
-    return new ClassInstrumentationConfiguration(activeScopes);
+    return getClassInstrumentationConfiguration(className);
   }
 
   /**
-   * Checks, if the provided class requires instrumentation.
+   * Gets the current instrumentation configuration for the specified class.
    *
-   * @param clazz the class object
-   * @return true, if the provided class should be instrumented
+   * @param typeDescription the type
+   * @return The active configuration or {@link
+   *     ClassInstrumentationConfiguration#NO_INSTRUMENTATION}
    */
-  public boolean shouldInstrument(Class<?> clazz) {
-    // TODO REMOVE
-    String className = clazz.getName();
-    return shouldInstrument(className);
+  public ClassInstrumentationConfiguration getClassInstrumentationConfiguration(
+      TypeDescription typeDescription) {
+    String typeName = typeDescription.getName();
+    return getClassInstrumentationConfiguration(typeName);
   }
 
   /**
-   * Checks, if the provided type requires instrumentation.
+   * Gets the current instrumentation configuration for the provided class name
    *
-   * @param type the class type description
-   * @return true, if the provided type should be instrumented
+   * @param fullyQualifiedName the class name
+   * @return The active configuration or {@link
+   *     ClassInstrumentationConfiguration#NO_INSTRUMENTATION}
    */
-  public boolean shouldInstrument(TypeDescription type) {
-    String typeName = type.getName();
-    return shouldInstrument(typeName);
+  private ClassInstrumentationConfiguration getClassInstrumentationConfiguration(
+      String fullyQualifiedName) {
+    Set<InstrumentationScope> activeScopes = scopeResolver.getActiveScopes(fullyQualifiedName);
+
+    if (activeScopes.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
+    return new ClassInstrumentationConfiguration(activeScopes);
   }
 
   /**
@@ -82,16 +78,6 @@ public class ConfigurationResolver {
    */
   public ElementMatcher.Junction<MethodDescription> getMethodMatcher(
       TypeDescription typeDescription) {
-    return scopeResolver.buildMethodMatcher(typeDescription);
-  }
-
-  /**
-   * Checks, if the provided class name requires instrumentation.
-   *
-   * @param fullyQualifiedName the full name of the class
-   * @return true, if the provided class should be instrumented
-   */
-  private boolean shouldInstrument(String fullyQualifiedName) {
-    return scopeResolver.shouldInstrument(fullyQualifiedName);
+    return scopeResolver.getMethodMatcher(typeDescription);
   }
 }

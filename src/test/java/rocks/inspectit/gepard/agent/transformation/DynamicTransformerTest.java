@@ -6,29 +6,34 @@ import static org.mockito.Mockito.*;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
+@ExtendWith(MockitoExtension.class)
 class DynamicTransformerTest {
 
-  @Mock private ConfigurationResolver resolver = mock(ConfigurationResolver.class);
+  @Mock private ConfigurationResolver resolver;
 
-  @Mock private InstrumentationState instrumentationState = mock(InstrumentationState.class);
+  @Mock private InstrumentationState instrumentationState;
 
-  @Mock DynamicType.Builder<?> builder = mock(DynamicType.Builder.class);
+  @Mock private DynamicType.Builder<?> builder;
+
+  @Mock private ClassInstrumentationConfiguration configuration;
+
+  private final Class<?> TEST_CLASS = getClass();
 
   @Test
   void testTransformTransformsOnShouldInstrumentTrue() {
-
-    Class<?> TEST_CLASS = DynamicTransformerTest.class;
-
     DynamicTransformer transformer = new DynamicTransformer(resolver, instrumentationState);
-
     TypeDescription typeDescription = TypeDescription.ForLoadedType.of(TEST_CLASS);
 
-    when(resolver.shouldInstrument(typeDescription)).thenReturn(true);
+    when(resolver.getClassInstrumentationConfiguration(typeDescription)).thenReturn(configuration);
+    when(configuration.isActive()).thenReturn(true);
 
     transformer.transform(builder, typeDescription, TEST_CLASS.getClassLoader(), null, null);
 
@@ -38,15 +43,11 @@ class DynamicTransformerTest {
 
   @Test
   void testTransformerDoesNotTransformOnShouldInstrumentFalse() {
-
-    Class<?> TEST_CLASS = DynamicTransformerTest.class;
-
     DynamicTransformer transformer = new DynamicTransformer(resolver, instrumentationState);
-
     TypeDescription typeDescription = TypeDescription.ForLoadedType.of(TEST_CLASS);
 
-    when(resolver.shouldInstrument(typeDescription)).thenReturn(false);
-
+    when(resolver.getClassInstrumentationConfiguration(typeDescription)).thenReturn(configuration);
+    when(configuration.isActive()).thenReturn(false);
     when(instrumentationState.isInstrumented(any(InstrumentedType.class))).thenReturn(true);
 
     transformer.transform(builder, typeDescription, TEST_CLASS.getClassLoader(), null, null);

@@ -25,8 +25,15 @@ public class InstrumentationState {
     return new InstrumentationState();
   }
 
-  public boolean shouldRetransform(
-      Class<?> clazz, ClassInstrumentationConfiguration currentConfig) {
+  /**
+   * Checks, if the provided class should be retransformed. A retransformation is necessary, if the
+   * new configuration differs from the current configuration.
+   *
+   * @param clazz the class
+   * @param newConfig the new instrumentation configuration
+   * @return true, if the provided class should be retransformed
+   */
+  public boolean shouldRetransform(Class<?> clazz, ClassInstrumentationConfiguration newConfig) {
     ClassInstrumentationConfiguration activeConfig =
         activeInstrumentations.asMap().entrySet().stream()
             .filter(entry -> entry.getKey().isEqualTo(clazz)) // find class
@@ -34,26 +41,8 @@ public class InstrumentationState {
             .findAny()
             .orElse(null);
 
-    if (Objects.nonNull(activeConfig)) return !activeConfig.equals(currentConfig);
-    return currentConfig.isActive();
-  }
-
-  /**
-   * Checks, if the provided class is already instrumented.
-   *
-   * @param clazz the class object
-   * @return true, if the provided class is already instrumented.
-   */
-  public boolean isInstrumented(Class<?> clazz) {
-    ClassInstrumentationConfiguration activeConfig =
-        activeInstrumentations.asMap().entrySet().stream()
-            .filter(entry -> entry.getKey().isEqualTo(clazz))
-            .map(Map.Entry::getValue)
-            .findAny()
-            .orElse(null);
-
-    // if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
-    return false;
+    if (Objects.nonNull(activeConfig)) return !activeConfig.equals(newConfig);
+    return newConfig.isActive();
   }
 
   /**
@@ -63,10 +52,10 @@ public class InstrumentationState {
    * @return true, if the provided type is already instrumented.
    */
   public boolean isInstrumented(InstrumentedType instrumentedType) {
-    ClassInstrumentationConfiguration activeConfig =
+    ClassInstrumentationConfiguration config =
         activeInstrumentations.getIfPresent(instrumentedType);
 
-    // if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
+    if (Objects.nonNull(config)) return config.isActive();
     return false;
   }
 

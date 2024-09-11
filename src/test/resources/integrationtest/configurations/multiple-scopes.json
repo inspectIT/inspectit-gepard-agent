@@ -13,6 +13,7 @@
       },
       {
         "fqn": "io.opentelemetry.smoketest.springboot.controller.PropagatingController",
+        "methods": [],
         "enabled": true
       }
     ]

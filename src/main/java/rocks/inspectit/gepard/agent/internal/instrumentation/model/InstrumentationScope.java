@@ -5,14 +5,16 @@ import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 
 /**
- * @param fqn
- * @param methods
+ * @param fqn the fully qualified name of a class
+ * @param methods the methods of the class to instrument
  */
 public record InstrumentationScope(String fqn, List<String> methods) {
 
   /**
-   * @param scope
-   * @return
+   * Creates an {@link InstrumentationScope} out of a {@link Scope}
+   *
+   * @param scope the scope
+   * @return the instrumentation scope
    */
   public static InstrumentationScope create(Scope scope) {
     return new InstrumentationScope(scope.getFqn(), scope.getMethods());

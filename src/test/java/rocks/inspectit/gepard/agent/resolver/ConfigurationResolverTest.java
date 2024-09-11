@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static rocks.inspectit.gepard.agent.testutils.CustomAssertions.assertMethodDescriptionMatcherMatches;
 
+import java.util.Collections;
 import java.util.List;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 class ConfigurationResolverTest {
@@ -29,7 +31,7 @@ class ConfigurationResolverTest {
       TypeDescription.ForLoadedType.of(ConfigurationResolverTest.class);
 
   @BeforeEach
-  void initialize() {
+  void beforeEach() {
     resolver = ConfigurationResolver.create(holder);
   }
 
@@ -38,9 +40,10 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = new InspectitConfiguration();
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    boolean shouldRetransform = resolver.shouldInstrument(TEST_TYPE);
+    ClassInstrumentationConfiguration config = resolver.getClassInstrumentationConfiguration(TEST_TYPE);
+    boolean isActive = config.isActive();
 
-    assertFalse(shouldRetransform);
+    assertFalse(isActive);
   }
 
   @Test
@@ -49,9 +52,10 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
+    ClassInstrumentationConfiguration config = resolver.getClassInstrumentationConfiguration(TEST_TYPE);
+    boolean isActive = config.isActive();
 
-    assertTrue(shouldInstrument);
+    assertTrue(isActive);
   }
 
   @Test
@@ -60,14 +64,14 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    boolean shouldInstrument = resolver.shouldInstrument(TEST_TYPE);
+    ClassInstrumentationConfiguration config = resolver.getClassInstrumentationConfiguration(TEST_TYPE);
+    boolean isActive = config.isActive();
 
-    assertFalse(shouldInstrument);
+    assertFalse(isActive);
   }
 
   @Test
   void methodIsNullShouldReturnIsMethodMatcher() {
-
     Scope scope = createScope(true);
     InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
@@ -142,11 +146,11 @@ class ConfigurationResolverTest {
    * @return the scope with the current class as fqn
    */
   private Scope createScope(boolean enabled, List<String> methodNames) {
-    return new Scope(TEST_TYPE.getName(), methodNames, enabled);
+    return new Scope(enabled, TEST_TYPE.getName(), methodNames);
   }
 
   private Scope createScope(boolean enabled) {
-    return createScope(enabled, null);
+    return createScope(enabled, Collections.emptyList());
   }
 
   // Mock methods for the matcher test. Has to be public to be visible.

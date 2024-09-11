@@ -1,9 +1,6 @@
 package rocks.inspectit.gepard.agent.resolver.scope;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -29,8 +26,10 @@ public class ScopeResolver {
   }
 
   /**
-   * @param fullyQualifiedName
-   * @return
+   * Finds all active scopes of the specified class for instrumentation.
+   *
+   * @param fullyQualifiedName the name of the class
+   * @return the set of active scopes for instrumentation
    */
   public Set<InstrumentationScope> getActiveScopes(String fullyQualifiedName) {
     if (shouldIgnore(fullyQualifiedName)) return Collections.emptySet();
@@ -43,46 +42,19 @@ public class ScopeResolver {
   }
 
   /**
-   * Checks, if the provided class name requires instrumentation.
-   *
-   * @param fullyQualifiedName the full name of the class
-   * @return true, if the provided class should be instrumented
-   */
-  public boolean shouldInstrument(String fullyQualifiedName) {
-    List<Scope> scopes = getScopes();
-
-    return !shouldIgnore(fullyQualifiedName)
-        && scopes.stream()
-            .anyMatch(scope -> scope.getFqn().equals(fullyQualifiedName) && scope.isEnabled());
-  }
-
-  /**
-   * Builds a matcher for the methods of the provided type.
+   * Creates a matcher for the methods of the provided type.
    *
    * @param typeDescription the type to build the method matcher for
-   * @return the matcher for the methods
+   * @return the matcher for the methods of the type
    */
-  public ElementMatcher.Junction<MethodDescription> buildMethodMatcher(
+  public ElementMatcher.Junction<MethodDescription> getMethodMatcher(
       TypeDescription typeDescription) {
     List<Scope> scopes = getAllMatchingScopes(typeDescription.getName());
 
-    if (containsAllMethodsScope(scopes)) {
-      return ElementMatchers.isMethod();
-    }
+    if (containsAllMethodsScope(scopes)) return ElementMatchers.isMethod();
 
     List<String> methodNames = collectMethodNames(scopes);
-
     return buildMatcherForMethods(methodNames);
-  }
-
-  /**
-   * Checks if the provided scope contains method definitions.
-   *
-   * @param scope the scope to check
-   * @return true if the scope contains method definitions
-   */
-  private boolean isAllMethodsScope(Scope scope) {
-    return scope.getMethods() == null || scope.getMethods().isEmpty();
   }
 
   /**
@@ -96,16 +68,23 @@ public class ScopeResolver {
   }
 
   /**
+   * Checks if the provided scope contains method definitions.
+   *
+   * @param scope the scope to check
+   * @return true if the scope contains method definitions
+   */
+  private boolean isAllMethodsScope(Scope scope) {
+    return scope.getMethods().isEmpty();
+  }
+
+  /**
    * Collects all method names from the provided list of scopes.
    *
    * @param scopes the list of scopes to collect the method names from
    * @return the list of method names
    */
   private List<String> collectMethodNames(List<Scope> scopes) {
-    return scopes.stream()
-        .map(Scope::getMethods) // Map Scope to its methods list
-        .flatMap(Collection::stream) // Flatten the list of methods
-        .toList();
+    return scopes.stream().map(Scope::getMethods).flatMap(Collection::stream).toList();
   }
 
   /**
@@ -123,6 +102,16 @@ public class ScopeResolver {
   }
 
   /**
+   * Returns all scopes, which match the provided fully qualified name.
+   *
+   * @param fqn the fully qualified name to match
+   * @return the list of matching scopes
+   */
+  private List<Scope> getAllMatchingScopes(String fqn) {
+    return holder.getConfiguration().getInstrumentation().getAllMatchingScopes(fqn);
+  }
+
+  /**
    * Checks, if the type should be able to be instrumented. Currently, we don't instrument lambda-
    * or array classes.
    *
@@ -131,24 +120,5 @@ public class ScopeResolver {
    */
   private boolean shouldIgnore(String fullyQualifiedName) {
     return fullyQualifiedName.contains("$$Lambda") || fullyQualifiedName.startsWith("[");
-  }
-
-  /**
-   * Returns the list of scopes from the current {@link InstrumentationConfiguration}.
-   *
-   * @return the list of scopes
-   */
-  private List<Scope> getScopes() {
-    return holder.getConfiguration().getInstrumentation().getScopes();
-  }
-
-  /**
-   * Returns all scopes, which match the provided fully qualified name.
-   *
-   * @param fqn the fully qualified name to match
-   * @return the list of matching scopes
-   */
-  private List<Scope> getAllMatchingScopes(String fqn) {
-    return holder.getConfiguration().getInstrumentation().getAllMatchingScopes(fqn);
   }
 }

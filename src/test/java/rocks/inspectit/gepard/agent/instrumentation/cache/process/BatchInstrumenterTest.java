@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,13 +32,15 @@ class BatchInstrumenterTest {
 
   @Mock private InstrumentationState instrumentationState;
 
+  @Mock private ClassInstrumentationConfiguration configuration;
+
   @Test
   void classIsRemovedFromCacheAndNotAddedToBatch() {
     Set<Class<?>> classes = new HashSet<>();
     classes.add(TEST_CLASS);
     when(cache.getKeyIterator()).thenReturn(classes.iterator());
-    when(configurationResolver.shouldInstrument(TEST_CLASS)).thenReturn(false);
-    when(instrumentationState.isInstrumented(TEST_CLASS)).thenReturn(false);
+    when(configurationResolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(instrumentationState.shouldRetransform(TEST_CLASS, configuration)).thenReturn(false);
 
     BatchInstrumenter instrumenter =
         new BatchInstrumenter(cache, instrumentation, configurationResolver, instrumentationState);
@@ -52,8 +55,8 @@ class BatchInstrumenterTest {
     Set<Class<?>> classes = new HashSet<>();
     classes.add(TEST_CLASS);
     when(cache.getKeyIterator()).thenReturn(classes.iterator());
-    when(configurationResolver.shouldInstrument(TEST_CLASS)).thenReturn(true);
-    when(instrumentationState.isInstrumented(TEST_CLASS)).thenReturn(false);
+    when(configurationResolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(instrumentationState.shouldRetransform(TEST_CLASS, configuration)).thenReturn(true);
 
     BatchInstrumenter instrumenter =
         new BatchInstrumenter(cache, instrumentation, configurationResolver, instrumentationState);

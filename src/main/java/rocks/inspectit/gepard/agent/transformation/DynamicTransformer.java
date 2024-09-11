@@ -52,7 +52,9 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       JavaModule module,
       ProtectionDomain protectionDomain) {
     InstrumentedType currentType = new InstrumentedType(typeDescription.getName(), classLoader);
-    if (resolver.shouldInstrument(typeDescription)) {
+    ClassInstrumentationConfiguration currentConfig =
+        resolver.getClassInstrumentationConfiguration(typeDescription);
+    if (currentConfig.isActive()) {
       log.debug("Adding transformation to {}", typeDescription.getName());
 
       ElementMatcher.Junction<MethodDescription> methodMatcher =
@@ -61,8 +63,7 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(methodMatcher));
 
       // Mark type as instrumented
-      ClassInstrumentationConfiguration config = resolver.getActiveConfiguration(typeDescription);
-      instrumentationState.addInstrumentedType(currentType, config);
+      instrumentationState.addInstrumentedType(currentType, currentConfig);
     } else if (instrumentationState.isInstrumented(currentType)) {
       log.debug("Removing transformation from {}", typeDescription.getName());
       // Mark type as uninstrumented or deinstrumented

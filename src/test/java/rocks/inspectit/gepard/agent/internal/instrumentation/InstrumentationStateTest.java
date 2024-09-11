@@ -2,10 +2,18 @@ package rocks.inspectit.gepard.agent.internal.instrumentation;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
+@ExtendWith(MockitoExtension.class)
 class InstrumentationStateTest {
+
+  @Mock private ClassInstrumentationConfiguration configuration;
 
   private static final Class<?> TEST_CLASS = InstrumentationStateTest.class;
 
@@ -13,39 +21,16 @@ class InstrumentationStateTest {
       new InstrumentedType(TEST_CLASS.getName(), TEST_CLASS.getClassLoader());
 
   @Test
-  void classIsNotInstrumented() {
-    InstrumentationState state = InstrumentationState.create();
-
-    boolean isInstrumented = state.isInstrumented(TEST_CLASS);
-
-    assertFalse(isInstrumented);
-  }
-
-  @Test
-  void classIsInstrumented() {
-    InstrumentationState state = InstrumentationState.create();
-
-    state.addInstrumentedType(TEST_TYPE);
-    boolean isInstrumented = state.isInstrumented(TEST_CLASS);
-
-    assertTrue(isInstrumented);
-  }
-
-  @Test
-  void classIsDeinstrumented() {
-    InstrumentationState state = InstrumentationState.create();
-
-    state.addInstrumentedType(TEST_TYPE);
-    state.invalidateInstrumentedType(TEST_TYPE);
-    boolean isInstrumented = state.isInstrumented(TEST_CLASS);
-
-    assertFalse(isInstrumented);
-  }
-
-  @Test
   void typeIsNotInstrumented() {
     InstrumentationState state = InstrumentationState.create();
+    boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
+    assertFalse(isInstrumented);
+  }
+
+  @Test
+  void typeIsNotInstrumentedWithConfiguration() {
+    InstrumentationState state = InstrumentationState.create();
     boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertFalse(isInstrumented);
@@ -53,9 +38,10 @@ class InstrumentationStateTest {
 
   @Test
   void typeIsInstrumented() {
-    InstrumentationState state = InstrumentationState.create();
+    when(configuration.isActive()).thenReturn(true);
 
-    state.addInstrumentedType(TEST_TYPE);
+    InstrumentationState state = InstrumentationState.create();
+    state.addInstrumentedType(TEST_TYPE, configuration);
     boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertTrue(isInstrumented);
@@ -64,8 +50,7 @@ class InstrumentationStateTest {
   @Test
   void typeIsDeinstrumented() {
     InstrumentationState state = InstrumentationState.create();
-
-    state.addInstrumentedType(TEST_TYPE);
+    state.addInstrumentedType(TEST_TYPE, configuration);
     state.invalidateInstrumentedType(TEST_TYPE);
     boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 

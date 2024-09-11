@@ -72,7 +72,7 @@ public class BatchInstrumenter implements NamedRunnable {
 
       try {
         ClassInstrumentationConfiguration instrumentationConfiguration =
-            configurationResolver.getActiveConfiguration(clazz);
+            configurationResolver.getClassInstrumentationConfiguration(clazz);
         boolean shouldRetransform =
             instrumentationState.shouldRetransform(clazz, instrumentationConfiguration);
 

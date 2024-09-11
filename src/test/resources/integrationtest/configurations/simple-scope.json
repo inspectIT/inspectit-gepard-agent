@@ -3,6 +3,7 @@
     "scopes": [
       {
         "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
+        "methods": [],
         "enabled": true
       }
     ]
