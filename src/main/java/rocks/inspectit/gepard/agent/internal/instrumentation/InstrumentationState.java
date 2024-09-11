@@ -25,6 +25,19 @@ public class InstrumentationState {
     return new InstrumentationState();
   }
 
+  public boolean shouldRetransform(
+      Class<?> clazz, ClassInstrumentationConfiguration currentConfig) {
+    ClassInstrumentationConfiguration activeConfig =
+        activeInstrumentations.asMap().entrySet().stream()
+            .filter(entry -> entry.getKey().isEqualTo(clazz)) // find class
+            .map(Map.Entry::getValue) // get configuration
+            .findAny()
+            .orElse(null);
+
+    if (Objects.nonNull(activeConfig)) return !activeConfig.equals(currentConfig);
+    return currentConfig.isActive();
+  }
+
   /**
    * Checks, if the provided class is already instrumented.
    *
@@ -39,7 +52,7 @@ public class InstrumentationState {
             .findAny()
             .orElse(null);
 
-    if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
+    // if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
     return false;
   }
 
@@ -53,7 +66,7 @@ public class InstrumentationState {
     ClassInstrumentationConfiguration activeConfig =
         activeInstrumentations.getIfPresent(instrumentedType);
 
-    if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
+    // if (Objects.nonNull(activeConfig)) return activeConfig.isInstrumented();
     return false;
   }
 
@@ -62,8 +75,8 @@ public class InstrumentationState {
    *
    * @param type the instrumented type
    */
-  public void addInstrumentedType(InstrumentedType type) {
-    ClassInstrumentationConfiguration newConfig = new ClassInstrumentationConfiguration(true);
+  public void addInstrumentedType(
+      InstrumentedType type, ClassInstrumentationConfiguration newConfig) {
     activeInstrumentations.put(type, newConfig);
   }
 

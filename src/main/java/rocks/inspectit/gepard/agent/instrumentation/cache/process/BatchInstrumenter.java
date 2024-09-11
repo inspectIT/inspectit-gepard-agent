@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 
@@ -70,10 +71,12 @@ public class BatchInstrumenter implements NamedRunnable {
       checkedClassesCount++;
 
       try {
-        boolean shouldInstrument = configurationResolver.shouldInstrument(clazz);
-        boolean isInstrumented = instrumentationState.isInstrumented(clazz);
+        ClassInstrumentationConfiguration instrumentationConfiguration =
+            configurationResolver.getActiveConfiguration(clazz);
+        boolean shouldRetransform =
+            instrumentationState.shouldRetransform(clazz, instrumentationConfiguration);
 
-        if (shouldInstrument != isInstrumented) classesToRetransform.add(clazz);
+        if (shouldRetransform) classesToRetransform.add(clazz);
       } catch (Exception e) {
         log.error("Could not check instrumentation status for {}", clazz.getName(), e);
       }

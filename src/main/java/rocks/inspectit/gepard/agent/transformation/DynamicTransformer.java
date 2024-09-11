@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
@@ -60,7 +61,8 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(methodMatcher));
 
       // Mark type as instrumented
-      instrumentationState.addInstrumentedType(currentType);
+      ClassInstrumentationConfiguration config = resolver.getActiveConfiguration(typeDescription);
+      instrumentationState.addInstrumentedType(currentType, config);
     } else if (instrumentationState.isInstrumented(currentType)) {
       log.debug("Removing transformation from {}", typeDescription.getName());
       // Mark type as uninstrumented or deinstrumented

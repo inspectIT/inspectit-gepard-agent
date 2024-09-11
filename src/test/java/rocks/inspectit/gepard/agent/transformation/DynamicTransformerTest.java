@@ -33,7 +33,7 @@ class DynamicTransformerTest {
     transformer.transform(builder, typeDescription, TEST_CLASS.getClassLoader(), null, null);
 
     verify(builder).visit(any());
-    verify(instrumentationState).addInstrumentedType(any());
+    verify(instrumentationState).addInstrumentedType(any(), any());
   }
 
   @Test

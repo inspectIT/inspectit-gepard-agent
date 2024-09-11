@@ -1,13 +1,17 @@
 package rocks.inspectit.gepard.agent.resolver.scope;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 import rocks.inspectit.gepard.agent.resolver.ConfigurationHolder;
 import rocks.inspectit.gepard.agent.resolver.matcher.CustomElementMatchers;
 import rocks.inspectit.gepard.agent.resolver.matcher.MatcherChainBuilder;
@@ -25,13 +29,26 @@ public class ScopeResolver {
   }
 
   /**
+   * @param fullyQualifiedName
+   * @return
+   */
+  public Set<InstrumentationScope> getActiveScopes(String fullyQualifiedName) {
+    if (shouldIgnore(fullyQualifiedName)) return Collections.emptySet();
+
+    List<Scope> scopes = getAllMatchingScopes(fullyQualifiedName);
+    return scopes.stream()
+        .filter(Scope::isEnabled)
+        .map(InstrumentationScope::create)
+        .collect(Collectors.toSet());
+  }
+
+  /**
    * Checks, if the provided class name requires instrumentation.
    *
    * @param fullyQualifiedName the full name of the class
    * @return true, if the provided class should be instrumented
    */
   public boolean shouldInstrument(String fullyQualifiedName) {
-
     List<Scope> scopes = getScopes();
 
     return !shouldIgnore(fullyQualifiedName)
@@ -47,7 +64,6 @@ public class ScopeResolver {
    */
   public ElementMatcher.Junction<MethodDescription> buildMethodMatcher(
       TypeDescription typeDescription) {
-
     List<Scope> scopes = getAllMatchingScopes(typeDescription.getName());
 
     if (containsAllMethodsScope(scopes)) {
