@@ -23,6 +23,7 @@ class InstrumentationStateTest {
   @Test
   void typeIsNotInstrumented() {
     InstrumentationState state = InstrumentationState.create();
+
     boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertFalse(isInstrumented);
@@ -30,7 +31,11 @@ class InstrumentationStateTest {
 
   @Test
   void typeIsNotInstrumentedWithConfiguration() {
+    when(configuration.isActive()).thenReturn(false);
+
     InstrumentationState state = InstrumentationState.create();
+    state.addInstrumentedType(TEST_TYPE, configuration);
+
     boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertFalse(isInstrumented);
@@ -42,6 +47,7 @@ class InstrumentationStateTest {
 
     InstrumentationState state = InstrumentationState.create();
     state.addInstrumentedType(TEST_TYPE, configuration);
+
     boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertTrue(isInstrumented);
@@ -52,6 +58,7 @@ class InstrumentationStateTest {
     InstrumentationState state = InstrumentationState.create();
     state.addInstrumentedType(TEST_TYPE, configuration);
     state.invalidateInstrumentedType(TEST_TYPE);
+
     boolean isInstrumented = state.isInstrumented(TEST_TYPE);
 
     assertFalse(isInstrumented);

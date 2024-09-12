@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.concurrent.TimeUnit;
 import okhttp3.Call;
 import okhttp3.Request;
-import org.junit.jupiter.api.Test;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.Test;
 
 public class ScopeTest extends SpringTestBase {
 
@@ -129,7 +129,8 @@ public class ScopeTest extends SpringTestBase {
   }
 
   /**
-   * Checks, if a specific message can be found for a specific amount of times inside the provided logs.
+   * Checks, if a specific message can be found for a specific amount of times inside the provided
+   * logs.
    *
    * @return true, if the message appears the expected amount of times in the logs
    */
@@ -163,13 +164,14 @@ public class ScopeTest extends SpringTestBase {
    * logs. First the method counts the current amount of update messages. If the amount of update
    * messages has increased, it is assumed that a new configuration has been pooled.
    */
-  private void awaitConfigurationUpdate() throws InterruptedException {
+  private void awaitConfigurationUpdate() {
     String updateMessage =
         "Fetched configuration from configuration server and received status code 200";
     String logs = target.getLogs();
     int configUpdateCount = countTimes(logs, updateMessage);
 
     Awaitility.await()
+        .pollDelay(5, TimeUnit.SECONDS)
         .atMost(15, TimeUnit.SECONDS)
         .until(
             () -> {
@@ -177,8 +179,5 @@ public class ScopeTest extends SpringTestBase {
               int currentConfigUpdateCount = countTimes(newLogs, updateMessage);
               return currentConfigUpdateCount > configUpdateCount;
             });
-
-    // Wait an additional second as puffer
-    Thread.sleep(1000);
   }
 }
