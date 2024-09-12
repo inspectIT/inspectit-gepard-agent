@@ -39,7 +39,8 @@ class BatchInstrumenterTest {
     Set<Class<?>> classes = new HashSet<>();
     classes.add(TEST_CLASS);
     when(cache.getKeyIterator()).thenReturn(classes.iterator());
-    when(configurationResolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(configurationResolver.getClassInstrumentationConfiguration(TEST_CLASS))
+        .thenReturn(configuration);
     when(instrumentationState.shouldRetransform(TEST_CLASS, configuration)).thenReturn(false);
 
     BatchInstrumenter instrumenter =
@@ -55,7 +56,8 @@ class BatchInstrumenterTest {
     Set<Class<?>> classes = new HashSet<>();
     classes.add(TEST_CLASS);
     when(cache.getKeyIterator()).thenReturn(classes.iterator());
-    when(configurationResolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(configurationResolver.getClassInstrumentationConfiguration(TEST_CLASS))
+        .thenReturn(configuration);
     when(instrumentationState.shouldRetransform(TEST_CLASS, configuration)).thenReturn(true);
 
     BatchInstrumenter instrumenter =

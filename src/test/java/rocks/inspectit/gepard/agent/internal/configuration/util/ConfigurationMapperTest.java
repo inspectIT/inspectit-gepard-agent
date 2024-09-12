@@ -62,7 +62,7 @@ class ConfigurationMapperTest {
   }
 
   private static InspectitConfiguration expectedConfig() {
-    Scope scope = new Scope(true,"com.example.Application", Collections.emptyList());
+    Scope scope = new Scope(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

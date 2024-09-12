@@ -44,7 +44,6 @@ public class ConfigurationManager {
    * configuration server url was set up.
    */
   private void startHttpPolling(String serverUrl, ConfigurationPersistence persistence) {
-    log.info("Starting configuration polling from configuration server with url: {}", serverUrl);
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
     HttpConfigurationPoller poller = new HttpConfigurationPoller(serverUrl, persistence);
     Duration pollingInterval = PropertiesResolver.getPollingInterval();

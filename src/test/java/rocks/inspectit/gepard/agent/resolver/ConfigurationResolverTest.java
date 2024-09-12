@@ -40,7 +40,8 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = new InspectitConfiguration();
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    ClassInstrumentationConfiguration config = resolver.getClassInstrumentationConfiguration(TEST_TYPE);
+    ClassInstrumentationConfiguration config =
+        resolver.getClassInstrumentationConfiguration(TEST_TYPE);
     boolean isActive = config.isActive();
 
     assertFalse(isActive);
@@ -52,7 +53,8 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    ClassInstrumentationConfiguration config = resolver.getClassInstrumentationConfiguration(TEST_TYPE);
+    ClassInstrumentationConfiguration config =
+        resolver.getClassInstrumentationConfiguration(TEST_TYPE);
     boolean isActive = config.isActive();
 
     assertTrue(isActive);
@@ -64,7 +66,8 @@ class ConfigurationResolverTest {
     InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
-    ClassInstrumentationConfiguration config = resolver.getClassInstrumentationConfiguration(TEST_TYPE);
+    ClassInstrumentationConfiguration config =
+        resolver.getClassInstrumentationConfiguration(TEST_TYPE);
     boolean isActive = config.isActive();
 
     assertFalse(isActive);
