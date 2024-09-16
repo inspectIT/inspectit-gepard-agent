@@ -41,6 +41,13 @@ public class InstrumentedType {
     return typeName.equals(clazz.getName()) && classLoader.equals(clazz.getClassLoader());
   }
 
+  /**
+   * @return the fully qualified name of the type
+   */
+  public String getName() {
+    return typeName;
+  }
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof InstrumentedType otherType) {

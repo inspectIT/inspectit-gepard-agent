@@ -1,9 +1,10 @@
-package rocks.inspectit.gepard.agent.internal.instrumentation;
+package rocks.inspectit.gepard.agent.state;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.Map;
 import java.util.Objects;
+import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
 /** Stores the instrumentation configuration of all instrumented classes. */
@@ -12,8 +13,11 @@ public class InstrumentationState {
   /** Store for every instrumented class */
   private final Cache<InstrumentedType, ClassInstrumentationConfiguration> activeInstrumentations;
 
-  private InstrumentationState() {
+  private final ConfigurationResolver configurationResolver;
+
+  private InstrumentationState(ConfigurationResolver configurationResolver) {
     this.activeInstrumentations = Caffeine.newBuilder().build();
+    this.configurationResolver = configurationResolver;
   }
 
   /**
@@ -21,8 +25,8 @@ public class InstrumentationState {
    *
    * @return the created state
    */
-  public static InstrumentationState create() {
-    return new InstrumentationState();
+  public static InstrumentationState create(ConfigurationResolver configurationResolver) {
+    return new InstrumentationState(configurationResolver);
   }
 
   /**
@@ -30,16 +34,18 @@ public class InstrumentationState {
    * new configuration differs from the current configuration.
    *
    * @param clazz the class
-   * @param newConfig the new instrumentation configuration
    * @return true, if the provided class should be retransformed
    */
-  public boolean shouldRetransform(Class<?> clazz, ClassInstrumentationConfiguration newConfig) {
+  public boolean shouldRetransform(Class<?> clazz) {
     ClassInstrumentationConfiguration activeConfig =
         activeInstrumentations.asMap().entrySet().stream()
             .filter(entry -> entry.getKey().isEqualTo(clazz)) // find class
             .map(Map.Entry::getValue) // get configuration
             .findAny()
             .orElse(null);
+
+    ClassInstrumentationConfiguration newConfig =
+        configurationResolver.getClassInstrumentationConfiguration(clazz);
 
     if (Objects.nonNull(activeConfig)) return !activeConfig.equals(newConfig);
     return newConfig.isActive();
@@ -51,12 +57,21 @@ public class InstrumentationState {
    * @param instrumentedType the class type
    * @return true, if the provided type is already instrumented.
    */
-  public boolean isInstrumented(InstrumentedType instrumentedType) {
+  public boolean isActive(InstrumentedType instrumentedType) {
     ClassInstrumentationConfiguration config =
         activeInstrumentations.getIfPresent(instrumentedType);
 
     if (Objects.nonNull(config)) return config.isActive();
     return false;
+  }
+
+  /**
+   * @param type the type to instrument
+   * @return The active configuration or {@link
+   *     ClassInstrumentationConfiguration#NO_INSTRUMENTATION}
+   */
+  public ClassInstrumentationConfiguration resolveClassConfiguration(InstrumentedType type) {
+    return configurationResolver.getClassInstrumentationConfiguration(type);
   }
 
   /**

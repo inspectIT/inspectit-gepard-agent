@@ -6,10 +6,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
-import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
-import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
-import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 /**
  * Responsible for retransforming classes in batches. The batch size is fixed to 1000. This is
@@ -26,18 +24,14 @@ public class BatchInstrumenter implements NamedRunnable {
 
   private final Instrumentation instrumentation;
 
-  private final ConfigurationResolver configurationResolver;
-
   private final InstrumentationState instrumentationState;
 
   public BatchInstrumenter(
       PendingClassesCache pendingClassesCache,
       Instrumentation instrumentation,
-      ConfigurationResolver configurationResolver,
       InstrumentationState instrumentationState) {
     this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = instrumentation;
-    this.configurationResolver = configurationResolver;
     this.instrumentationState = instrumentationState;
   }
 
@@ -71,10 +65,7 @@ public class BatchInstrumenter implements NamedRunnable {
       checkedClassesCount++;
 
       try {
-        ClassInstrumentationConfiguration instrumentationConfiguration =
-            configurationResolver.getClassInstrumentationConfiguration(clazz);
-        boolean shouldRetransform =
-            instrumentationState.shouldRetransform(clazz, instrumentationConfiguration);
+        boolean shouldRetransform = instrumentationState.shouldRetransform(clazz);
 
         if (shouldRetransform) classesToRetransform.add(clazz);
       } catch (Exception e) {

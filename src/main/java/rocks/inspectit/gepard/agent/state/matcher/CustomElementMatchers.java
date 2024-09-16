@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.resolver.matcher;
+package rocks.inspectit.gepard.agent.state.matcher;
 
 import net.bytebuddy.description.NamedElement;
 import net.bytebuddy.matcher.ElementMatcher;

@@ -1,17 +1,16 @@
-package rocks.inspectit.gepard.agent.resolver.scope;
+package rocks.inspectit.gepard.agent.state.scope;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
-import rocks.inspectit.gepard.agent.resolver.ConfigurationHolder;
-import rocks.inspectit.gepard.agent.resolver.matcher.CustomElementMatchers;
-import rocks.inspectit.gepard.agent.resolver.matcher.MatcherChainBuilder;
+import rocks.inspectit.gepard.agent.state.InspectitConfigurationHolder;
+import rocks.inspectit.gepard.agent.state.matcher.CustomElementMatchers;
+import rocks.inspectit.gepard.agent.state.matcher.MatcherChainBuilder;
 
 /**
  * This class is used to resolve the {@link Scope} based on the {@link Scope} List, contained in the
@@ -19,9 +18,9 @@ import rocks.inspectit.gepard.agent.resolver.matcher.MatcherChainBuilder;
  */
 public class ScopeResolver {
 
-  private final ConfigurationHolder holder;
+  private final InspectitConfigurationHolder holder;
 
-  public ScopeResolver(ConfigurationHolder holder) {
+  public ScopeResolver(InspectitConfigurationHolder holder) {
     this.holder = holder;
   }
 
@@ -42,63 +41,17 @@ public class ScopeResolver {
   }
 
   /**
-   * Creates a matcher for the methods of the provided type.
+   * Creates a matcher for the methods of the provided scopes.
    *
-   * @param typeDescription the type to build the method matcher for
-   * @return the matcher for the methods of the type
+   * @param scopes the scopes containing methods
+   * @return the matcher for the methods of the scopes
    */
   public ElementMatcher.Junction<MethodDescription> getMethodMatcher(
-      TypeDescription typeDescription) {
-    List<Scope> scopes = getAllMatchingScopes(typeDescription.getName());
-
+      Set<InstrumentationScope> scopes) {
     if (containsAllMethodsScope(scopes)) return ElementMatchers.isMethod();
 
-    List<String> methodNames = collectMethodNames(scopes);
+    Set<String> methodNames = collectMethodNames(scopes);
     return buildMatcherForMethods(methodNames);
-  }
-
-  /**
-   * Checks if the provided list of scopes contains at least one whole class scope.
-   *
-   * @param scopes the list of scopes to check
-   * @return true if the list of scopes contains at least one whole class scope
-   */
-  private boolean containsAllMethodsScope(List<Scope> scopes) {
-    return scopes.stream().anyMatch(this::isAllMethodsScope);
-  }
-
-  /**
-   * Checks if the provided scope contains method definitions.
-   *
-   * @param scope the scope to check
-   * @return true if the scope contains method definitions
-   */
-  private boolean isAllMethodsScope(Scope scope) {
-    return scope.getMethods().isEmpty();
-  }
-
-  /**
-   * Collects all method names from the provided list of scopes.
-   *
-   * @param scopes the list of scopes to collect the method names from
-   * @return the list of method names
-   */
-  private List<String> collectMethodNames(List<Scope> scopes) {
-    return scopes.stream().map(Scope::getMethods).flatMap(Collection::stream).toList();
-  }
-
-  /**
-   * Builds a matcher for each method name and chains them using 'or'.
-   *
-   * @param methodNames the method names to build matchers for
-   * @return a matcher for the methods
-   */
-  private ElementMatcher.Junction<MethodDescription> buildMatcherForMethods(
-      List<String> methodNames) {
-    MatcherChainBuilder<MethodDescription> matcherChainBuilder = new MatcherChainBuilder<>();
-    methodNames.forEach(
-        methodName -> matcherChainBuilder.or(CustomElementMatchers.nameIs(methodName)));
-    return matcherChainBuilder.build();
   }
 
   /**
@@ -109,6 +62,53 @@ public class ScopeResolver {
    */
   private List<Scope> getAllMatchingScopes(String fqn) {
     return holder.getConfiguration().getInstrumentation().getAllMatchingScopes(fqn);
+  }
+
+  /**
+   * Checks if the provided list of scopes contains at least one whole class scope.
+   *
+   * @param scopes the list of scopes to check
+   * @return true if the list of scopes contains at least one whole class scope
+   */
+  private boolean containsAllMethodsScope(Set<InstrumentationScope> scopes) {
+    return scopes.stream().anyMatch(this::isAllMethodsScope);
+  }
+
+  /**
+   * Checks if the provided scope contains method definitions.
+   *
+   * @param scope the scope to check
+   * @return true if the scope contains method definitions
+   */
+  private boolean isAllMethodsScope(InstrumentationScope scope) {
+    return scope.methods().isEmpty();
+  }
+
+  /**
+   * Collects all method names from the provided list of scopes.
+   *
+   * @param scopes the list of scopes to collect the method names from
+   * @return the set of method names
+   */
+  private Set<String> collectMethodNames(Set<InstrumentationScope> scopes) {
+    return scopes.stream()
+        .map(InstrumentationScope::methods)
+        .flatMap(Collection::stream)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Builds a matcher for each method name and chains them using 'or'.
+   *
+   * @param methodNames the method names to build matchers for
+   * @return a matcher for the methods
+   */
+  private ElementMatcher.Junction<MethodDescription> buildMatcherForMethods(
+      Set<String> methodNames) {
+    MatcherChainBuilder<MethodDescription> matcherChainBuilder = new MatcherChainBuilder<>();
+    methodNames.forEach(
+        methodName -> matcherChainBuilder.or(CustomElementMatchers.nameIs(methodName)));
+    return matcherChainBuilder.build();
   }
 
   /**

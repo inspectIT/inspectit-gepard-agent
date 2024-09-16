@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.resolver.matcher;
+package rocks.inspectit.gepard.agent.state.matcher;
 
 import static net.bytebuddy.matcher.ElementMatchers.not;
 import static org.junit.jupiter.api.Assertions.*;

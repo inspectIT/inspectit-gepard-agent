@@ -10,9 +10,8 @@ import rocks.inspectit.gepard.agent.instrumentation.cache.input.ClassDiscoverySe
 import rocks.inspectit.gepard.agent.instrumentation.cache.input.ConfigurationReceiver;
 import rocks.inspectit.gepard.agent.instrumentation.cache.process.BatchInstrumenter;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
-import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
-import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 /** Responsible component for setting up and executing instrumentation. */
 public class InstrumentationManager {
@@ -55,12 +54,10 @@ public class InstrumentationManager {
    * Starts the scheduled instrumentation of pending class batched via {@link BatchInstrumenter}.
    * Currently, the instrumentation interval is fixed to 500 ms.
    */
-  public void startBatchInstrumentation(
-      ConfigurationResolver configurationResolver, InstrumentationState instrumentationState) {
+  public void startBatchInstrumentation(InstrumentationState instrumentationState) {
     InspectitScheduler scheduler = InspectitScheduler.getInstance();
     BatchInstrumenter batchInstrumenter =
-        new BatchInstrumenter(
-            pendingClassesCache, instrumentation, configurationResolver, instrumentationState);
+        new BatchInstrumenter(pendingClassesCache, instrumentation, instrumentationState);
     Duration batchInterval = Duration.ofMillis(500);
     scheduler.startRunnable(batchInstrumenter, batchInterval);
   }

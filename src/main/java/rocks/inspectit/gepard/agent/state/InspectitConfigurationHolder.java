@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.resolver;
+package rocks.inspectit.gepard.agent.state;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,28 +7,28 @@ import rocks.inspectit.gepard.agent.internal.configuration.observer.Configuratio
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 
 /**
- * When the agent receives a new Configuration from the Configuration Server, it will notify the
- * ConfigurationHolder about the new Configuration. The ConfigurationHolder will then update its
- * current Configuration. The ConfigurationHolder is used by the ConfigurationResolver to determine
- * if a class should be retransformed or instrumented.
+ * When the agent receives a new configuration, it will notify this holder about the new
+ * configuration. The InspectitConfigurationHolder will then update its current configuration. The
+ * InspectitConfigurationHolder is used by the ConfigurationResolver to determine if a class should
+ * be retransformed or instrumented.
  */
-public class ConfigurationHolder implements ConfigurationReceivedObserver {
-  private static final Logger log = LoggerFactory.getLogger(ConfigurationHolder.class);
+public class InspectitConfigurationHolder implements ConfigurationReceivedObserver {
+  private static final Logger log = LoggerFactory.getLogger(InspectitConfigurationHolder.class);
 
   /** Current inspectit configuration */
   private volatile InspectitConfiguration configuration;
 
-  private ConfigurationHolder() {
+  private InspectitConfigurationHolder() {
     this.configuration = new InspectitConfiguration();
   }
 
   /**
-   * Factory method to create an {@link ConfigurationHolder}
+   * Factory method to create an {@link InspectitConfigurationHolder}
    *
    * @return the created holder
    */
-  public static ConfigurationHolder create() {
-    ConfigurationHolder holder = new ConfigurationHolder();
+  public static InspectitConfigurationHolder create() {
+    InspectitConfigurationHolder holder = new InspectitConfigurationHolder();
     holder.subscribeToConfigurationReceivedEvents();
     return holder;
   }
