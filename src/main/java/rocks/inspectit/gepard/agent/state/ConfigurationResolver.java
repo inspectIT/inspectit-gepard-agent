@@ -69,7 +69,7 @@ public class ConfigurationResolver {
     if (activeScopes.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
 
     ElementMatcher.Junction<MethodDescription> methodMatcher =
-            scopeResolver.getMethodMatcher(activeScopes);
+        scopeResolver.getMethodMatcher(activeScopes);
     return new ClassInstrumentationConfiguration(activeScopes, methodMatcher);
   }
 }
