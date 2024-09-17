@@ -1,5 +1,8 @@
 package rocks.inspectit.gepard.agent.state.scope;
 
+import static net.bytebuddy.matcher.ElementMatchers.isSynthetic;
+import static net.bytebuddy.matcher.ElementMatchers.not;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
@@ -48,7 +51,11 @@ public class ScopeResolver {
    */
   public ElementMatcher.Junction<MethodDescription> getMethodMatcher(
       Set<InstrumentationScope> scopes) {
-    if (containsAllMethodsScope(scopes)) return ElementMatchers.isMethod();
+    if (containsAllMethodsScope(scopes)) {
+      // Currently, we also exclude synthetic methods, since we cannot handle lambda expressions
+      // properly yet
+      return ElementMatchers.isMethod().and(not(isSynthetic()));
+    }
 
     Set<String> methodNames = collectMethodNames(scopes);
     return buildMatcherForMethods(methodNames);
