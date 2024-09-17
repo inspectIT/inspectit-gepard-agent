@@ -65,10 +65,11 @@ public class ConfigurationResolver {
   private ClassInstrumentationConfiguration getClassInstrumentationConfiguration(
       String fullyQualifiedName) {
     Set<InstrumentationScope> activeScopes = scopeResolver.getActiveScopes(fullyQualifiedName);
-    ElementMatcher.Junction<MethodDescription> methodMatcher =
-        scopeResolver.getMethodMatcher(activeScopes);
 
     if (activeScopes.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
+
+    ElementMatcher.Junction<MethodDescription> methodMatcher =
+            scopeResolver.getMethodMatcher(activeScopes);
     return new ClassInstrumentationConfiguration(activeScopes, methodMatcher);
   }
 }
