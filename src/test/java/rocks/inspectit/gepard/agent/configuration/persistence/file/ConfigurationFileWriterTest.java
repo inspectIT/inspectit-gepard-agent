@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,13 +48,13 @@ public class ConfigurationFileWriterTest {
   }
 
   private static InspectitConfiguration createConfiguration() {
-    Scope scope = new Scope("com.example.Application", true);
+    Scope scope = new Scope(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);
   }
 
   private static String expectedString() {
-    return "{\"instrumentation\":{\"scopes\":[{\"fqn\":\"com.example.Application\",\"methods\":null,\"enabled\":true}]}}";
+    return "{\"instrumentation\":{\"scopes\":[{\"enabled\":true,\"fqn\":\"com.example.Application\",\"methods\":[]}]}}";
   }
 }

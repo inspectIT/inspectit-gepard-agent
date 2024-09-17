@@ -8,23 +8,22 @@ import java.util.List;
  */
 public class Scope {
 
+  private boolean enabled;
+
   private String fqn;
 
   private List<String> methods;
 
-  private boolean enabled;
-
   public Scope() {}
 
-  public Scope(String fqn, boolean enabled) {
-    this.fqn = fqn;
-    this.enabled = enabled;
-  }
-
-  public Scope(String fqn, List<String> methods, boolean enabled) {
+  public Scope(boolean enabled, String fqn, List<String> methods) {
     this.fqn = fqn;
     this.methods = methods;
     this.enabled = enabled;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
   }
 
   public String getFqn() {
@@ -33,9 +32,5 @@ public class Scope {
 
   public List<String> getMethods() {
     return methods;
-  }
-
-  public boolean isEnabled() {
-    return enabled;
   }
 }

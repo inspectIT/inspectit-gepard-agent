@@ -32,7 +32,7 @@ class InstrumentationManagerTest {
   @Test
   void startBatchInstrumentation() {
     InstrumentationManager manager = InstrumentationManager.create();
-    manager.startBatchInstrumentation(null, null);
+    manager.startBatchInstrumentation(null);
     assertEquals(1, InspectitScheduler.getInstance().getNumberOfScheduledFutures());
   }
 }

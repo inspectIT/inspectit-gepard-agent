@@ -12,19 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
-import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 @ExtendWith(MockitoExtension.class)
 class TransformationManagerTest {
-
-  @Mock private ConfigurationResolver resolver;
 
   @Mock private InstrumentationState instrumentationState;
 
   @Test
   void agentBuilderDoNotEqual() {
-    TransformationManager manager = TransformationManager.create(resolver, instrumentationState);
+    TransformationManager manager = TransformationManager.create(instrumentationState);
 
     AgentBuilder agent = createAgentBuilder();
     AgentBuilder modifiedAgent = manager.modify(agent);

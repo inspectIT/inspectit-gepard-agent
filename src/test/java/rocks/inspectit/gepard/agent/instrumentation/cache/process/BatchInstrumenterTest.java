@@ -10,11 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
-import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
-import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 @ExtendWith(MockitoExtension.class)
 class BatchInstrumenterTest {
@@ -27,20 +27,18 @@ class BatchInstrumenterTest {
 
   @Mock private PendingClassesCache cache;
 
-  @Mock private ConfigurationResolver configurationResolver;
-
   @Mock private InstrumentationState instrumentationState;
+
+  @InjectMocks private BatchInstrumenter instrumenter;
 
   @Test
   void classIsRemovedFromCacheAndNotAddedToBatch() {
     Set<Class<?>> classes = new HashSet<>();
     classes.add(TEST_CLASS);
     when(cache.getKeyIterator()).thenReturn(classes.iterator());
-    when(configurationResolver.shouldInstrument(TEST_CLASS)).thenReturn(false);
-    when(instrumentationState.isInstrumented(TEST_CLASS)).thenReturn(false);
+    when(instrumentationState.shouldRetransform(TEST_CLASS)).thenReturn(false);
 
-    BatchInstrumenter instrumenter =
-        new BatchInstrumenter(cache, instrumentation, configurationResolver, instrumentationState);
+    instrumenter = new BatchInstrumenter(cache, instrumentation, instrumentationState);
     Set<Class<?>> classesToBeInstrumented = instrumenter.getNextBatch(BATCH_SIZE);
 
     assertEquals(0, classesToBeInstrumented.size());
@@ -52,11 +50,9 @@ class BatchInstrumenterTest {
     Set<Class<?>> classes = new HashSet<>();
     classes.add(TEST_CLASS);
     when(cache.getKeyIterator()).thenReturn(classes.iterator());
-    when(configurationResolver.shouldInstrument(TEST_CLASS)).thenReturn(true);
-    when(instrumentationState.isInstrumented(TEST_CLASS)).thenReturn(false);
+    when(instrumentationState.shouldRetransform(TEST_CLASS)).thenReturn(true);
 
-    BatchInstrumenter instrumenter =
-        new BatchInstrumenter(cache, instrumentation, configurationResolver, instrumentationState);
+    instrumenter = new BatchInstrumenter(cache, instrumentation, instrumentationState);
     Set<Class<?>> classesToBeInstrumented = instrumenter.getNextBatch(BATCH_SIZE);
 
     assertEquals(1, classesToBeInstrumented.size());
@@ -68,8 +64,7 @@ class BatchInstrumenterTest {
     Set<Class<?>> classes = new HashSet<>();
     classes.add(TEST_CLASS);
 
-    BatchInstrumenter instrumenter =
-        new BatchInstrumenter(cache, instrumentation, configurationResolver, instrumentationState);
+    instrumenter = new BatchInstrumenter(cache, instrumentation, instrumentationState);
     instrumenter.retransformBatch(classes);
 
     verify(instrumentation).retransformClasses(TEST_CLASS);

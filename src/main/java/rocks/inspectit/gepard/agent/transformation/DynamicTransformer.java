@@ -10,9 +10,10 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.utility.JavaModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
-import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
+import rocks.inspectit.gepard.agent.state.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 
 /**
@@ -23,13 +24,10 @@ import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;
 public class DynamicTransformer implements AgentBuilder.Transformer {
   private static final Logger log = LoggerFactory.getLogger(DynamicTransformer.class);
 
-  private final ConfigurationResolver resolver;
-
   /** The instrumentation state of the agent */
   private final InstrumentationState instrumentationState;
 
-  DynamicTransformer(ConfigurationResolver resolver, InstrumentationState instrumentationState) {
-    this.resolver = resolver;
+  DynamicTransformer(InstrumentationState instrumentationState) {
     this.instrumentationState = instrumentationState;
   }
 
@@ -51,17 +49,17 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       JavaModule module,
       ProtectionDomain protectionDomain) {
     InstrumentedType currentType = new InstrumentedType(typeDescription.getName(), classLoader);
-    if (resolver.shouldInstrument(typeDescription)) {
+    ClassInstrumentationConfiguration currentConfig =
+        instrumentationState.resolveClassConfiguration(currentType);
+    if (currentConfig.isActive()) {
       log.debug("Adding transformation to {}", typeDescription.getName());
 
-      ElementMatcher.Junction<MethodDescription> methodMatcher =
-          resolver.getMethodMatcher(typeDescription);
-
+      ElementMatcher.Junction<MethodDescription> methodMatcher = currentConfig.methodMatcher();
       builder = builder.visit(Advice.to(InspectitAdvice.class).on(methodMatcher));
 
       // Mark type as instrumented
-      instrumentationState.addInstrumentedType(currentType);
-    } else if (instrumentationState.isInstrumented(currentType)) {
+      instrumentationState.addInstrumentedType(currentType, currentConfig);
+    } else if (instrumentationState.isActive(currentType)) {
       log.debug("Removing transformation from {}", typeDescription.getName());
       // Mark type as uninstrumented or deinstrumented
       instrumentationState.invalidateInstrumentedType(currentType);

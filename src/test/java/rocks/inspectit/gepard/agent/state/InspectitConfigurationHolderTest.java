@@ -1,8 +1,9 @@
-package rocks.inspectit.gepard.agent.resolver;
+package rocks.inspectit.gepard.agent.state;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
@@ -10,9 +11,9 @@ import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 
-class ConfigurationHolderTest {
+class InspectitConfigurationHolderTest {
 
-  private final ConfigurationHolder holder = ConfigurationHolder.create();
+  private static final InspectitConfigurationHolder holder = InspectitConfigurationHolder.create();
 
   @Test
   void configurationNotNull() {
@@ -33,7 +34,7 @@ class ConfigurationHolderTest {
   }
 
   private InspectitConfiguration createConfiguration() {
-    Scope scope = new Scope("com.example.Application", true);
+    Scope scope = new Scope(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

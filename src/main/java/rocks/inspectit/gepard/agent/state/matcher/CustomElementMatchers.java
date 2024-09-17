@@ -1,4 +1,4 @@
-package rocks.inspectit.gepard.agent.resolver.matcher;
+package rocks.inspectit.gepard.agent.state.matcher;
 
 import net.bytebuddy.description.NamedElement;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -15,6 +15,8 @@ import net.bytebuddy.matcher.StringMatcher;
  * <p>Date Copied: 09.09.2024 This class provides advanced and custom ElementMatchers.
  */
 public class CustomElementMatchers {
+
+  private CustomElementMatchers() {}
 
   /**
    * Creates an {@link ElementMatcher} matching items with the given name settings. Currently, there

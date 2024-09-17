@@ -50,7 +50,6 @@ public class ConfigurationServerMock {
   }
 
   public void configServerSetup(String config_path) throws IOException {
-
     ClassLoader loader = getClass().getClassLoader();
     File file = new File(loader.getResource(config_path).getFile());
     String body = FileUtils.readFileToString(file, "UTF-8");

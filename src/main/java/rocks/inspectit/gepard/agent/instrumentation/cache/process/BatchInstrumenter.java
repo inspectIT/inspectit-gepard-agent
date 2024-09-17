@@ -6,9 +6,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
-import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
-import rocks.inspectit.gepard.agent.resolver.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 /**
  * Responsible for retransforming classes in batches. The batch size is fixed to 1000. This is
@@ -25,18 +24,14 @@ public class BatchInstrumenter implements NamedRunnable {
 
   private final Instrumentation instrumentation;
 
-  private final ConfigurationResolver configurationResolver;
-
   private final InstrumentationState instrumentationState;
 
   public BatchInstrumenter(
       PendingClassesCache pendingClassesCache,
       Instrumentation instrumentation,
-      ConfigurationResolver configurationResolver,
       InstrumentationState instrumentationState) {
     this.pendingClassesCache = pendingClassesCache;
     this.instrumentation = instrumentation;
-    this.configurationResolver = configurationResolver;
     this.instrumentationState = instrumentationState;
   }
 
@@ -70,10 +65,9 @@ public class BatchInstrumenter implements NamedRunnable {
       checkedClassesCount++;
 
       try {
-        boolean shouldInstrument = configurationResolver.shouldInstrument(clazz);
-        boolean isInstrumented = instrumentationState.isInstrumented(clazz);
+        boolean shouldRetransform = instrumentationState.shouldRetransform(clazz);
 
-        if (shouldInstrument != isInstrumented) classesToRetransform.add(clazz);
+        if (shouldRetransform) classesToRetransform.add(clazz);
       } catch (Exception e) {
         log.error("Could not check instrumentation status for {}", clazz.getName(), e);
       }

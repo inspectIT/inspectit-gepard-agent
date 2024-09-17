@@ -3,6 +3,7 @@ package rocks.inspectit.gepard.agent.internal.configuration.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
@@ -57,11 +58,11 @@ class ConfigurationMapperTest {
   }
 
   private static String expectedString() {
-    return "{\"instrumentation\":{\"scopes\":[{\"fqn\":\"com.example.Application\",\"methods\":null,\"enabled\":true}]}}";
+    return "{\"instrumentation\":{\"scopes\":[{\"enabled\":true,\"fqn\":\"com.example.Application\",\"methods\":[]}]}}";
   }
 
   private static InspectitConfiguration expectedConfig() {
-    Scope scope = new Scope("com.example.Application", true);
+    Scope scope = new Scope(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);
