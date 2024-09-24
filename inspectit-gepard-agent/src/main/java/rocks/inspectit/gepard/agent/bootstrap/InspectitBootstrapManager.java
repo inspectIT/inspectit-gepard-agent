@@ -11,8 +11,11 @@ import java.util.jar.JarFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This manager should append our bootstrap classes to the bootstrap classloader, so there are
+ * accessible globally in the target application as well as this agent.
+ */
 public class InspectitBootstrapManager {
-
   private static final Logger log = LoggerFactory.getLogger(InspectitBootstrapManager.class);
 
   private static final String INSPECTIT_BOOTSTRAP_JAR_PATH = "/inspectit-gepard-bootstrap.jar";
@@ -21,6 +24,7 @@ public class InspectitBootstrapManager {
 
   private InspectitBootstrapManager() {}
 
+  /** Appends our inspectit-gepard-bootstrap.jar to the bootstrap-classloader */
   public static synchronized void appendToBootstrapClassLoader() {
     Instrumentation instrumentation = InstrumentationHolder.getInstrumentation();
     try {
