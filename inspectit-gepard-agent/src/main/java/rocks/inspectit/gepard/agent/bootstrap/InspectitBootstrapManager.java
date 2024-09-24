@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.bootstrap;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.opentelemetry.javaagent.bootstrap.InstrumentationHolder;
 import java.io.*;
 import java.lang.instrument.Instrumentation;
@@ -24,14 +25,21 @@ public class InspectitBootstrapManager {
 
   private InspectitBootstrapManager() {}
 
+  /**
+   * Factory method to create an {@link InspectitBootstrapManager}
+   *
+   * @return the created manager
+   */
+  public static InspectitBootstrapManager create() {
+    return new InspectitBootstrapManager();
+  }
+
   /** Appends our inspectit-gepard-bootstrap.jar to the bootstrap-classloader */
-  public static synchronized void appendToBootstrapClassLoader() {
+  public synchronized void appendToBootstrapClassLoader() {
     Instrumentation instrumentation = InstrumentationHolder.getInstrumentation();
     try {
-      Path bootstrapJarPath =
-          copyResourceToTempJarFile(
-              INSPECTIT_BOOTSTRAP_JAR_PATH, INSPECTIT_BOOTSTRAP_JAR_TEMP_PREFIX);
-      JarFile bootstrapJar = new JarFile(bootstrapJarPath.toFile());
+      JarFile bootstrapJar =
+          copyJarFile(INSPECTIT_BOOTSTRAP_JAR_PATH, INSPECTIT_BOOTSTRAP_JAR_TEMP_PREFIX);
       instrumentation.appendToBootstrapClassLoaderSearch(bootstrapJar);
     } catch (Exception e) {
       log.error("Could not append inspectIT Gepard interfaces to bootstrap classloader", e);
@@ -41,20 +49,22 @@ public class InspectitBootstrapManager {
   }
 
   /**
-   * Copies the given resource to a new temporary file with the ending ".jar"
+   * Copies the given resource to a new temporary jar file
    *
    * @param resourcePath the path to the resource
    * @param prefix the name of the new temporary file
    * @return the path to the generated jar file
    */
-  private static Path copyResourceToTempJarFile(String resourcePath, String prefix)
-      throws IOException {
+  @VisibleForTesting
+  JarFile copyJarFile(String resourcePath, String prefix) throws IOException {
     try (InputStream inputStream =
         InspectitBootstrapManager.class.getResourceAsStream(resourcePath)) {
-      Path targetFile = Files.createTempFile(prefix, ".jar");
-      Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
-      targetFile.toFile().deleteOnExit();
-      return targetFile;
+      Path targetPath = Files.createTempFile(prefix, ".jar");
+      Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+      File targetFile = targetPath.toFile();
+      targetFile.deleteOnExit();
+
+      return new JarFile(targetFile);
     }
   }
 }

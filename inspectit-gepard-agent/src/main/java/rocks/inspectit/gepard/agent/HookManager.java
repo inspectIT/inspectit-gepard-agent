@@ -7,7 +7,7 @@ import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 import rocks.inspectit.gepard.bootstrap.instrumentation.noop.NoopHookManager;
 
 /**
- * TODO
+ * TODO implement
  *
  * <p>Note: In inspectIT Ocelot we don't implement {@link IHookManager} directly, but instead pass
  * over {@link #getHook} as lambda to {@link Instances}. This should avoid issues with spring
@@ -32,7 +32,7 @@ public class HookManager implements IHookManager {
 
   @Override
   public IMethodHook getHook(Class<?> clazz, String methodSignature) {
-    // TODO
+    // TODO implement
     return null;
   }
 

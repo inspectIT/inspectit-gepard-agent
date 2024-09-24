@@ -105,6 +105,7 @@ dependencies {
     testImplementation("io.opentelemetry.javaagent:opentelemetry-javaagent-tooling")
     testCompileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api")
     testCompileOnly("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi")
+    testCompileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-bootstrap")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junit}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junit}")
