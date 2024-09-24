@@ -130,18 +130,51 @@ dependencies {
     add("muzzleTooling", "io.opentelemetry.javaagent:opentelemetry-javaagent-tooling:${versions.opentelemetryJavaagentAlpha}")
 }
 
-// Produces a copy of upstream javaagent with this extension jar included inside it
+/*
+ Since we cannot include additional submodules into the shadowJar that easily, we use the following approach
+ to create one extension-jar, containing all of our submodules:
+
+ 1. Copy the output of all submodules to a temporary directory
+ 2. Unzip the output of the shadowJar task (which includes our core logic)
+ 3. Move the jars of the other submodules into the unzipped directory
+ 4. Re-zip the directory
+ 5. Insert the re-zipped jar into the opentelemetry-javaagent.jar
+ 6. Delete the temporary directory
+ */
+def mergeModules = tasks.register("mergeModules", Zip) {
+    dependsOn(copyModules)
+    from tasks.copyModules.destinationDir
+    destinationDirectory = layout.buildDirectory.dir('libs').get().asFile
+    archiveFileName.set("inspectit-gepard-agent-extension-${version}.jar")
+}
+
+// Copies the output of your submodules to a temporary directory
+def copyModules = tasks.register("copyModules", Copy) {
+    dependsOn(shadowJar)
+    dependsOn(project(":inspectit-gepard-bootstrap").tasks.jar)
+
+    destinationDir = layout.buildDirectory.dir('copy').get().asFile
+
+    from(zipTree(tasks.shadowJar.archiveFile.get()))
+    from(project(":inspectit-gepard-bootstrap").jar.outputs)
+
+    finalizedBy(mergeModules)
+}
+
+shadowJar.finalizedBy(copyModules)
+
+assemble.dependsOn(shadowJar)
+
+// Produces a copy of upstream javaagent with this extension jar included inside it.
 // The location of extension directory inside agent jar is hard-coded in the agent source code
 tasks.register('extendedAgent', Jar) {
     dependsOn(configurations.otel)
+    dependsOn(mergeModules)
+
     archiveFileName = "inspectit-gepard-agent.jar"
     from zipTree(configurations.otel.singleFile)
-//    from(tasks.shadowJar.archiveFile) {
-//        into "extensions"
-//    }
 
-    dependsOn(repack)
-    from(tasks.repack.archiveFile) {
+    from(tasks.mergeModules.archiveFile) {
         into "extensions"
     }
 
@@ -153,41 +186,21 @@ tasks.register('extendedAgent', Jar) {
             }.singleFile
         )
     }
-}
 
-def repack = tasks.register("repack", Zip) {
-    dependsOn(horst)
-    from layout.buildDirectory.dir('bootstrap/tmp').get().asFile
-    destinationDirectory.set(file("${buildDir}/libs"))
-    archiveFileName.set("inspectit-gepard-agent-extension.jar")
-}
-
-def horst = tasks.register("horst", Copy) {
-    dependsOn(shadowJar)
-
-    destinationDir = layout.buildDirectory.dir('bootstrap').get().asFile
-
-    from(zipTree(tasks.shadowJar.archiveFile.get())) {
-        into "tmp"
+    // Remove temporary directory
+    doLast {
+        delete tasks.copyModules.destinationDir
     }
-
-    from(project(":inspectit-gepard-bootstrap").jar.outputs) {
-        into "tmp"
-    }
-
-    finalizedBy(repack)
-}
-
-shadowJar {
-    finalizedBy(horst)
 }
 
 tasks {
     test {
-        dependsOn(extendedAgent)
+        // we need to merge our submodules before running tests,
+        // so all classes are accessible for integration tests
+        dependsOn(mergeModules)
         useJUnitPlatform()
 
-        inputs.files(layout.files(tasks.repack))
+        inputs.files(layout.files(tasks.mergeModules))
         inputs.files(layout.files(tasks.extendedAgent))
 
         // Necessary to use system-lambda in tests
@@ -197,16 +210,16 @@ tasks {
 
         systemProperty 'io.opentelemetry.smoketest.agentPath', configurations.otel.singleFile.absolutePath
         systemProperty 'io.opentelemetry.smoketest.extendedAgentPath', tasks.extendedAgent.archiveFile.get().asFile.absolutePath
-        systemProperty 'io.opentelemetry.smoketest.extensionPath', tasks.repack.archiveFile.get().asFile.absolutePath
+        systemProperty 'io.opentelemetry.smoketest.extensionPath', tasks.mergeModules.archiveFile.get().asFile.absolutePath
 
-        finalizedBy jacocoTestReport
+        finalizedBy(jacocoTestReport)
     }
+
+    jacocoTestReport.dependsOn(test)
 
     compileJava {
         options.release.set(17)
     }
-
-    assemble.dependsOn(shadowJar)
 
     dockerPrepare.dependsOn(extendedAgent)
 
@@ -218,6 +231,4 @@ tasks {
         dockerfile file('docker/Dockerfile')
         files 'docker/entrypoint.sh', agentJar.get().asFile
     }
-
-    jacocoTestReport.dependsOn(test)
 }

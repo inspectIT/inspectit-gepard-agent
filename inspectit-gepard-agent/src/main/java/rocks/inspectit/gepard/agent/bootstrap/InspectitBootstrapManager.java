@@ -15,8 +15,6 @@ public class InspectitBootstrapManager {
 
   private static final Logger log = LoggerFactory.getLogger(InspectitBootstrapManager.class);
 
-  // private static final String INSPECTIT_BOOTSTRAP_JAR_PATH =
-  // "/extensions/inspectit-gepard-bootstrap.jar";
   private static final String INSPECTIT_BOOTSTRAP_JAR_PATH = "/inspectit-gepard-bootstrap.jar";
 
   private static final String INSPECTIT_BOOTSTRAP_JAR_TEMP_PREFIX = "gepard-bootstrap-";
@@ -32,10 +30,10 @@ public class InspectitBootstrapManager {
       JarFile bootstrapJar = new JarFile(bootstrapJarPath.toFile());
       instrumentation.appendToBootstrapClassLoaderSearch(bootstrapJar);
     } catch (Exception e) {
-      log.error("Could not add inspectIT Gepard interfaces to bootstrap classloader", e);
+      log.error("Could not append inspectIT Gepard interfaces to bootstrap classloader", e);
       return;
     }
-    log.info("Successfully added inspectIT Gepard interfaces to bootstrap classloader");
+    log.info("Successfully appended inspectIT Gepard interfaces to bootstrap classloader");
   }
 
   /**
@@ -47,7 +45,6 @@ public class InspectitBootstrapManager {
    */
   private static Path copyResourceToTempJarFile(String resourcePath, String prefix)
       throws IOException {
-    // try (InputStream inputStream = OpenTelemetryAgent.class.getResourceAsStream(resourcePath)) {
     try (InputStream inputStream =
         InspectitBootstrapManager.class.getResourceAsStream(resourcePath)) {
       Path targetFile = Files.createTempFile(prefix, ".jar");
