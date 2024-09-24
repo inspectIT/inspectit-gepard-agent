@@ -140,6 +140,7 @@ tasks.register('extendedAgent', Jar) {
 //        into "extensions"
 //    }
 
+    dependsOn(repack)
     from(tasks.repack.archiveFile) {
         into "extensions"
     }
@@ -155,7 +156,8 @@ tasks.register('extendedAgent', Jar) {
 }
 
 def repack = tasks.register("repack", Zip) {
-    from layout.buildDirectory.dir('horst/shadowJar').get().asFile
+    dependsOn(horst)
+    from layout.buildDirectory.dir('bootstrap/tmp').get().asFile
     destinationDirectory.set(file("${buildDir}/libs"))
     archiveFileName.set("inspectit-gepard-agent-extension.jar")
 }
@@ -163,14 +165,14 @@ def repack = tasks.register("repack", Zip) {
 def horst = tasks.register("horst", Copy) {
     dependsOn(shadowJar)
 
-    destinationDir = layout.buildDirectory.dir('temp').get().asFile
+    destinationDir = layout.buildDirectory.dir('bootstrap').get().asFile
 
     from(zipTree(tasks.shadowJar.archiveFile.get())) {
-        into "temp"
+        into "tmp"
     }
 
     from(project(":inspectit-gepard-bootstrap").jar.outputs) {
-        into "temp"
+        into "tmp"
     }
 
     finalizedBy(repack)
@@ -182,6 +184,7 @@ shadowJar {
 
 tasks {
     test {
+        dependsOn(extendedAgent)
         useJUnitPlatform()
 
         inputs.files(layout.files(tasks.repack))
