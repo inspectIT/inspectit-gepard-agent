@@ -53,18 +53,35 @@ public class InspectitBootstrapManager {
    *
    * @param resourcePath the path to the resource
    * @param prefix the name of the new temporary file
-   * @return the path to the generated jar file
+   * @return the copied jar file
    */
   @VisibleForTesting
   JarFile copyJarFile(String resourcePath, String prefix) throws IOException {
     try (InputStream inputStream =
         InspectitBootstrapManager.class.getResourceAsStream(resourcePath)) {
-      Path targetPath = Files.createTempFile(prefix, ".jar");
-      Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-      File targetFile = targetPath.toFile();
-      targetFile.deleteOnExit();
+
+      File targetFile = prepareTempFile(prefix);
+      Files.copy(inputStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
       return new JarFile(targetFile);
     }
+  }
+
+  /**
+   * Creates and set-ups a new temporary file with the ending ".jar"
+   *
+   * @param prefix the name of the new temporary file
+   * @return the created temporary file
+   */
+  private File prepareTempFile(String prefix) throws IOException {
+    Path targetPath = Files.createTempFile(prefix, ".jar");
+    File targetFile = targetPath.toFile();
+
+    targetFile.setReadable(true, true);
+    targetFile.setWritable(true, true);
+    targetFile.setExecutable(true, true);
+    targetFile.deleteOnExit();
+
+    return targetFile;
   }
 }
