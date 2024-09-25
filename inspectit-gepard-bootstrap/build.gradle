@@ -1,0 +1,17 @@
+plugins {
+    id "com.diffplug.spotless" version "6.25.0"
+}
+
+sourceCompatibility = "17"
+targetCompatibility = "17"
+
+spotless {
+    java {
+        importOrder()
+        removeUnusedImports()
+        googleJavaFormat()
+        formatAnnotations()
+        target("src/**/*.java")
+        licenseHeader '/* (C) 2024 */'
+    }
+}

@@ -9,3 +9,5 @@ pluginManagement {
 }
 
 rootProject.name = 'inspectit-gepard-agent'
+include 'inspectit-gepard-agent'
+include 'inspectit-gepard-bootstrap'
