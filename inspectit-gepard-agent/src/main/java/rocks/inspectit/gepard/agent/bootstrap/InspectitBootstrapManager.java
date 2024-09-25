@@ -74,7 +74,8 @@ public class InspectitBootstrapManager {
    * @return the created temporary file
    */
   private File prepareTempFile(String prefix) throws IOException {
-    Path targetPath = Files.createTempFile(prefix, ".jar");
+    Path tempDir = Files.createTempDirectory("inspectit-gepard-");
+    Path targetPath = Files.createTempFile(tempDir, prefix, ".jar");
     File targetFile = targetPath.toFile();
 
     targetFile.setReadable(true, true);
