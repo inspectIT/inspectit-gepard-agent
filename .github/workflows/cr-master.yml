@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: agent-artifact
-          path: build/libs/inspectit-gepard-agent.jar
+          path: inspectit-gepard-agent/build/libs/inspectit-gepard-agent.jar
 
   build-image:
     runs-on: ubuntu-latest
