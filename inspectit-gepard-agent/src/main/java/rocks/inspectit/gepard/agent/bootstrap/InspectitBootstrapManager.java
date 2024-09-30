@@ -13,25 +13,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This manager should append our bootstrap classes to the bootstrap classloader, so they are
+ * This manager should append our bootstrap classes to the bootstrap classloader, so there are
  * accessible globally in the target application as well as this agent.
  */
-public class BootstrapManager {
-  private static final Logger log = LoggerFactory.getLogger(BootstrapManager.class);
+public class InspectitBootstrapManager {
+  private static final Logger log = LoggerFactory.getLogger(InspectitBootstrapManager.class);
 
   private static final String INSPECTIT_BOOTSTRAP_JAR_PATH = "/inspectit-gepard-bootstrap.jar";
 
   private static final String INSPECTIT_BOOTSTRAP_JAR_TEMP_PREFIX = "gepard-bootstrap-";
 
-  private BootstrapManager() {}
+  private InspectitBootstrapManager() {}
 
   /**
-   * Factory method to create an {@link BootstrapManager}
+   * Factory method to create an {@link InspectitBootstrapManager}
    *
    * @return the created manager
    */
-  public static BootstrapManager create() {
-    return new BootstrapManager();
+  public static InspectitBootstrapManager create() {
+    return new InspectitBootstrapManager();
   }
 
   /** Appends our inspectit-gepard-bootstrap.jar to the bootstrap-classloader */
@@ -57,7 +57,8 @@ public class BootstrapManager {
    */
   @VisibleForTesting
   JarFile copyJarFile(String resourcePath, String prefix) throws IOException {
-    try (InputStream inputStream = BootstrapManager.class.getResourceAsStream(resourcePath)) {
+    try (InputStream inputStream =
+        InspectitBootstrapManager.class.getResourceAsStream(resourcePath)) {
 
       File targetFile = prepareTempFile(prefix);
       Files.copy(inputStream, targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

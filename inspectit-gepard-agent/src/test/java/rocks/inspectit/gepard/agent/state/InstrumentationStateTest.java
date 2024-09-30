@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state;
+package rocks.inspectit.gepard.agent.state;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
@@ -20,11 +18,9 @@ class InstrumentationStateTest {
 
   @Mock private ConfigurationResolver resolver;
 
-  @Mock private MethodHookManager hookState;
-
   @Mock private ClassInstrumentationConfiguration configuration;
 
-  private InstrumentationState instrumentationState;
+  private InstrumentationState state;
 
   private static final Class<?> TEST_CLASS = InstrumentationStateTest.class;
 
@@ -33,12 +29,12 @@ class InstrumentationStateTest {
 
   @BeforeEach
   void beforeEach() {
-    instrumentationState = InstrumentationState.create(resolver, hookState);
+    state = InstrumentationState.create(resolver);
   }
 
   @Test
   void typeIsNotInstrumented() {
-    boolean isActive = instrumentationState.isActive(TEST_TYPE);
+    boolean isActive = state.isActive(TEST_TYPE);
 
     assertFalse(isActive);
   }
@@ -47,9 +43,9 @@ class InstrumentationStateTest {
   void typeIsNotInstrumentedWithConfiguration() {
     when(configuration.isActive()).thenReturn(false);
 
-    instrumentationState.addInstrumentedType(TEST_TYPE, configuration);
+    state.addInstrumentedType(TEST_TYPE, configuration);
 
-    boolean isActive = instrumentationState.isActive(TEST_TYPE);
+    boolean isActive = state.isActive(TEST_TYPE);
 
     assertFalse(isActive);
   }
@@ -58,19 +54,19 @@ class InstrumentationStateTest {
   void typeIsInstrumented() {
     when(configuration.isActive()).thenReturn(true);
 
-    instrumentationState.addInstrumentedType(TEST_TYPE, configuration);
+    state.addInstrumentedType(TEST_TYPE, configuration);
 
-    boolean isActive = instrumentationState.isActive(TEST_TYPE);
+    boolean isActive = state.isActive(TEST_TYPE);
 
     assertTrue(isActive);
   }
 
   @Test
   void typeIsDeinstrumented() {
-    instrumentationState.addInstrumentedType(TEST_TYPE, configuration);
-    instrumentationState.invalidateInstrumentedType(TEST_TYPE);
+    state.addInstrumentedType(TEST_TYPE, configuration);
+    state.invalidateInstrumentedType(TEST_TYPE);
 
-    boolean isActive = instrumentationState.isActive(TEST_TYPE);
+    boolean isActive = state.isActive(TEST_TYPE);
 
     assertFalse(isActive);
   }

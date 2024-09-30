@@ -15,7 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
-import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 @ExtendWith(MockitoExtension.class)
 class BatchInstrumenterTest {

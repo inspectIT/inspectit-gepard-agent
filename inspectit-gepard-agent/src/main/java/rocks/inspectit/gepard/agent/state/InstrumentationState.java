@@ -1,32 +1,24 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state;
+package rocks.inspectit.gepard.agent.state;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.Map;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
 /** Stores the instrumentation configuration of all instrumented classes. */
 public class InstrumentationState {
-  private static final Logger log = LoggerFactory.getLogger(InstrumentationState.class);
 
   /** Store for every instrumented class */
   private final Cache<InstrumentedType, ClassInstrumentationConfiguration> activeInstrumentations;
 
   private final ConfigurationResolver configurationResolver;
 
-  private final MethodHookManager methodHookManager;
-
-  private InstrumentationState(
-      ConfigurationResolver configurationResolver, MethodHookManager methodHookManager) {
+  private InstrumentationState(ConfigurationResolver configurationResolver) {
     this.activeInstrumentations = Caffeine.newBuilder().build();
     this.configurationResolver = configurationResolver;
-    this.methodHookManager = methodHookManager;
   }
 
   /**
@@ -34,32 +26,29 @@ public class InstrumentationState {
    *
    * @return the created state
    */
-  public static InstrumentationState create(
-      ConfigurationResolver configurationResolver, MethodHookManager methodHookManager) {
-    return new InstrumentationState(configurationResolver, methodHookManager);
+  public static InstrumentationState create(ConfigurationResolver configurationResolver) {
+    return new InstrumentationState(configurationResolver);
   }
 
   /**
    * Checks, if the provided class should be retransformed. A retransformation is necessary, if the
-   * new configuration differs from the current configuration. Additionally, we trigger the update
-   * of the classes method hooks, if necessary.
+   * new configuration differs from the current configuration.
    *
    * @param clazz the class
    * @return true, if the provided class should be retransformed
    */
   public boolean shouldRetransform(Class<?> clazz) {
-    InstrumentedType type = new InstrumentedType(clazz.getName(), clazz.getClassLoader());
-    ClassInstrumentationConfiguration currentConfig = activeInstrumentations.getIfPresent(type);
+    ClassInstrumentationConfiguration activeConfig =
+        activeInstrumentations.asMap().entrySet().stream()
+            .filter(entry -> entry.getKey().isEqualTo(clazz)) // find class
+            .map(Map.Entry::getValue) // get configuration
+            .findAny()
+            .orElse(null);
+
     ClassInstrumentationConfiguration newConfig =
         configurationResolver.getClassInstrumentationConfiguration(clazz);
 
-    try {
-      updateHooks(clazz, currentConfig, newConfig);
-    } catch (Exception e) {
-      log.error("Could not update method hooks", e);
-    }
-
-    if (Objects.nonNull(currentConfig)) return !currentConfig.equals(newConfig);
+    if (Objects.nonNull(activeConfig)) return !activeConfig.equals(newConfig);
     return newConfig.isActive();
   }
 
@@ -103,25 +92,5 @@ public class InstrumentationState {
    */
   public void invalidateInstrumentedType(InstrumentedType type) {
     activeInstrumentations.invalidate(type);
-  }
-
-  /**
-   * Checks, if the instrumentation configurations of the provided class require method hooks. If
-   * one of the configurations is active, we require method hooks for them. Then we should update
-   * the method hooks.
-   *
-   * @param clazz the current class
-   * @param currentConfig the current instrumentation configuration of the class
-   * @param newConfig the new instrumentation configuration of the class
-   */
-  private void updateHooks(
-      Class<?> clazz,
-      ClassInstrumentationConfiguration currentConfig,
-      ClassInstrumentationConfiguration newConfig) {
-    boolean newConfigRequiresHooks = newConfig.isActive();
-    boolean currentConfigRequiresHooks = Objects.nonNull(currentConfig) && currentConfig.isActive();
-
-    if (newConfigRequiresHooks || currentConfigRequiresHooks)
-      methodHookManager.updateHooksFor(clazz, newConfig);
   }
 }

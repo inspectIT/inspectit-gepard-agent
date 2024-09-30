@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher;
+package rocks.inspectit.gepard.agent.state.matcher;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static rocks.inspectit.gepard.agent.testutils.CustomAssertions.assertNamedElementMatcherMatches;

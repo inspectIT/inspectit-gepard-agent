@@ -10,7 +10,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 
 /**
  * Stores the instrumentation configuration for a specific class. Currently, a class can only be
- * instrumented or not.
+ * instrumented or not. Later, we could add a list of active rules for example.
  */
 public record ClassInstrumentationConfiguration(
     Set<InstrumentationScope> activeScopes,

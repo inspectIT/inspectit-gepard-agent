@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state.configuration;
+package rocks.inspectit.gepard.agent.state;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

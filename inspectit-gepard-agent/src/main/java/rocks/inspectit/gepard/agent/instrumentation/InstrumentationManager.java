@@ -10,9 +10,9 @@ import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
 import rocks.inspectit.gepard.agent.instrumentation.cache.input.ClassDiscoveryService;
 import rocks.inspectit.gepard.agent.instrumentation.cache.input.ConfigurationReceiver;
 import rocks.inspectit.gepard.agent.instrumentation.cache.process.BatchInstrumenter;
-import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 /** Responsible component for setting up and executing instrumentation. */
 public class InstrumentationManager {

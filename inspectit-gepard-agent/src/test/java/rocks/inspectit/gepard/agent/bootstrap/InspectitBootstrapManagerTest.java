@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class BootstrapManagerTest {
+class InspectitBootstrapManagerTest {
 
   @Mock private Instrumentation instrumentation;
 
@@ -29,7 +29,7 @@ class BootstrapManagerTest {
 
   @Test
   void bootstrapClassesAreAvailable() throws IOException {
-    BootstrapManager manager = Mockito.spy(BootstrapManager.class);
+    InspectitBootstrapManager manager = Mockito.spy(InspectitBootstrapManager.class);
 
     Mockito.doReturn(jarFile).when(manager).copyJarFile(anyString(), anyString());
     manager.appendToBootstrapClassLoader();

@@ -4,7 +4,7 @@ package rocks.inspectit.gepard.agent.transformation;
 import static net.bytebuddy.matcher.ElementMatchers.any;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
-import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
+import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 /** Responsible component for setting up class transformation for instrumentation */
 public class TransformationManager {
