@@ -62,7 +62,7 @@ public class MethodHookManager implements IHookManager {
   }
 
   public void updateHooksFor(Class<?> clazz, ClassInstrumentationConfiguration configuration) {
-    log.debug("Updating hooks for {}", clazz.getName());
+    log.info("Updating hooks for {}", clazz.getName());
     ElementMatcher.Junction<MethodDescription> methodMatcher = configuration.methodMatcher();
     TypeDescription type = TypeDescription.ForLoadedType.of(clazz);
     Set<MethodDescription.InDefinedShape> matchedMethods =
@@ -112,7 +112,6 @@ public class MethodHookManager implements IHookManager {
                 }
               }
             });
-    // TODO This should be DEBUG, but should also be visible in tests
     log.info("Updated {} method hooks for {}", operationCounter.get(), clazz.getName());
   }
 
