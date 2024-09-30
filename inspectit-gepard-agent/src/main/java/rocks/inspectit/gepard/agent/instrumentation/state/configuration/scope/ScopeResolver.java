@@ -1,17 +1,17 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.state.scope;
+package rocks.inspectit.gepard.agent.instrumentation.state.configuration.scope;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.CustomElementMatchers;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.MatcherChainBuilder;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
-import rocks.inspectit.gepard.agent.state.InspectitConfigurationHolder;
-import rocks.inspectit.gepard.agent.state.matcher.CustomElementMatchers;
-import rocks.inspectit.gepard.agent.state.matcher.MatcherChainBuilder;
 
 /**
  * This class is used to resolve the {@link Scope} based on the {@link Scope} List, contained in the

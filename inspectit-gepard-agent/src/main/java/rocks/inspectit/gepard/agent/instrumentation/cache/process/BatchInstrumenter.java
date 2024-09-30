@@ -7,8 +7,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
+import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.internal.schedule.NamedRunnable;
-import rocks.inspectit.gepard.agent.state.InstrumentationState;
 
 /**
  * Responsible for retransforming classes in batches. The batch size is fixed to 1000. This is
@@ -67,17 +67,16 @@ public class BatchInstrumenter implements NamedRunnable {
 
       try {
         boolean shouldRetransform = instrumentationState.shouldRetransform(clazz);
-
         if (shouldRetransform) classesToRetransform.add(clazz);
       } catch (Exception e) {
-        log.error("Could not check instrumentation status for {}", clazz.getName(), e);
+        log.error("Could not check instrumentation state for {}", clazz.getName(), e);
       }
 
       if (checkedClassesCount >= batchSize) break;
     }
 
     log.debug(
-        "Checked configuration of {} classes, {} classes left to check",
+        "Checked instrumentation state of {} classes, {} classes left to check",
         checkedClassesCount,
         pendingClassesCache.getSize());
 

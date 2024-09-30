@@ -7,13 +7,14 @@ import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.bootstrap.InspectitBootstrapManager;
+import rocks.inspectit.gepard.agent.bootstrap.BootstrapManager;
 import rocks.inspectit.gepard.agent.configuration.ConfigurationManager;
 import rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager;
+import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
+import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
 import rocks.inspectit.gepard.agent.notification.NotificationManager;
-import rocks.inspectit.gepard.agent.state.ConfigurationResolver;
-import rocks.inspectit.gepard.agent.state.InspectitConfigurationHolder;
-import rocks.inspectit.gepard.agent.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.transformation.TransformationManager;
 
 @SuppressWarnings("unused")
@@ -34,33 +35,34 @@ public class InspectitAgentExtension implements AgentExtension {
     log.info("Starting inspectIT Gepard agent extension ...");
 
     // Append the bootstrap classloader with inspectIT interfaces
-    InspectitBootstrapManager bootstrapManager = InspectitBootstrapManager.create();
+    BootstrapManager bootstrapManager = BootstrapManager.create();
     bootstrapManager.appendToBootstrapClassLoader();
 
     // Notify configuration server about this agent
     NotificationManager notificationManager = NotificationManager.create();
     notificationManager.sendStartNotification();
 
+    // Set up methods hooks to execute inspectIT code inside target applications
+    MethodHookManager methodHookManager = MethodHookManager.create();
+
     // Prepare instrumentation state tracking
     InspectitConfigurationHolder configurationHolder = InspectitConfigurationHolder.create();
     ConfigurationResolver configurationResolver = ConfigurationResolver.create(configurationHolder);
-    InstrumentationState instrumentationState = InstrumentationState.create(configurationResolver);
-
-    // Set up methods hooks to execute inspectIT code inside target applications
-    HookManager hookManager = HookManager.create();
+    InstrumentationState instrumentationState =
+        InstrumentationState.create(configurationResolver, methodHookManager);
 
     // Modify the OTel AgentBuilder with our transformer
     TransformationManager transformationManager =
         TransformationManager.create(instrumentationState);
     agentBuilder = transformationManager.modify(agentBuilder);
 
-    // Set up instrumentation
+    // Set up dynamic instrumentation
     InstrumentationManager instrumentationManager = InstrumentationManager.create();
     instrumentationManager.createConfigurationReceiver();
     instrumentationManager.startClassDiscovery();
     instrumentationManager.startBatchInstrumentation(instrumentationState);
 
-    // Start loading the inspectit configuration
+    // Start loading the inspectIT configuration
     ConfigurationManager configurationManager = ConfigurationManager.create();
     configurationManager.loadConfiguration();
 
