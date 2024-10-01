@@ -173,6 +173,7 @@ assemble.dependsOn(shadowJar)
 tasks.register('extendedAgent', Jar) {
     dependsOn(configurations.otel)
     dependsOn(mergeModules)
+    finalizedBy(spotlessApply)
 
     archiveFileName = "inspectit-gepard-agent.jar"
     from zipTree(configurations.otel.singleFile)

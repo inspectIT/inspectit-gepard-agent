@@ -3,13 +3,12 @@ package rocks.inspectit.gepard.agent.instrumentation.hook;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import com.google.common.annotations.VisibleForTesting;
 import net.bytebuddy.description.method.MethodDescription;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;

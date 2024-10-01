@@ -6,16 +6,14 @@ import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Map;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
@@ -98,7 +96,8 @@ class MethodHookStateTest {
     int updatedHooks = methodHookState.updateHooks(TEST_CLASS, classHookConfiguration);
 
     assertEquals(0, updatedHooks);
-    verify(methodHookState, times(0)).setHook(eq(TEST_CLASS), any(String.class), any(MethodHook.class));
+    verify(methodHookState, times(0))
+        .setHook(eq(TEST_CLASS), any(String.class), any(MethodHook.class));
   }
 
   @Test
