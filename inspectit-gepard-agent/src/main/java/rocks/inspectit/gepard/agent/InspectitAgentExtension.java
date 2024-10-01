@@ -11,6 +11,7 @@ import rocks.inspectit.gepard.agent.bootstrap.BootstrapManager;
 import rocks.inspectit.gepard.agent.configuration.ConfigurationManager;
 import rocks.inspectit.gepard.agent.instrumentation.InstrumentationManager;
 import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
+import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookState;
 import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
@@ -43,7 +44,7 @@ public class InspectitAgentExtension implements AgentExtension {
     notificationManager.sendStartNotification();
 
     // Set up methods hooks to execute inspectIT code inside target applications
-    MethodHookManager methodHookManager = MethodHookManager.create();
+    MethodHookManager methodHookManager = MethodHookManager.create(new MethodHookState());
 
     // Prepare instrumentation state tracking
     InspectitConfigurationHolder configurationHolder = InspectitConfigurationHolder.create();

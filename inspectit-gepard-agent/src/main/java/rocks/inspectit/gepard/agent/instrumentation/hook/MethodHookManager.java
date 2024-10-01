@@ -19,7 +19,8 @@ import rocks.inspectit.gepard.bootstrap.instrumentation.noop.NoopMethodHook;
 
 /**
  * Implements {@link IHookManager} and serves as singleton, which returns the {@link IMethodHook}
- * for every instrumented method. The hooks are stored within the {@link MethodHookState}.
+ * for every instrumented method via {@link Instances#hookManager}. The hooks are stored within the
+ * {@link MethodHookState}.
  *
  * <p>Note: In inspectIT Ocelot we don't implement {@link IHookManager} directly, but instead pass
  * over {@link #getHook} as lambda to {@link Instances}. This should avoid issues with spring
@@ -32,8 +33,8 @@ public class MethodHookManager implements IHookManager {
   /** Stores classes and all of their hooked methods. Will be kept up-to-date during runtime. */
   private final MethodHookState hookState;
 
-  private MethodHookManager() {
-    hookState = new MethodHookState();
+  private MethodHookManager(MethodHookState hookState) {
+    this.hookState = hookState;
   }
 
   /**
@@ -41,12 +42,11 @@ public class MethodHookManager implements IHookManager {
    *
    * @return the created manager
    */
-  public static MethodHookManager create() {
+  public static MethodHookManager create(MethodHookState hookState) {
     log.debug("Creating MethodHookManager...");
-    if (!Instances.hookManager.equals(NoopHookManager.INSTANCE))
-      throw new IllegalStateException("Global HookManager already set");
+    if (isAlreadySet()) throw new IllegalStateException("Global HookManager already set");
 
-    MethodHookManager methodHookManager = new MethodHookManager();
+    MethodHookManager methodHookManager = new MethodHookManager(hookState);
     Instances.hookManager = methodHookManager;
     addShutdownHook();
     return methodHookManager;
@@ -92,9 +92,17 @@ public class MethodHookManager implements IHookManager {
       Class<?> clazz, ClassInstrumentationConfiguration configuration) {
     ElementMatcher.Junction<MethodDescription> methodMatcher = configuration.methodMatcher();
     TypeDescription type = TypeDescription.ForLoadedType.of(clazz);
+
     return type.getDeclaredMethods().stream()
         .filter(methodMatcher::matches)
         .collect(Collectors.toSet());
+  }
+
+  /**
+   * @return true, if the singleton {@link Instances#hookManager} is already set.
+   */
+  private static boolean isAlreadySet() {
+    return !Instances.hookManager.equals(NoopHookManager.INSTANCE);
   }
 
   /** Remove at shutdown */

@@ -8,16 +8,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import com.google.common.annotations.VisibleForTesting;
 import net.bytebuddy.description.method.MethodDescription;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
 
 /** Stores the method hook configurations of all instrumented classes. */
 public class MethodHookState {
-  private static final Logger log = LoggerFactory.getLogger(MethodHookState.class);
 
+  /** Stores classes and all of their hooked methods. Will be kept up-to-date during runtime. */
   private final Cache<Class<?>, HookedMethods> hooks;
 
   public MethodHookState() {
@@ -97,7 +97,8 @@ public class MethodHookState {
    * @param methodDescription the method description
    * @return the signature of the provided method
    */
-  private String getSignature(MethodDescription methodDescription) {
+  @VisibleForTesting
+  String getSignature(MethodDescription methodDescription) {
     String methodName = methodDescription.getName();
     String parameters =
         methodDescription.getParameters().asTypeList().stream()
@@ -113,7 +114,8 @@ public class MethodHookState {
    * @param methodSignature the method signature to be hooked
    * @param newHook the hook for the method
    */
-  private void setHook(Class<?> declaringClass, String methodSignature, MethodHook newHook) {
+  @VisibleForTesting
+  void setHook(Class<?> declaringClass, String methodSignature, MethodHook newHook) {
     hooks
         .asMap()
         .computeIfAbsent(declaringClass, (v) -> new HookedMethods())
@@ -126,7 +128,8 @@ public class MethodHookState {
    * @param declaringClass the class containing the method
    * @param methodSignature the method, whose hook should be removed
    */
-  private void removeHook(Class<?> declaringClass, String methodSignature) {
+  @VisibleForTesting
+  void removeHook(Class<?> declaringClass, String methodSignature) {
     HookedMethods hookedMethods = hooks.getIfPresent(declaringClass);
     if (Objects.nonNull(hookedMethods)) {
       hookedMethods.removeMethod(methodSignature);
@@ -141,7 +144,8 @@ public class MethodHookState {
    * @param methodSignature the method, which might be hooked
    * @return the hook of the method, if existing
    */
-  private Optional<MethodHook> getCurrentHook(Class<?> clazz, String methodSignature) {
+  @VisibleForTesting
+  Optional<MethodHook> getCurrentHook(Class<?> clazz, String methodSignature) {
     HookedMethods hookedMethods = hooks.getIfPresent(clazz);
     return Optional.ofNullable(hookedMethods)
         .map(methods -> methods.getActiveHook(methodSignature));

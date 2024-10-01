@@ -3,7 +3,7 @@ package rocks.inspectit.gepard.agent.instrumentation.state;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ class InstrumentationStateTest {
 
   @Mock private ConfigurationResolver resolver;
 
-  @Mock private MethodHookManager hookState;
+  @Mock private MethodHookManager methodHookManager;
 
   @Mock private ClassInstrumentationConfiguration configuration;
 
@@ -33,7 +33,7 @@ class InstrumentationStateTest {
 
   @BeforeEach
   void beforeEach() {
-    instrumentationState = InstrumentationState.create(resolver, hookState);
+    instrumentationState = InstrumentationState.create(resolver, methodHookManager);
   }
 
   @Test
@@ -73,5 +73,66 @@ class InstrumentationStateTest {
     boolean isActive = instrumentationState.isActive(TEST_TYPE);
 
     assertFalse(isActive);
+  }
+
+  @Test
+  void shouldNotRetransformWhenConfigurationEquals() {
+    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    instrumentationState.addInstrumentedType(TEST_TYPE, configuration);
+
+    boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
+
+    assertFalse(shouldRetransform);
+  }
+
+  @Test
+  void shouldNotRetransformWhenConfigurationDiffer() {
+    ClassInstrumentationConfiguration oldConfig = mock(ClassInstrumentationConfiguration.class);
+    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    instrumentationState.addInstrumentedType(TEST_TYPE, oldConfig);
+
+    boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
+
+    assertTrue(shouldRetransform);
+  }
+
+  @Test
+  void shouldRetransformWhenConfigurationIsActive() {
+    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(configuration.isActive()).thenReturn(true);
+
+    boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
+
+    assertTrue(shouldRetransform);
+  }
+
+  @Test
+  void shouldNotRetransformWhenConfigurationIsInactive() {
+    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(configuration.isActive()).thenReturn(false);
+
+    boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
+
+    assertFalse(shouldRetransform);
+  }
+
+  @Test
+  void shouldUpdateHooksWhenConfigurationIsActive() {
+    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(configuration.isActive()).thenReturn(true);
+
+    instrumentationState.shouldRetransform(TEST_CLASS);
+
+    verify(methodHookManager).updateHooksFor(TEST_CLASS, configuration);
+  }
+
+  @Test
+  void shouldNotUpdateHooksWhenConfigurationIsInactive() {
+    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(configuration.isActive()).thenReturn(false);
+
+    instrumentationState.shouldRetransform(TEST_CLASS);
+
+    verifyNoInteractions(methodHookManager);
   }
 }
