@@ -13,7 +13,7 @@ public class MethodHook implements IMethodHook {
 
   @Override
   public void onEnter(Object[] instrumentedMethodArgs, Object thiz) {
-    // Using our log4j does not work here...
+    // Using our log4j here will not be visible in the target application...
     String message =
         String.format(
             "inspectIT: Enter MethodHook with %d args in %s",
@@ -25,7 +25,7 @@ public class MethodHook implements IMethodHook {
   @Override
   public void onExit(
       Object[] instrumentedMethodArgs, Object thiz, Object returnValue, Throwable thrown) {
-    // Using our log4j does not work here...
+    // Using our log4j here will not be visible in the target application...
     String exceptionMessage = Objects.nonNull(thrown) ? thrown.getMessage() : "no exception";
     String message =
         String.format(

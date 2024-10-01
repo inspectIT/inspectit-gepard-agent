@@ -18,7 +18,7 @@ public class ScopeTest extends SpringTestBase {
   void scopeWithoutMethodInstrumentsAllMethods() throws Exception {
     configurationServerMock.configServerSetup(configDir + "simple-scope.json");
     startTarget("/opentelemetry-extensions.jar");
-    awaitInstrumentationUpdate();
+    awaitInstrumentationUpdate(1);
 
     sendRequestToTarget("/greeting");
     String logs = target.getLogs();
@@ -31,7 +31,7 @@ public class ScopeTest extends SpringTestBase {
   void scopeWithOneMethodInstrumentsOneMethod() throws Exception {
     configurationServerMock.configServerSetup(configDir + "scope-with-method.json");
     startTarget("/opentelemetry-extensions.jar");
-    awaitInstrumentationUpdate();
+    awaitInstrumentationUpdate(1);
 
     sendRequestToTarget("/greeting");
     String logs = target.getLogs();
@@ -44,7 +44,7 @@ public class ScopeTest extends SpringTestBase {
   void scopeWithTwoMethodsInstrumentsTwoMethods() throws Exception {
     configurationServerMock.configServerSetup(configDir + "scope-with-multiple-methods.json");
     startTarget("/opentelemetry-extensions.jar");
-    awaitInstrumentationUpdate();
+    awaitInstrumentationUpdate(1);
 
     sendRequestToTarget("/greeting");
     String logs = target.getLogs();
@@ -57,7 +57,7 @@ public class ScopeTest extends SpringTestBase {
   void emptyConfigurationDoesntInstrument() throws Exception {
     configurationServerMock.configServerSetup(configDir + "empty-configuration.json");
     startTarget("/opentelemetry-extensions.jar");
-    awaitInstrumentationUpdate();
+    awaitInstrumentationUpdate(1);
 
     sendRequestToTarget("/greeting");
     String logs = target.getLogs();
@@ -70,7 +70,8 @@ public class ScopeTest extends SpringTestBase {
   void multipleScopesInstrumentAllSelectedMethods() throws Exception {
     configurationServerMock.configServerSetup(configDir + "multiple-scopes.json");
     startTarget("/opentelemetry-extensions.jar");
-    awaitInstrumentationUpdate();
+    // We need to instrument 2 classes
+    awaitInstrumentationUpdate(2);
 
     sendRequestToTarget("/greeting");
     sendRequestToTarget("/front");
@@ -86,7 +87,7 @@ public class ScopeTest extends SpringTestBase {
     // Set up config server to instrument multiple methods
     configurationServerMock.configServerSetup(configDir + "scope-with-multiple-methods.json");
     startTarget("/opentelemetry-extensions.jar");
-    awaitInstrumentationUpdate();
+    awaitInstrumentationUpdate(1);
 
     sendRequestToTarget("/greeting");
     String logs = target.getLogs();
@@ -97,7 +98,7 @@ public class ScopeTest extends SpringTestBase {
     configurationServerMock.reset();
     configurationServerMock.configServerSetup(configDir + "scope-with-method.json");
     awaitConfigurationUpdate();
-    awaitInstrumentationUpdate();
+    awaitInstrumentationUpdate(1);
 
     sendRequestToTarget("/greeting");
     logs = target.getLogs();
@@ -162,15 +163,15 @@ public class ScopeTest extends SpringTestBase {
   }
 
   /**
-   * Waits until the instrumentation was applied in the method hooks. The test should not fail here,
-   * if no further update message was found.
+   * Waits until the instrumentation was applied in the method hooks for the specified amount of
+   * times. The test should not fail here, if no further update message was found.
    */
-  private void awaitInstrumentationUpdate() {
+  private void awaitInstrumentationUpdate(int amount) {
     String updateMessage =
         "method hooks for io.opentelemetry.smoketest.springboot.controller.WebController";
 
     try {
-      awaitUpdateMessage(updateMessage);
+      awaitUpdateMessage(updateMessage, amount);
     } catch (ConditionTimeoutException e) {
       System.out.println("No instrumentation update occurred");
     }
@@ -184,7 +185,7 @@ public class ScopeTest extends SpringTestBase {
     String updateMessage =
         "Fetched configuration from configuration server and received status code 200";
     try {
-      awaitUpdateMessage(updateMessage);
+      awaitUpdateMessage(updateMessage, 1);
     } catch (ConditionTimeoutException e) {
       System.out.println("No configuration update occurred");
     }
@@ -197,7 +198,7 @@ public class ScopeTest extends SpringTestBase {
    *
    * @param updateMessage the message, which will be waited for
    */
-  private void awaitUpdateMessage(String updateMessage) {
+  private void awaitUpdateMessage(String updateMessage, int amount) {
     String logs = target.getLogs();
     int updateCount = countTimes(logs, updateMessage);
 
@@ -208,7 +209,7 @@ public class ScopeTest extends SpringTestBase {
             () -> {
               String newLogs = target.getLogs();
               int currentUpdateCount = countTimes(newLogs, updateMessage);
-              return currentUpdateCount > updateCount;
+              return currentUpdateCount >= updateCount + amount;
             });
   }
 }
