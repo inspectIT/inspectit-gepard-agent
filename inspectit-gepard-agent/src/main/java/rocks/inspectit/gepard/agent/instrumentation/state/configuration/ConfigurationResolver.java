@@ -1,14 +1,14 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.state;
+package rocks.inspectit.gepard.agent.instrumentation.state.configuration;
 
 import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.scope.ScopeResolver;
 import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
-import rocks.inspectit.gepard.agent.state.scope.ScopeResolver;
 
 /**
  * Utility class to resolve the {@link InstrumentationConfiguration} and determine whether class

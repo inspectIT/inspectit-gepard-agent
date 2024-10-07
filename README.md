@@ -66,3 +66,6 @@ Gepard is the German name for the animal cheetah as well as an acronym for:
 
 which means: holistic, efficiency-orientated, performance application monitoring with reporting and diagnostics.
 
+### Limitations
+
+Currently, it is not tested to instrument methods of **lambdas** or synthetic methods.

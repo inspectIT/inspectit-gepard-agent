@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.state.InstrumentationState;
+import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 
 @ExtendWith(MockitoExtension.class)
 class TransformationManagerTest {

@@ -11,7 +11,7 @@ import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 public class InspectitAdvice {
 
   @Advice.OnMethodEnter(suppress = Throwable.class)
-  public static void onEnter(
+  public static IMethodHook onEnter(
       @Advice.AllArguments Object[] args,
       @Advice.This Object thiz,
       @Advice.Origin("#t") Class<?> declaringClass,
@@ -21,9 +21,9 @@ public class InspectitAdvice {
             + signature
             + " of class: "
             + thiz.getClass().getName());
-    System.out.println("HELLO GEPARD");
     IMethodHook hook = Instances.hookManager.getHook(declaringClass, signature);
     hook.onEnter(args, thiz);
+    return hook;
   }
 
   @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
@@ -33,13 +33,12 @@ public class InspectitAdvice {
       @Advice.Thrown Throwable throwable,
       @Advice.Return(typing = Assigner.Typing.DYNAMIC) Object returnValue,
       @Advice.Origin("#m#s") String signature,
-      @Advice.Local("hook") IMethodHook hook) {
+      @Advice.Enter IMethodHook hook) {
     System.out.println(
         "Executing Exit Advice in method: "
             + signature
             + " of class: "
             + thiz.getClass().getName());
-    System.out.println("BYE GEPARD");
     hook.onExit(args, thiz, returnValue, throwable);
   }
 }

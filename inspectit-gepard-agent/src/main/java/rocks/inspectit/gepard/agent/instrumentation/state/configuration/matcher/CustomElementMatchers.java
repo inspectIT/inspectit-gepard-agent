@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.state.matcher;
+package rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher;
 
 import net.bytebuddy.description.NamedElement;
 import net.bytebuddy.matcher.ElementMatcher;
