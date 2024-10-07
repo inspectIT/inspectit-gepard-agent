@@ -31,8 +31,8 @@ public class MethodHook implements IMethodHook {
 
     try {
       spanScope = spanAction.startSpan(spanName);
-    } catch (Throwable t) {
-      log.error("Could not execute start-span-action", t);
+    } catch (Exception e) {
+      log.error("Could not execute start-span-action", e);
     }
 
     // Using our log4j here will not be visible in the target application...
@@ -50,8 +50,8 @@ public class MethodHook implements IMethodHook {
     AutoCloseable spanScope = context.getSpanScope();
     try {
       spanAction.endSpan(spanScope);
-    } catch (Throwable t) {
-      log.error("Could not execute end-span-action", t);
+    } catch (Exception e) {
+      log.error("Could not execute end-span-action", e);
     }
 
     // Using our log4j here will not be visible in the target application...

@@ -27,7 +27,9 @@ public class InspectitListener implements AgentBuilder.Listener {
 
   @Override
   public void onDiscovery(
-      String typeName, ClassLoader classLoader, JavaModule module, boolean loaded) {}
+      String typeName, ClassLoader classLoader, JavaModule module, boolean loaded) {
+    // unused
+  }
 
   @Override
   public void onTransformation(
@@ -35,16 +37,22 @@ public class InspectitListener implements AgentBuilder.Listener {
       ClassLoader classLoader,
       JavaModule module,
       boolean loaded,
-      DynamicType dynamicType) {}
+      DynamicType dynamicType) {
+    // unused
+  }
 
   @Override
   public void onIgnored(
       TypeDescription typeDescription,
       ClassLoader classLoader,
       JavaModule module,
-      boolean loaded) {}
+      boolean loaded) {
+    // unused
+  }
 
   @Override
   public void onComplete(
-      String typeName, ClassLoader classLoader, JavaModule module, boolean loaded) {}
+      String typeName, ClassLoader classLoader, JavaModule module, boolean loaded) {
+    // unused
+  }
 }
