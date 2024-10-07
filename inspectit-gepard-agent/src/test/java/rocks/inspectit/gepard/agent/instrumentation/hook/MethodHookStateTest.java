@@ -27,8 +27,6 @@ class MethodHookStateTest {
 
   @Mock private ClassHookConfiguration classHookConfiguration;
 
-  @Mock private HookedMethods hookedMethods;
-
   @Mock private MethodHook methodHook;
 
   private static final Class<?> TEST_CLASS = MethodHookManagerTest.class;
