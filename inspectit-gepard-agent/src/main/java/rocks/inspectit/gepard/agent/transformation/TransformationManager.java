@@ -32,7 +32,9 @@ public class TransformationManager {
    */
   public AgentBuilder modify(AgentBuilder agentBuilder) {
     DynamicTransformer transformer = new DynamicTransformer(instrumentationState);
+    InspectitListener listener = new InspectitListener();
+
     // In the future, we might add a white- or black-list for types
-    return agentBuilder.type(any()).transform(transformer);
+    return agentBuilder.type(any()).transform(transformer).with(listener);
   }
 }

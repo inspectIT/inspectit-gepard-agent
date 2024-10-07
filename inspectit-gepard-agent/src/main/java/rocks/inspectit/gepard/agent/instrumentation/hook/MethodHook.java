@@ -1,11 +1,10 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Context;
-import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
+import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
 /**
@@ -14,68 +13,48 @@ import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
  * we just log our method calls.
  */
 public class MethodHook implements IMethodHook {
+  private static final Logger log = LoggerFactory.getLogger(MethodHook.class);
 
-  // TODO Property entryActions mit StartSpanAction drinnen
+  private final String methodName;
 
-  // TODO Property exitActions mit EndSpanAction drinnen
+  private final SpanAction spanAction;
 
-  // TODO diese Listen abarbeiten und execute() aufrufen
+  public MethodHook(String methodName, SpanAction spanAction) {
+    this.methodName = methodName;
+    this.spanAction = spanAction;
+  }
 
   @Override
-  public AutoCloseable onEnter(String methodName, Object[] instrumentedMethodArgs, Object thiz) {
+  public InternalInspectitContext onEnter(Object[] instrumentedMethodArgs, Object thiz) {
+    String spanName = thiz.getClass().getSimpleName() + "." + methodName;
+    AutoCloseable spanScope = null;
+
+    try {
+      spanScope = spanAction.startSpan(spanName);
+    } catch (Throwable t) {
+      log.error("Could not execute start-span-action", t);
+    }
+
     // Using our log4j here will not be visible in the target application...
-    String message =
-        String.format(
-            "inspectIT: Enter MethodHook with %d args in %s",
-            instrumentedMethodArgs.length, thiz.getClass().getName());
-    System.out.println(message);
-
-    AutoCloseable spanScope = startSpan(methodName);
-
     System.out.println("HELLO GEPARD : " + methodName);
-    return spanScope;
+    return new InternalInspectitContext(this, spanScope);
   }
 
   @Override
   public void onExit(
-      String methodName,
-      AutoCloseable spanScope,
+      InternalInspectitContext context,
       Object[] instrumentedMethodArgs,
       Object thiz,
       Object returnValue,
       Throwable thrown) {
+    AutoCloseable spanScope = context.getSpanScope();
     try {
-      // Using our log4j here will not be visible in the target application...
-      String exceptionMessage = Objects.nonNull(thrown) ? thrown.getMessage() : "no exception";
-      String returnMessage = Objects.nonNull(returnValue) ? returnValue.toString() : "nothing";
-      String message =
-          String.format(
-              "inspectIT: Exit MethodHook who returned %s and threw %s",
-              returnMessage, exceptionMessage);
-      System.out.println(message);
-      endSpan(methodName, spanScope);
-
-      System.out.println("BYE GEPARD");
+      spanAction.endSpan(spanScope);
     } catch (Throwable t) {
-      t.printStackTrace();
+      log.error("Could not execute end-span-action", t);
     }
-  }
 
-  // TODO move to StartSpanAction
-  private AutoCloseable startSpan(String name) {
-    Span current = Span.current();
-    Tracer tracer = GlobalOpenTelemetry.getTracer("inspectit-gepard");
-    Span span = tracer.spanBuilder(name).setParent(Context.current()).startSpan();
-    return span.makeCurrent();
-  }
-
-  // TODO move to EndSpanAction
-  // TODO Zuerst scope schließen oder span beenden?
-  private void endSpan(String name, AutoCloseable spanScope) throws Exception {
-    Span current = Span.current();
-    System.out.println("END SPAN FOR " + name);
-
-    spanScope.close(); // TODO Exception handling
-    current.end();
+    // Using our log4j here will not be visible in the target application...
+    System.out.println("BYE GEPARD");
   }
 }

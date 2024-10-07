@@ -16,17 +16,15 @@ public class InspectitAdvice {
       @Advice.AllArguments Object[] args,
       @Advice.This Object thiz,
       @Advice.Origin("#t") Class<?> declaringClass,
-      @Advice.Origin("#m#s") String signature,
-      @Advice.Origin("#m") String method) {
+      @Advice.Origin("#m#s") String signature) {
     System.out.println(
         "Executing ENTRY Advice in method: "
             + signature
             + " of class: "
             + thiz.getClass().getName());
-    IMethodHook hook = Instances.hookManager.getHook(declaringClass, signature);
-    AutoCloseable spanScope = hook.onEnter(method, args, thiz);
 
-    return new InternalInspectitContext(hook, spanScope);
+    IMethodHook hook = Instances.hookManager.getHook(declaringClass, signature);
+    return hook.onEnter(args, thiz);
   }
 
   @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
@@ -35,17 +33,15 @@ public class InspectitAdvice {
       @Advice.This Object thiz,
       @Advice.Thrown Throwable throwable,
       @Advice.Return(typing = Assigner.Typing.DYNAMIC) Object returnValue,
-      @Advice.Origin("#m#s") String signature,
-      @Advice.Origin("#m") String method,
-      @Advice.Enter InternalInspectitContext inspectitContext) {
+      @Advice.Enter InternalInspectitContext context,
+      @Advice.Origin("#m#s") String signature) {
     System.out.println(
         "Executing EXIT Advice in method: "
             + signature
             + " of class: "
             + thiz.getClass().getName());
 
-    IMethodHook hook = inspectitContext.getHook();
-    AutoCloseable spanScope = inspectitContext.getScope();
-    hook.onExit(method, spanScope, args, thiz, returnValue, throwable);
+    IMethodHook hook = context.getHook();
+    hook.onExit(context, args, thiz, returnValue, throwable);
   }
 }

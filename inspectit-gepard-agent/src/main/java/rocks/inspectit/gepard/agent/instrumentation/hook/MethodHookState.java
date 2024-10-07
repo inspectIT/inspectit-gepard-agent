@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
+import rocks.inspectit.gepard.agent.instrumentation.hook.util.MethodHookGenerator;
 
 /** Stores the method hook configurations of all instrumented classes. */
 public class MethodHookState {
@@ -78,7 +79,8 @@ public class MethodHookState {
                 String signature = getSignature(method);
                 Optional<MethodHook> maybeHook = getCurrentHook(clazz, signature);
                 if (maybeHook.isEmpty()) {
-                  setHook(clazz, signature, new MethodHook());
+                  MethodHook hook = MethodHookGenerator.createHook(method);
+                  setHook(clazz, signature, hook);
                   operationCounter.addAndGet(1);
                 }
               }

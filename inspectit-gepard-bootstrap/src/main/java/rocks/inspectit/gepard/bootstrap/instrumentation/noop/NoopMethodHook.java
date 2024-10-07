@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.bootstrap.instrumentation.noop;
 
+import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
 /** No-operation implementation of {@link IMethodHook} */
@@ -11,11 +12,12 @@ public class NoopMethodHook implements IMethodHook {
   private NoopMethodHook() {}
 
   @Override
-  public AutoCloseable onEnter(String methodName, Object[] instrumentedMethodArgs, Object thiz) {
+  public InternalInspectitContext onEnter(Object[] instrumentedMethodArgs, Object thiz) {
     return null;
   }
 
   @Override
-  public void onExit(String methodName, AutoCloseable spanScope,
+  public void onExit(
+       InternalInspectitContext context,
       Object[] instrumentedMethodArgs, Object thiz, Object returnValue, Throwable thrown) {}
 }
