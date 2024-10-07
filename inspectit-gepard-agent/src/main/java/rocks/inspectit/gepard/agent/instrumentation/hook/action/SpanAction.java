@@ -20,6 +20,8 @@ public class SpanAction {
     this.openTelemetry = OpenTelemetryAccessor.getOpenTelemetry();
   }
 
+  // TODO We need to check, if a span is already recorded for the current method by OTEL
+
   /**
    * Starts a new {@link Span}. Should be called before {@link SpanAction#endSpan}.
    *

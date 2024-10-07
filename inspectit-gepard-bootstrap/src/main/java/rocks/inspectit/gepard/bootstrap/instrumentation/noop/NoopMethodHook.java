@@ -18,6 +18,9 @@ public class NoopMethodHook implements IMethodHook {
 
   @Override
   public void onExit(
-       InternalInspectitContext context,
-      Object[] instrumentedMethodArgs, Object thiz, Object returnValue, Throwable thrown) {}
+      InternalInspectitContext context,
+      Object[] instrumentedMethodArgs,
+      Object thiz,
+      Object returnValue,
+      Throwable thrown) {}
 }

@@ -29,6 +29,9 @@ public interface IMethodHook {
    * @param thrown the exception thrown by the instrumented method, null otherwise
    */
   void onExit(
-       InternalInspectitContext context,
-      Object[] instrumentedMethodArgs, Object thiz, Object returnValue, Throwable thrown);
+      InternalInspectitContext context,
+      Object[] instrumentedMethodArgs,
+      Object thiz,
+      Object returnValue,
+      Throwable thrown);
 }

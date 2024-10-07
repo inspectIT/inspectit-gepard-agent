@@ -15,3 +15,5 @@ spotless {
         licenseHeader '/* (C) 2024 */'
     }
 }
+
+jar.dependsOn(spotlessApply)
