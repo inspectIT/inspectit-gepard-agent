@@ -11,9 +11,11 @@ public class NoopMethodHook implements IMethodHook {
   private NoopMethodHook() {}
 
   @Override
-  public void onEnter(Object[] instrumentedMethodArgs, Object thiz) {}
+  public AutoCloseable onEnter(String methodName, Object[] instrumentedMethodArgs, Object thiz) {
+    return null;
+  }
 
   @Override
-  public void onExit(
+  public void onExit(String methodName, AutoCloseable spanScope,
       Object[] instrumentedMethodArgs, Object thiz, Object returnValue, Throwable thrown) {}
 }

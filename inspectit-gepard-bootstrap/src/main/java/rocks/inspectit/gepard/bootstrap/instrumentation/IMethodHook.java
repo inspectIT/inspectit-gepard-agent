@@ -10,7 +10,7 @@ public interface IMethodHook {
    * @param instrumentedMethodArgs the arguments passed to the method for which the hook is executed
    * @param thiz the "this" instance of the invoked method, null if the invoked method is static
    */
-  void onEnter(Object[] instrumentedMethodArgs, Object thiz);
+  AutoCloseable onEnter(String methodName, Object[] instrumentedMethodArgs, Object thiz);
 
   /**
    * Called when the hooked method exits.
@@ -21,5 +21,5 @@ public interface IMethodHook {
    *     the end and no exception was thrown
    * @param thrown the exception thrown by the instrumented method, null otherwise
    */
-  void onExit(Object[] instrumentedMethodArgs, Object thiz, Object returnValue, Throwable thrown);
+  void onExit(String methodName, AutoCloseable spanScope, Object[] instrumentedMethodArgs, Object thiz, Object returnValue, Throwable thrown);
 }
