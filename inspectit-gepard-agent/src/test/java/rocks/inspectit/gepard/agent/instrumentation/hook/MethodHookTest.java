@@ -35,7 +35,7 @@ class MethodHookTest {
   void shouldStartSpanAndCreateContext() {
     when(spanAction.startSpan(anyString())).thenReturn(closeable);
 
-    InternalInspectitContext context = hook.onEnter(null, this);
+    InternalInspectitContext context = hook.onEnter(new Object[] {}, this);
 
     verify(spanAction).startSpan(anyString());
     assertEquals(closeable, context.getSpanScope());
@@ -46,7 +46,7 @@ class MethodHookTest {
   void shouldNotReturnSpanScopeWhenExceptionThrown() {
     doThrow(CouldNotCloseSpanScopeException.class).when(spanAction).startSpan(anyString());
 
-    InternalInspectitContext context = hook.onEnter(null, this);
+    InternalInspectitContext context = hook.onEnter(new Object[] {}, this);
 
     verify(spanAction).startSpan(anyString());
     assertNull(context.getSpanScope());
@@ -56,7 +56,7 @@ class MethodHookTest {
   void shouldEndSpan() {
     when(internalContext.getSpanScope()).thenReturn(closeable);
 
-    hook.onExit(internalContext, null, this, null, null);
+    hook.onExit(internalContext, new Object[] {}, this, null, null);
 
     verify(spanAction).endSpan(closeable);
   }
