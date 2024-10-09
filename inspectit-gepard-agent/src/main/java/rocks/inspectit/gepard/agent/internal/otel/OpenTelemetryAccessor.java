@@ -6,9 +6,9 @@ import io.opentelemetry.api.OpenTelemetry;
 import java.util.Objects;
 
 /**
- * Singleton to access the {@link OpenTelemetry} instance. We use this accessor, because according
- * to the documentation of {@link GlobalOpenTelemetry}, the method should only be called once during
- * the application.
+ * Singleton to access the {@link OpenTelemetry} instance. For now, we use the OTel SDK provided by
+ * the Java Agent. We use this accessor, because according to the documentation of {@link
+ * GlobalOpenTelemetry}, the method should only be called once during the application.
  */
 public class OpenTelemetryAccessor {
 
@@ -18,7 +18,7 @@ public class OpenTelemetryAccessor {
 
   /**
    * Get the global {@link OpenTelemetry} instance. The global instance should have been set by the
-   * OpenTelemetry Java agent beforehand.
+   * Java agent beforehand.
    *
    * @return the global {@link OpenTelemetry} instance
    */

@@ -122,6 +122,10 @@ public class InstrumentationState {
     boolean currentConfigRequiresHooks = Objects.nonNull(currentConfig) && currentConfig.isActive();
 
     if (newConfigRequiresHooks || currentConfigRequiresHooks)
-      methodHookManager.updateHooksFor(clazz, newConfig);
+      try {
+        methodHookManager.updateHooksFor(clazz, newConfig);
+      } catch (Exception e) {
+        log.error("There was an error while updating the hooks of class {}", clazz.getName(), e);
+      }
   }
 }

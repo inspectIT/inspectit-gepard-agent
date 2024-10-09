@@ -7,7 +7,17 @@ import rocks.inspectit.gepard.bootstrap.Instances;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
-/** Static code, which should be injected into target scopes (class methods) */
+/**
+ * Static code, which will be injected into target scopes (class methods). There are some rules for
+ * advice classes:
+ *
+ * <ul>
+ *   <li>They MUST only contain static methods
+ *   <li>They MUST NOT contain any state (fields) whatsoever, static constants included. Only the
+ *       advice methods' content is copied to the instrumented code, constants are not
+ *   <li>They SHOULD NOT contain any methods other than @Advice-annotated method
+ * </ul>
+ */
 @SuppressWarnings("unused")
 public class InspectitAdvice {
 

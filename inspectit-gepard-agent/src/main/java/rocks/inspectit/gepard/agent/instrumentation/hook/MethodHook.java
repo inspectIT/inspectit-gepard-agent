@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook;
 
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
@@ -26,6 +27,12 @@ public class MethodHook implements IMethodHook {
 
   @Override
   public InternalInspectitContext onEnter(Object[] instrumentedMethodArgs, Object thiz) {
+    String message =
+        String.format(
+            "inspectIT: Enter MethodHook with %d args in %s",
+            instrumentedMethodArgs.length, thiz.getClass().getName());
+    System.out.println(message);
+
     String spanName = thiz.getClass().getSimpleName() + "." + methodName;
     AutoCloseable spanScope = null;
 
@@ -47,6 +54,14 @@ public class MethodHook implements IMethodHook {
       Object thiz,
       Object returnValue,
       Throwable thrown) {
+    String exceptionMessage = Objects.nonNull(thrown) ? thrown.getMessage() : "no exception";
+    String returnMessage = Objects.nonNull(returnValue) ? returnValue.toString() : "nothing";
+    String message =
+        String.format(
+            "inspectIT: Exit MethodHook who returned %s and threw %s",
+            returnMessage, exceptionMessage);
+    System.out.println(message);
+
     AutoCloseable spanScope = context.getSpanScope();
     try {
       spanAction.endSpan(spanScope);
