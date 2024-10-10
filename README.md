@@ -6,6 +6,17 @@ inspectIT Gepard is the further development of [inspectIT Ocelot](https://github
 While the inspectIT Ocelot Java agent is self-made, inspectIT Gepard uses the OpenTelemetry Java agent as basis
 and extends it with features from inspectIT Ocelot.
 
+## Main Features
+
+We want to enable **dynamic instrumentation** with the OpenTelemetry agent. 
+This means, that you can change your instrumentation **during runtime**. 
+For example, you can add new methods to your tracing or record data for new metrics, everything without restarting your application!
+
+The instrumentation configuration will be fetched from a remote server regularly. 
+The server's url is configurable via the property `inspectit.config.http.url`
+
+We are also developing our own [configuration server](https://github.com/inspectIT/inspectit-gepard-agentmanager).
+
 ## Installation
 
 To build this extension project, run `./gradlew build` or `./gradlew extendedAgent` (no tests). 

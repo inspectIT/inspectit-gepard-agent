@@ -7,3 +7,5 @@ The resulting Jar file of this package will be pushed to the JVM's bootstrap cla
 This is necessary in order to create a bridge between the user (application) classes 
 and the classes which will be loaded by the OpenTelemetry extension class loader 
 (classes of the inspectIT Gepard Java agent). 
+
+**There should be NO dependencies in this submodule!**

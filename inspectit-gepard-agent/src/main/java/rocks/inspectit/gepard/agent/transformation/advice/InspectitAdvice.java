@@ -4,14 +4,25 @@ package rocks.inspectit.gepard.agent.transformation.advice;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
 import rocks.inspectit.gepard.bootstrap.Instances;
+import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
-/** Static code, which should be injected into target scopes (class methods) */
+/**
+ * Static code, which will be injected into target scopes (class methods). There are some rules for
+ * advice classes:
+ *
+ * <ul>
+ *   <li>They MUST only contain static methods
+ *   <li>They MUST NOT contain any state (fields) whatsoever, static constants included. Only the
+ *       advice methods' content is copied to the instrumented code, constants are not
+ *   <li>They SHOULD NOT contain any methods other than @Advice-annotated method
+ * </ul>
+ */
 @SuppressWarnings("unused")
 public class InspectitAdvice {
 
   @Advice.OnMethodEnter(suppress = Throwable.class)
-  public static IMethodHook onEnter(
+  public static InternalInspectitContext onEnter(
       @Advice.AllArguments Object[] args,
       @Advice.This Object thiz,
       @Advice.Origin("#t") Class<?> declaringClass,
@@ -21,9 +32,9 @@ public class InspectitAdvice {
             + signature
             + " of class: "
             + thiz.getClass().getName());
+
     IMethodHook hook = Instances.hookManager.getHook(declaringClass, signature);
-    hook.onEnter(args, thiz);
-    return hook;
+    return hook.onEnter(args, thiz);
   }
 
   @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
@@ -32,13 +43,15 @@ public class InspectitAdvice {
       @Advice.This Object thiz,
       @Advice.Thrown Throwable throwable,
       @Advice.Return(typing = Assigner.Typing.DYNAMIC) Object returnValue,
-      @Advice.Origin("#m#s") String signature,
-      @Advice.Enter IMethodHook hook) {
+      @Advice.Enter InternalInspectitContext context,
+      @Advice.Origin("#m#s") String signature) {
     System.out.println(
-        "Executing Exit Advice in method: "
+        "Executing EXIT Advice in method: "
             + signature
             + " of class: "
             + thiz.getClass().getName());
-    hook.onExit(args, thiz, returnValue, throwable);
+
+    IMethodHook hook = context.getHook();
+    hook.onExit(context, args, thiz, returnValue, throwable);
   }
 }
