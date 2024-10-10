@@ -86,7 +86,7 @@ class MethodHookManagerTest {
     methodHookManager.updateHooksFor(
         TEST_CLASS, ClassInstrumentationConfiguration.NO_INSTRUMENTATION);
 
-    verify(hookState).removeObsoleteHooks(eq(TEST_CLASS), eq(Collections.emptySet()));
+    verify(hookState).removeObsoleteHooks(TEST_CLASS, Collections.emptySet());
     verify(hookState).updateHooks(eq(TEST_CLASS), argThat(config -> config.getMethods().isEmpty()));
   }
 }
