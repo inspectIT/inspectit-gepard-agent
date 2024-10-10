@@ -90,6 +90,9 @@ public class MethodHookManager implements IHookManager {
    */
   private Set<MethodDescription.InDefinedShape> getInstrumentedMethods(
       Class<?> clazz, ClassInstrumentationConfiguration configuration) {
+    if (configuration.equals(ClassInstrumentationConfiguration.NO_INSTRUMENTATION))
+      return Collections.emptySet();
+
     ElementMatcher.Junction<MethodDescription> methodMatcher = configuration.methodMatcher();
     TypeDescription type = TypeDescription.ForLoadedType.of(clazz);
 

@@ -5,14 +5,13 @@ import static net.bytebuddy.matcher.ElementMatchers.isMethod;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Set;
+import java.util.Collections;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.bootstrap.Instances;
@@ -77,7 +76,17 @@ class MethodHookManagerTest {
 
     methodHookManager.updateHooksFor(TEST_CLASS, classConfiguration);
 
-    verify(hookState).removeObsoleteHooks(eq(TEST_CLASS), any(Set.class));
-    verify(hookState).updateHooks(eq(TEST_CLASS), any(ClassHookConfiguration.class));
+    verify(hookState).removeObsoleteHooks(eq(TEST_CLASS), argThat(set -> !set.isEmpty()));
+    verify(hookState)
+        .updateHooks(eq(TEST_CLASS), argThat(config -> !config.getMethods().isEmpty()));
+  }
+
+  @Test
+  void shouldRemoveHooksForClassWhenScopeIsInactive() {
+    methodHookManager.updateHooksFor(
+        TEST_CLASS, ClassInstrumentationConfiguration.NO_INSTRUMENTATION);
+
+    verify(hookState).removeObsoleteHooks(TEST_CLASS, Collections.emptySet());
+    verify(hookState).updateHooks(eq(TEST_CLASS), argThat(config -> config.getMethods().isEmpty()));
   }
 }
