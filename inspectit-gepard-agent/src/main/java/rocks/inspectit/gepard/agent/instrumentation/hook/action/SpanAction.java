@@ -27,6 +27,8 @@ public class SpanAction {
    * @return the scope of the started span
    */
   public AutoCloseable startSpan(String spanName) {
+    Span.current().getSpanContext();
+
     Tracer tracer = openTelemetry.getTracer(INSTRUMENTATION_SCOPE_NAME);
     Span span = tracer.spanBuilder(spanName).setParent(Context.current()).startSpan();
     return span.makeCurrent();

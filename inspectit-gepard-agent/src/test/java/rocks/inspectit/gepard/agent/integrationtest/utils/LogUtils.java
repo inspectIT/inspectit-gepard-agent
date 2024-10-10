@@ -12,11 +12,11 @@ public class LogUtils {
    * @param times the amount of times "HELLO GEPARD" and "BYE GEPARD" should be present in the logs
    */
   public static void assertLogs(String logs, int times) {
-    boolean loggedHelloGepardTwice = containsTimes(logs, "HELLO GEPARD", times);
-    boolean loggedByeGepardTwice = containsTimes(logs, "BYE GEPARD", times);
+    boolean loggedHelloGepard = containsTimes(logs, "HELLO GEPARD", times);
+    boolean loggedByeGepard = containsTimes(logs, "BYE GEPARD", times);
 
-    assertTrue(loggedHelloGepardTwice);
-    assertTrue(loggedByeGepardTwice);
+    assertTrue(loggedHelloGepard);
+    assertTrue(loggedByeGepard);
   }
 
   /**

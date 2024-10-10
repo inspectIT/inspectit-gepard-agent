@@ -45,7 +45,7 @@ public class InspectitAgentExtension implements AgentExtension {
     NotificationManager notificationManager = NotificationManager.create();
     notificationManager.sendStartNotification();
 
-    // Set our the global OpenTelemetry instance. For now, we use the Agent SDK
+    // Set our global OpenTelemetry instance. For now, we use the Agent SDK
     OpenTelemetryAccessor.setOpenTelemetry(GlobalOpenTelemetry.get());
 
     // Set up methods hooks to execute inspectIT code inside target applications
