@@ -15,6 +15,7 @@ import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookState;
 import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
+import rocks.inspectit.gepard.agent.internal.identity.IdentityManager;
 import rocks.inspectit.gepard.agent.notification.NotificationManager;
 import rocks.inspectit.gepard.agent.transformation.TransformationManager;
 
@@ -62,6 +63,10 @@ public class InspectitAgentExtension implements AgentExtension {
     instrumentationManager.createConfigurationReceiver();
     instrumentationManager.startClassDiscovery();
     instrumentationManager.startBatchInstrumentation(instrumentationState);
+
+    // Set agentId based on generation type
+    IdentityManager identityManager = IdentityManager.create();
+    identityManager.setIdentity();
 
     // Start loading the inspectIT configuration
     ConfigurationManager configurationManager = ConfigurationManager.create();

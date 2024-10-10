@@ -2,6 +2,10 @@
 package rocks.inspectit.gepard.agent.internal.properties;
 
 import io.opentelemetry.javaagent.bootstrap.JavaagentFileHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.internal.identity.type.IdGenerationType;
+
 import java.io.File;
 import java.time.Duration;
 import java.util.Objects;
@@ -12,21 +16,23 @@ import java.util.Objects;
  * are higher prioritized than environmental properties.
  */
 public class PropertiesResolver {
+  private static final Logger log = LoggerFactory.getLogger(PropertiesResolver.class);
 
   public static final String SERVER_URL_SYSTEM_PROPERTY = "inspectit.config.http.url";
 
   public static final String SERVER_URL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_URL";
 
-  public static final String PERSISTENCE_FILE_SYSTEM_PROPERTY =
-      "inspectit.config.http.persistence-file";
+  public static final String PERSISTENCE_FILE_SYSTEM_PROPERTY = "inspectit.config.http.persistence-file";
 
-  public static final String PERSISTENCE_FILE_ENV_PROPERTY =
-      "INSPECTIT_CONFIG_HTTP_PERSISTENCE_FILE";
+  public static final String PERSISTENCE_FILE_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_PERSISTENCE_FILE";
 
-  public static final String POLLING_INTERVAL_SYSTEM_PROPERTY =
-      "inspectit.config.http.polling-interval";
-  public static final String POLLING_INTERVAL_ENV_PROPERTY =
-      "INSPECTIT_CONFIG_HTTP_POLLING_INTERVAL";
+  public static final String POLLING_INTERVAL_SYSTEM_PROPERTY = "inspectit.config.http.polling-interval";
+
+  public static final String POLLING_INTERVAL_ENV_PROPERTY = "INSPECTIT_CONFIG_HTTP_POLLING_INTERVAL";
+
+  public static final String ID_GENERATION_TYPE_SYSTEM_PROPERTY = "inspectit.config.id-generation-type";
+
+  public static final String ID_GENERATION_TYPE_ENV_PROPERTY = "INSPECTIT_CONFIG_ID_GENERATION_TYPE";
 
   private PropertiesResolver() {}
 
@@ -89,5 +95,34 @@ public class PropertiesResolver {
     return Objects.nonNull(pollingIntervalEnvProperty)
         ? Duration.parse(pollingIntervalEnvProperty)
         : Duration.ofSeconds(10);
+  }
+
+  /**
+   * TODO
+   * @return
+   */
+  public static IdGenerationType getIdGenerationType() {
+    String idGenerationTypeSystemProperty = System.getProperty(ID_GENERATION_TYPE_SYSTEM_PROPERTY);
+    if (Objects.nonNull(idGenerationTypeSystemProperty))
+      return convertToIdGenerationType(idGenerationTypeSystemProperty);
+
+    String idGenerationTypeEnvProperty = System.getenv(ID_GENERATION_TYPE_ENV_PROPERTY);
+    return convertToIdGenerationType(idGenerationTypeEnvProperty);
+  }
+
+  /**
+   * TODO
+   * @param idGenerationType
+   * @return
+   */
+  private static IdGenerationType convertToIdGenerationType(String idGenerationType) {
+    IdGenerationType idGeneration;
+    try {
+      idGeneration = IdGenerationType.valueOf(idGenerationType);
+    } catch (IllegalArgumentException e) {
+      log.info("Unknown id-generation type: {}. Using fallback: FQDN", idGenerationType);
+      idGeneration = IdGenerationType.FQDN;
+    }
+    return idGeneration;
   }
 }
