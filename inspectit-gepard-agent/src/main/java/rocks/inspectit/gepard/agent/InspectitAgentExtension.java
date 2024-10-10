@@ -2,6 +2,7 @@
 package rocks.inspectit.gepard.agent;
 
 import com.google.auto.service.AutoService;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.javaagent.tooling.AgentExtension;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import net.bytebuddy.agent.builder.AgentBuilder;
@@ -15,6 +16,7 @@ import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookState;
 import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
+import rocks.inspectit.gepard.agent.internal.otel.OpenTelemetryAccessor;
 import rocks.inspectit.gepard.agent.notification.NotificationManager;
 import rocks.inspectit.gepard.agent.transformation.TransformationManager;
 
@@ -42,6 +44,9 @@ public class InspectitAgentExtension implements AgentExtension {
     // Notify configuration server about this agent
     NotificationManager notificationManager = NotificationManager.create();
     notificationManager.sendStartNotification();
+
+    // Set our the global OpenTelemetry instance. For now, we use the Agent SDK
+    OpenTelemetryAccessor.setOpenTelemetry(GlobalOpenTelemetry.get());
 
     // Set up methods hooks to execute inspectIT code inside target applications
     MethodHookManager methodHookManager = MethodHookManager.create(new MethodHookState());

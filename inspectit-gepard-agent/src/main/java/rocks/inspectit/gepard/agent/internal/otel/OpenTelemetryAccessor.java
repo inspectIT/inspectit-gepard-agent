@@ -3,12 +3,11 @@ package rocks.inspectit.gepard.agent.internal.otel;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
-import java.util.Objects;
 
 /**
- * Singleton to access the {@link OpenTelemetry} instance. For now, we use the OTel SDK provided by
- * the Java Agent. We use this accessor, because according to the documentation of {@link
- * GlobalOpenTelemetry}, the method should only be called once during the application.
+ * Singleton to access the {@link OpenTelemetry} instance. We use this accessor, because according
+ * to the documentation of {@link GlobalOpenTelemetry}, the get() method should only be called once
+ * during the application.
  */
 public class OpenTelemetryAccessor {
 
@@ -17,15 +16,19 @@ public class OpenTelemetryAccessor {
   private OpenTelemetryAccessor() {}
 
   /**
-   * Get the global {@link OpenTelemetry} instance. The global instance should have been set by the
-   * Java agent beforehand.
-   *
    * @return the global {@link OpenTelemetry} instance
    */
   public static OpenTelemetry getOpenTelemetry() {
-    if (Objects.isNull(openTelemetry)) {
-      openTelemetry = GlobalOpenTelemetry.get();
-    }
     return openTelemetry;
+  }
+
+  /**
+   * Sets the global {@link OpenTelemetry} instance for inspectIT. This will allow us to create
+   * traces or metrics. Should only be called once.
+   *
+   * @param otel the openTelemetry object
+   */
+  public static void setOpenTelemetry(OpenTelemetry otel) {
+    openTelemetry = otel;
   }
 }

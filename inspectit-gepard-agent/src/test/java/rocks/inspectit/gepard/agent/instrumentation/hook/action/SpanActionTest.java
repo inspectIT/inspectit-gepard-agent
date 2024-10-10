@@ -5,11 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.exception.CouldNotCloseSpanScopeException;
+import rocks.inspectit.gepard.agent.internal.otel.OpenTelemetryAccessor;
 
 @ExtendWith(MockitoExtension.class)
 class SpanActionTest {
@@ -17,6 +20,11 @@ class SpanActionTest {
   @Mock private AutoCloseable closeable;
 
   private final SpanAction action = new SpanAction();
+
+  @BeforeAll
+  static void beforeAll() {
+    OpenTelemetryAccessor.setOpenTelemetry(GlobalOpenTelemetry.get());
+  }
 
   @Test
   void shouldCreateScope() {

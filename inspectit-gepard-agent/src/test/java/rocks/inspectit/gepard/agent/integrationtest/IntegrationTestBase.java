@@ -1,6 +1,8 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.integrationtest;
 
+import static rocks.inspectit.gepard.agent.integrationtest.utils.LogUtils.countTimes;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -18,6 +20,8 @@ import java.util.stream.StreamSupport;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import org.awaitility.Awaitility;
+import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,12 +43,14 @@ import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
 public abstract class IntegrationTestBase {
 
   private static final Logger logger = LoggerFactory.getLogger(IntegrationTestBase.class);
-
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   protected static OkHttpClient client = OkHttpUtils.client();
 
   private static final Network network = Network.newNetwork();
+
+  protected static final String configDir = "integrationtest/configurations/";
+
   protected static final String agentPath =
       System.getProperty("io.opentelemetry.smoketest.agentPath");
   // Javaagent with extensions embedded inside it
@@ -219,5 +225,56 @@ public abstract class IntegrationTestBase {
     }
 
     return content;
+  }
+
+  /**
+   * Waits until the instrumentation was applied in the method hooks for the specified amount of
+   * times. The test should not fail here, if no further update message was found.
+   */
+  protected void awaitInstrumentationUpdate(int amount) {
+    String updateMessage =
+        "method hooks for io.opentelemetry.smoketest.springboot.controller.WebController";
+
+    try {
+      awaitUpdateMessage(updateMessage, amount);
+    } catch (ConditionTimeoutException e) {
+      System.out.println("No instrumentation update occurred");
+    }
+  }
+
+  /**
+   * Waits until the configuration was polled one more time. The test should not fail here, if no
+   * further update message was found.
+   */
+  protected void awaitConfigurationUpdate() {
+    String updateMessage =
+        "Fetched configuration from configuration server and received status code 200";
+    try {
+      awaitUpdateMessage(updateMessage, 1);
+    } catch (ConditionTimeoutException e) {
+      System.out.println("No configuration update occurred");
+    }
+  }
+
+  /**
+   * Waits until a certain update message was logged again. This happens via checking the container
+   * logs. First the method counts the current amount of update messages. If the amount of update
+   * messages has increased, it is assumed that a new configuration has been pooled.
+   *
+   * @param updateMessage the message, which will be waited for
+   */
+  private void awaitUpdateMessage(String updateMessage, int amount) {
+    String logs = target.getLogs();
+    int updateCount = countTimes(logs, updateMessage);
+
+    Awaitility.await()
+        .pollDelay(5, TimeUnit.SECONDS)
+        .atMost(15, TimeUnit.SECONDS)
+        .until(
+            () -> {
+              String newLogs = target.getLogs();
+              int currentUpdateCount = countTimes(newLogs, updateMessage);
+              return currentUpdateCount >= updateCount + amount;
+            });
   }
 }
