@@ -5,6 +5,7 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import rocks.inspectit.gepard.agent.instrumentation.hook.action.exception.SdkSpanClassNotFoundException;
 
 /**
  * Special util class, to access the package private {@link io.opentelemetry.sdk.trace.SdkSpan}
@@ -16,11 +17,14 @@ public class SpanUtil {
   /** The class of {@link io.opentelemetry.sdk.trace.SdkSpan} */
   private static final Class<?> SDKSPAN_CLASS;
 
+  private SpanUtil() {}
+
   static {
+    String className = "io.opentelemetry.sdk.trace.SdkSpan";
     try {
-      SDKSPAN_CLASS = Class.forName("io.opentelemetry.sdk.trace.SdkSpan");
+      SDKSPAN_CLASS = Class.forName(className);
     } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
+      throw new SdkSpanClassNotFoundException(className, e);
     }
   }
 
