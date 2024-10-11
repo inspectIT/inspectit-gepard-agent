@@ -9,8 +9,6 @@ on:
 jobs:
   build-and-test:
     name: "Build and test extension"
-    # Don't run the job twice for PRs of feature-branches
-    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/heads/feature/')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -44,7 +42,6 @@ jobs:
         path: build/libs
 
   dependency-submission:
-    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/heads/feature/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
