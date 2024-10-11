@@ -5,6 +5,7 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.exception.SdkSpanClassNotFoundException;
 
 /**
@@ -39,18 +40,17 @@ public class SpanUtil {
    */
   public static boolean spanAlreadyExists(String spanName)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    Span span = Span.current();
+    if (Objects.isNull(SDKSPAN_CLASS)) return false;
 
-    if (!SDKSPAN_CLASS.isInstance(span)) {
+    Span span = Span.current();
+    if (!SDKSPAN_CLASS.isInstance(span))
       throw new IllegalArgumentException("The provided Span is not an instance of SdkSpan.");
-    }
 
     Object sdkSpan = SDKSPAN_CLASS.cast(span);
     Method toSpanData = SDKSPAN_CLASS.getDeclaredMethod("toSpanData");
     toSpanData.setAccessible(true);
 
     SpanData spanData = (SpanData) toSpanData.invoke(sdkSpan);
-
     return spanName.equals(spanData.getName());
   }
 }
