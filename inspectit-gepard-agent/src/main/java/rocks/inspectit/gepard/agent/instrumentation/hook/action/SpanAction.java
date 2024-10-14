@@ -22,14 +22,10 @@ public class SpanAction {
    * @return the scope of the started span or null, if the current span has the same name
    */
   public AutoCloseable startSpan(String spanName) {
-    try {
-      // In the future, we still might want to set some attributes in the current span
-      if (SpanUtil.spanAlreadyExists(spanName)) {
-        log.debug("Span '{}' already exists at the moment. No new span will be started", spanName);
-        return null;
-      }
-    } catch (Exception e) {
-      log.debug("Could not check current span data. New span will be started", e);
+    // In the future, we still might want to set some attributes in the current span
+    if (SpanUtil.spanAlreadyExists(spanName)) {
+      log.debug("Span '{}' already exists at the moment. No new span will be started", spanName);
+      return null;
     }
 
     Tracer tracer = OpenTelemetryAccessor.getTracer();
