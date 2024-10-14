@@ -34,8 +34,8 @@ public class SpanUtil {
    * prevent span duplicates. For example, we would like to create a span for a method, which is
    * already recorded by OpenTelemetry. In this case, we should not create a new span.
    *
-   * @param spanName the name of the span with the format 'simple-class-name.method-name', for
-   *     instance 'SpanUtil.spanAlreadyExists'
+   * @param spanName the name of the span with the format 'SimpleClassName.methodName', for instance
+   *     'SpanUtil.spanAlreadyExists'
    * @return true, if the current span uses the provided span name
    */
   public static boolean spanAlreadyExists(String spanName)
