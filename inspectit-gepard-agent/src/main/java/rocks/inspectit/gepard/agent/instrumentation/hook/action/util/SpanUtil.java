@@ -43,8 +43,7 @@ public class SpanUtil {
     if (Objects.isNull(SDKSPAN_CLASS)) return false;
 
     Span span = Span.current();
-    if (!SDKSPAN_CLASS.isInstance(span))
-      throw new IllegalArgumentException("The provided Span is not an instance of SdkSpan.");
+    if (!SDKSPAN_CLASS.isInstance(span)) return false;
 
     Object sdkSpan = SDKSPAN_CLASS.cast(span);
     Method toSpanData = SDKSPAN_CLASS.getDeclaredMethod("toSpanData");
