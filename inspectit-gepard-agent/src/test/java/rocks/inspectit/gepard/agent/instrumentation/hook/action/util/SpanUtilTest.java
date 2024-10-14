@@ -10,7 +10,6 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,13 +21,9 @@ class SpanUtilTest {
 
   @BeforeEach
   void beforeEach() {
+    GlobalOpenTelemetry.resetForTest();
     OpenTelemetry openTelemetry = OpenTelemetrySdk.builder().buildAndRegisterGlobal();
     tracer = openTelemetry.getTracer("inspectit-gepard");
-  }
-
-  @AfterEach
-  void afterEach() {
-    GlobalOpenTelemetry.resetForTest();
   }
 
   @Test
