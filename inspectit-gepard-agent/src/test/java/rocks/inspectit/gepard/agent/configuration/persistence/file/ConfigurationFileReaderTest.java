@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +34,7 @@ public class ConfigurationFileReaderTest {
     when(fileAccessor.readFile()).thenReturn(expectedString);
 
     InspectitConfiguration configuration = reader.readConfiguration();
-    List<Scope> scopes = configuration.getInstrumentation().getScopes();
+    List<ScopeConfiguration> scopes = configuration.getInstrumentation().getScopes();
 
     boolean foundScope = scopes.stream().anyMatch(scope -> expectedScope.equals(scope.getFqn()));
     assertTrue(foundScope);

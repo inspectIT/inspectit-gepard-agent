@@ -4,6 +4,22 @@
 
 We recommend using [IntelliJ](https://www.jetbrains.com/idea/download/#section=windows) as IDE for contributing.
 
+## Dependencies
+
+We integrate our [inspectit-gepard-config](https://github.com/inspectIT/inspectit-gepard-config) model as dependency. We download the dependency
+from GitHub Packages, which requires authentication. To set up your authentication, follow these steps:
+
+1. Create a `gradle.properties` file in `%userprofile%\.gradle`
+2. Create a [(classic) personal access token (PAT)](https://github.com/settings/tokens) with `read:packages` permissions.
+3. Paste the following content into your `gradle.properties`:
+
+```
+gpr.inspectit.gepard.user=<YOUR_GITHUB_USERNAME>
+gpr.inspectit.gepard.token=<YOUR_GITHUB_ACCESS_TOKEN>
+```
+
+You can find more information here as well: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry
+
 ## Formatting
 
 We have [spotless](https://github.com/diffplug/spotless) configured to format the code. You can run the following commands:

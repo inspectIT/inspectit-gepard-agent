@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.configuration.persistence.file.ConfigurationFileReader;
 import rocks.inspectit.gepard.agent.configuration.persistence.file.ConfigurationFileWriter;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;

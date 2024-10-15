@@ -3,7 +3,7 @@ package rocks.inspectit.gepard.agent.instrumentation.state.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 

@@ -9,12 +9,12 @@ import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.CustomElementMatchers;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.MatcherChainBuilder;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 
 /**
- * This class is used to resolve the {@link Scope} based on the {@link Scope} List, contained in the
+ * This class is used to resolve the {@link ScopeConfiguration} based on the {@link ScopeConfiguration} List, contained in the
  * {@link InstrumentationConfiguration}.
  */
 public class ScopeResolver {
@@ -34,9 +34,9 @@ public class ScopeResolver {
   public Set<InstrumentationScope> getActiveScopes(String fullyQualifiedName) {
     if (shouldIgnore(fullyQualifiedName)) return Collections.emptySet();
 
-    List<Scope> scopes = getAllMatchingScopes(fullyQualifiedName);
+    List<ScopeConfiguration> scopes = getAllMatchingScopes(fullyQualifiedName);
     return scopes.stream()
-        .filter(Scope::isEnabled)
+        .filter(ScopeConfiguration::isEnabled)
         .map(InstrumentationScope::create)
         .collect(Collectors.toSet());
   }
@@ -61,7 +61,7 @@ public class ScopeResolver {
    * @param fqn the fully qualified name to match
    * @return the list of matching scopes
    */
-  private List<Scope> getAllMatchingScopes(String fqn) {
+  private List<ScopeConfiguration> getAllMatchingScopes(String fqn) {
     return holder.getConfiguration().getInstrumentation().getAllMatchingScopes(fqn);
   }
 

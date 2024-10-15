@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
@@ -46,7 +46,7 @@ class ConfigurationResolverTest {
 
   @Test
   void typeShouldBeInstrumented() {
-    Scope scope = createScope(true, getClass().getName());
+    ScopeConfiguration scope = createScope(true, getClass().getName());
     InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
@@ -59,7 +59,7 @@ class ConfigurationResolverTest {
 
   @Test
   void typeShouldBeDeinstrumented() {
-    Scope scope = createScope(false, getClass().getName());
+    ScopeConfiguration scope = createScope(false, getClass().getName());
     InspectitConfiguration configuration = createConfiguration(List.of(scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 

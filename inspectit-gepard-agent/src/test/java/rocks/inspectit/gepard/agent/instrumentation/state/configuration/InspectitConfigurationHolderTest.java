@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 
 class InspectitConfigurationHolderTest {
@@ -35,7 +35,7 @@ class InspectitConfigurationHolderTest {
   }
 
   private InspectitConfiguration createConfiguration() {
-    Scope scope = new Scope(true, "com.example.Application", Collections.emptyList());
+    ScopeConfiguration scope = new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

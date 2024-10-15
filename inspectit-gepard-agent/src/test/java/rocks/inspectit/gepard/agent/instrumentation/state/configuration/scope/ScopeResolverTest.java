@@ -19,8 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,10 +34,10 @@ class ScopeResolverTest {
 
   @Test
   void returnsOnlyActiveScopes() {
-    Scope matchingScope = createScope(true, CLASS_NAME, List.of("method"));
-    Scope nonMatchingScope1 = createScope(false, CLASS_NAME);
-    Scope nonMatchingScope2 = createScope(true, "dummyName");
-    List<Scope> scopes = List.of(matchingScope, nonMatchingScope1, nonMatchingScope2);
+    ScopeConfiguration matchingScope = createScope(true, CLASS_NAME, List.of("method"));
+    ScopeConfiguration nonMatchingScope1 = createScope(false, CLASS_NAME);
+    ScopeConfiguration nonMatchingScope2 = createScope(true, "dummyName");
+    List<ScopeConfiguration> scopes = List.of(matchingScope, nonMatchingScope1, nonMatchingScope2);
     InspectitConfiguration configuration = createConfiguration(scopes);
     when(holder.getConfiguration()).thenReturn(configuration);
 
