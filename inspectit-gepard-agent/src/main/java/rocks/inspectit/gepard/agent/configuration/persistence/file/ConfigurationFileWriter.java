@@ -4,9 +4,9 @@ package rocks.inspectit.gepard.agent.configuration.persistence.file;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 
 /**
  * Writes into the agent configuration persistence file. After every configuration update, the

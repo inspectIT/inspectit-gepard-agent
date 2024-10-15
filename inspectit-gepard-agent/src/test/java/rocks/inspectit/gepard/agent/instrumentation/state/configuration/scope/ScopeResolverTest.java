@@ -19,9 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
-import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 
 @ExtendWith(MockitoExtension.class)
 class ScopeResolverTest {

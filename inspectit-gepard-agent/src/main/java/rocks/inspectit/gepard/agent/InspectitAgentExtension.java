@@ -37,8 +37,6 @@ public class InspectitAgentExtension implements AgentExtension {
   public AgentBuilder extend(AgentBuilder agentBuilder, ConfigProperties config) {
     log.info("Starting inspectIT Gepard agent extension ...");
 
-
-
     // Append the bootstrap classloader with inspectIT interfaces
     BootstrapManager bootstrapManager = BootstrapManager.create();
     bootstrapManager.appendToBootstrapClassLoader();

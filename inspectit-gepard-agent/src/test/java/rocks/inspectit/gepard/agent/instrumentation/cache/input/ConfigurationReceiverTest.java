@@ -10,8 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.cache.PendingClassesCache;
-import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 class ConfigurationReceiverTest {

@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
-import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationFileWriterTest {
@@ -49,7 +49,8 @@ public class ConfigurationFileWriterTest {
   }
 
   private static InspectitConfiguration createConfiguration() {
-    ScopeConfiguration scope = new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
+    ScopeConfiguration scope =
+        new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);

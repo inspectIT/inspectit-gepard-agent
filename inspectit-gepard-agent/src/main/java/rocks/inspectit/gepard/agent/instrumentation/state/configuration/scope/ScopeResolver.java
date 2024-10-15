@@ -9,13 +9,13 @@ import net.bytebuddy.matcher.ElementMatchers;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.CustomElementMatchers;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.MatcherChainBuilder;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
-import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 
 /**
- * This class is used to resolve the {@link ScopeConfiguration} based on the {@link ScopeConfiguration} List, contained in the
- * {@link InstrumentationConfiguration}.
+ * This class is used to resolve the {@link ScopeConfiguration} based on the {@link
+ * ScopeConfiguration} List, contained in the {@link InstrumentationConfiguration}.
  */
 public class ScopeResolver {
 

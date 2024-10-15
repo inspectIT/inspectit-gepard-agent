@@ -6,7 +6,6 @@ import java.util.List;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 
 public class InspectitConfigurationUtil {
 
@@ -27,7 +26,8 @@ public class InspectitConfigurationUtil {
    * @param methodNames the method names to be instrumented
    * @return the scope with the current class as fqn
    */
-  public static ScopeConfiguration createScope(boolean enabled, String name, List<String> methodNames) {
+  public static ScopeConfiguration createScope(
+      boolean enabled, String name, List<String> methodNames) {
     return new ScopeConfiguration(enabled, name, methodNames);
   }
 

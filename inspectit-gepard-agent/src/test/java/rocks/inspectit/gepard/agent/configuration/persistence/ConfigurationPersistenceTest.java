@@ -15,12 +15,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.configuration.persistence.file.ConfigurationFileReader;
 import rocks.inspectit.gepard.agent.configuration.persistence.file.ConfigurationFileWriter;
-import rocks.inspectit.gepard.config.model.InspectitConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationPersistenceTest {
@@ -82,7 +82,8 @@ public class ConfigurationPersistenceTest {
   }
 
   private static InspectitConfiguration createConfiguration() {
-    ScopeConfiguration scope = new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
+    ScopeConfiguration scope =
+        new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
         new InstrumentationConfiguration(List.of(scope));
     return new InspectitConfiguration(instrumentationConfiguration);
