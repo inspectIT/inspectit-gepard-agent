@@ -149,7 +149,7 @@ def mergeModules = tasks.register("mergeModules", Zip) {
     dependsOn(copyModules)
     from tasks.copyModules.destinationDir
     destinationDirectory = layout.buildDirectory.dir('libs').get().asFile
-    archiveFileName.set("inspectit-gepard-agent-extension-${version}.jar")
+    archiveFileName.set("inspectit-gepard-agent-extension-${configVersion}.jar")
 }
 
 // Copies the output of your submodules to a temporary directory
@@ -232,7 +232,7 @@ tasks {
         Provider<Directory> agentJar = layout.buildDirectory.dir("/libs/inspectit-gepard-agent.jar")
 
         name "inspectit/inspectit-gepard-agent"
-        tag 'versioned', "hub.docker.com/${name}:${version}"
+        tag 'versioned', "hub.docker.com/${name}:${configVersion}"
         dockerfile file('docker/Dockerfile')
         files 'docker/entrypoint.sh', agentJar.get().asFile
     }
