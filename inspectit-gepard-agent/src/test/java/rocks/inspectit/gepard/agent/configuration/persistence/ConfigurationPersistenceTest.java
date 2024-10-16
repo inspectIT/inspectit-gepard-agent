@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import rocks.inspectit.gepard.agent.internal.configuration.observer.Configuratio
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationPersistenceTest {
@@ -85,7 +85,7 @@ public class ConfigurationPersistenceTest {
     ScopeConfiguration scope =
         new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
-        new InstrumentationConfiguration(List.of(scope));
+        new InstrumentationConfiguration(Map.of("s_scope", scope), Map.of());
     return new InspectitConfiguration(instrumentationConfiguration);
   }
 }

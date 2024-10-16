@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 class InspectitConfigurationHolderTest {
 
@@ -38,7 +38,7 @@ class InspectitConfigurationHolderTest {
     ScopeConfiguration scope =
         new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
-        new InstrumentationConfiguration(List.of(scope));
+        new InstrumentationConfiguration(Map.of("s_scope", scope), Map.of());
     return new InspectitConfiguration(instrumentationConfiguration);
   }
 }

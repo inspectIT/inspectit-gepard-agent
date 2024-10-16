@@ -11,7 +11,7 @@ import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.MatcherChainBuilder;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 /**
  * This class is used to resolve the {@link ScopeConfiguration} based on the {@link

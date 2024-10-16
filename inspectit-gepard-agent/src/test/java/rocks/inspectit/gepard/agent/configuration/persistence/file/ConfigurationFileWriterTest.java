@@ -8,16 +8,17 @@ import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
+import rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationFileWriterTest {
@@ -34,7 +35,7 @@ public class ConfigurationFileWriterTest {
   @Test
   void configurationIsWrittenToFile() throws IOException {
     InspectitConfiguration configuration = createConfiguration();
-    String expectedString = expectedString();
+    String expectedString = InspectitConfigurationTestUtil.expectedString();
 
     writer.writeConfiguration(configuration);
 
@@ -52,11 +53,7 @@ public class ConfigurationFileWriterTest {
     ScopeConfiguration scope =
         new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
     InstrumentationConfiguration instrumentationConfiguration =
-        new InstrumentationConfiguration(List.of(scope));
+        new InstrumentationConfiguration(Map.of("s_scope", scope), Map.of());
     return new InspectitConfiguration(instrumentationConfiguration);
-  }
-
-  private static String expectedString() {
-    return "{\"instrumentation\":{\"scopes\":[{\"enabled\":true,\"fqn\":\"com.example.Application\",\"methods\":[]}]}}";
   }
 }

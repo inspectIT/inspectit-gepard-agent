@@ -4,11 +4,12 @@ package rocks.inspectit.gepard.agent.instrumentation.state.configuration.scope;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static rocks.inspectit.gepard.agent.testutils.CustomAssertions.assertMethodDescriptionMatcherMatches;
-import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationUtil.createConfiguration;
-import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationUtil.createScope;
+import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil.createConfiguration;
+import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil.createScope;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -21,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 class ScopeResolverTest {
@@ -37,7 +38,14 @@ class ScopeResolverTest {
     ScopeConfiguration matchingScope = createScope(true, CLASS_NAME, List.of("method"));
     ScopeConfiguration nonMatchingScope1 = createScope(false, CLASS_NAME);
     ScopeConfiguration nonMatchingScope2 = createScope(true, "dummyName");
-    List<ScopeConfiguration> scopes = List.of(matchingScope, nonMatchingScope1, nonMatchingScope2);
+    Map<String, ScopeConfiguration> scopes =
+        Map.of(
+            "s_scope1",
+            matchingScope,
+            "s_scope2",
+            nonMatchingScope1,
+            "s_scope3",
+            nonMatchingScope2);
     InspectitConfiguration configuration = createConfiguration(scopes);
     when(holder.getConfiguration()).thenReturn(configuration);
 

@@ -3,7 +3,7 @@ package rocks.inspectit.gepard.agent.internal.instrumentation.model;
 
 import java.util.List;
 import java.util.Objects;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 /**
  * @param fqn the fully qualified name of a class
