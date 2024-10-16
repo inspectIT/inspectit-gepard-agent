@@ -2,7 +2,6 @@
 package rocks.inspectit.gepard.agent.instrumentation.hook.action.util;
 
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
 
 /** Util class to access span data, like the name or attributes. */
