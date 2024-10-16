@@ -3,7 +3,7 @@ package rocks.inspectit.gepard.agent.internal.instrumentation.model;
 
 import java.util.List;
 import java.util.Objects;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
+import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
 
 /**
  * @param fqn the fully qualified name of a class
@@ -12,12 +12,12 @@ import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation
 public record InstrumentationScope(String fqn, List<String> methods) {
 
   /**
-   * Creates an {@link InstrumentationScope} out of a {@link Scope}
+   * Creates an {@link InstrumentationScope} out of a {@link ScopeConfiguration}
    *
    * @param scope the scope
    * @return the instrumentation scope
    */
-  public static InstrumentationScope create(Scope scope) {
+  public static InstrumentationScope create(ScopeConfiguration scope) {
     return new InstrumentationScope(scope.getFqn(), scope.getMethods());
   }
 

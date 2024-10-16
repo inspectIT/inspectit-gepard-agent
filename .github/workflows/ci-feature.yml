@@ -1,10 +1,13 @@
-name: Feature Branch Continous Integration
+name: Feature Branch Continuous Integration
 
 on:
   push:
     branches:
       - "feature/**"
   pull_request:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build-and-test:

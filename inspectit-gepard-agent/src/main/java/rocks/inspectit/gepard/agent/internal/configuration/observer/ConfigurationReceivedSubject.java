@@ -4,7 +4,7 @@ package rocks.inspectit.gepard.agent.internal.configuration.observer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 
 /**
  * Observer pattern subject, which notifies all registered observers about {@link

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotSerializeConfigurationException;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 
 /** Utility class for mapping configuration strings to configuration objects. */
 public class ConfigurationMapper {
