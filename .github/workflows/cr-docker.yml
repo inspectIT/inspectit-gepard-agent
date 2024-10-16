@@ -1,5 +1,4 @@
-# This workflow is triggered on pushes to the master branch.
-# It builds the agent and creates a multi-arch image for it.
+# This workflow builds the agent and creates a multi-arch image for it.
 # The image is then pushed to Docker Hub.
 #
 # The workflow consists of three jobs:
@@ -18,8 +17,6 @@ name: Master Branch Continuous Release
 
 on:
   push:
-    branches:
-    - master
 
 env:
   REGISTRY_IMAGE: inspectit/inspectit-gepard-agent
@@ -159,4 +156,4 @@ jobs:
 
       - name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ github.ref_name }}
