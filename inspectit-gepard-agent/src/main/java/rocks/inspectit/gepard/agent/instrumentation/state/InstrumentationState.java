@@ -48,10 +48,13 @@ public class InstrumentationState {
    * @return true, if the provided class should be retransformed
    */
   public boolean shouldRetransform(Class<?> clazz) {
-    InstrumentedType type = new InstrumentedType(clazz.getName(), clazz.getClassLoader());
+    if (clazz.getName() != null && clazz.getName().startsWith("com.example.demo"))
+      log.info("DEBUG");
+
+    InstrumentedType type = new InstrumentedType(clazz, clazz.getClassLoader());
     ClassInstrumentationConfiguration currentConfig = activeInstrumentations.getIfPresent(type);
     ClassInstrumentationConfiguration newConfig =
-        configurationResolver.getClassInstrumentationConfiguration(clazz);
+        configurationResolver.getClassInstrumentationConfiguration(type);
 
     try {
       updateHooks(clazz, currentConfig, newConfig);

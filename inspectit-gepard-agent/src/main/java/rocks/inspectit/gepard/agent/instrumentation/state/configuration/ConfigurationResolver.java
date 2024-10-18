@@ -3,11 +3,12 @@ package rocks.inspectit.gepard.agent.instrumentation.state.configuration;
 
 import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.scope.ScopeResolver;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.rules.RuleResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
-import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.InstrumentationRule;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
 
 /**
@@ -15,11 +16,13 @@ import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfig
  * byte code needs updates.
  */
 public class ConfigurationResolver {
+  private final InspectitConfigurationHolder holder;
 
-  private final ScopeResolver scopeResolver;
+  private final RuleResolver ruleResolver;
 
   private ConfigurationResolver(InspectitConfigurationHolder holder) {
-    this.scopeResolver = new ScopeResolver(holder);
+    this.holder = holder;
+    this.ruleResolver = new RuleResolver();
   }
 
   /**
@@ -32,19 +35,7 @@ public class ConfigurationResolver {
   }
 
   /**
-   * Gets the current instrumentation configuration for the specified class.
-   *
-   * @param clazz the class
-   * @return The active configuration or {@link
-   *     ClassInstrumentationConfiguration#NO_INSTRUMENTATION}
-   */
-  public ClassInstrumentationConfiguration getClassInstrumentationConfiguration(Class<?> clazz) {
-    String className = clazz.getName();
-    return getClassInstrumentationConfiguration(className);
-  }
-
-  /**
-   * Gets the current instrumentation configuration for the specified class.
+   * Gets the current instrumentation configuration for the specified type.
    *
    * @param type the instrumented type
    * @return The active configuration or {@link
@@ -52,25 +43,28 @@ public class ConfigurationResolver {
    */
   public ClassInstrumentationConfiguration getClassInstrumentationConfiguration(
       InstrumentedType type) {
-    String typeName = type.getName();
-    return getClassInstrumentationConfiguration(typeName);
+    TypeDescription typeDescription = type.getTypeDescription();
+    if (shouldIgnore(typeDescription)) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
+
+    InstrumentationConfiguration currentConfig = holder.getConfiguration().getInstrumentation();
+    Set<InstrumentationRule> activeRules =
+        ruleResolver.getActiveRules(typeDescription, currentConfig);
+    if (activeRules.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
+
+    ElementMatcher.Junction<MethodDescription> methodMatcher =
+        ruleResolver.getMethodMatcher(activeRules);
+    return new ClassInstrumentationConfiguration(activeRules, methodMatcher);
   }
 
   /**
-   * Gets the current instrumentation configuration for the provided class name
+   * Checks, if the type should be able to be instrumented. Currently, we don't instrument lambda-
+   * or array classes.
    *
-   * @param fullyQualifiedName the class name
-   * @return The active configuration or {@link
-   *     ClassInstrumentationConfiguration#NO_INSTRUMENTATION}
+   * @param type the type description
+   * @return true, if the provided type should NOT be able to be instrumented
    */
-  private ClassInstrumentationConfiguration getClassInstrumentationConfiguration(
-      String fullyQualifiedName) {
-    Set<InstrumentationScope> activeScopes = scopeResolver.getActiveScopes(fullyQualifiedName);
-
-    if (activeScopes.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
-
-    ElementMatcher.Junction<MethodDescription> methodMatcher =
-        scopeResolver.getMethodMatcher(activeScopes);
-    return new ClassInstrumentationConfiguration(activeScopes, methodMatcher);
+  private boolean shouldIgnore(TypeDescription type) {
+    String typeName = type.getName();
+    return typeName.contains("$$Lambda") || typeName.startsWith("[");
   }
 }

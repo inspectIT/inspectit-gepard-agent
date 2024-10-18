@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state.configuration.scope;
+package rocks.inspectit.gepard.agent.instrumentation.state.configuration.scopes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -20,7 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
-import rocks.inspectit.gepard.agent.internal.instrumentation.model.InstrumentationScope;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.rules.scopes.ScopeResolver;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.scopes.InstrumentationScope;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 

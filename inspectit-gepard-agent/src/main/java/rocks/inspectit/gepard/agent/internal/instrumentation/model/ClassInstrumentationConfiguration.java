@@ -7,13 +7,18 @@ import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
+import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.InstrumentationRule;
 
 /**
- * Stores the instrumentation configuration for a specific class. Currently, a class can only be
- * instrumented or not.
+ * Stores the instrumentation configuration for a specific class. The configuration is linked to a
+ * class via the cache in {@link InstrumentationState}.
+ *
+ * @param activeRules all active rules of the class
+ * @param methodMatcher the matcher for all instrumented methods of the class
  */
 public record ClassInstrumentationConfiguration(
-    Set<InstrumentationScope> activeScopes,
+    Set<InstrumentationRule> activeRules,
     ElementMatcher.Junction<MethodDescription> methodMatcher) {
 
   /** The configuration representing that no instrumentation of the class if performed. */
@@ -26,18 +31,19 @@ public record ClassInstrumentationConfiguration(
    * @return true, if this configuration expects instrumentation
    */
   public boolean isActive() {
-    return !activeScopes.isEmpty();
+    return !activeRules.isEmpty();
   }
 
   @Override
   public boolean equals(Object o) {
     if (o instanceof ClassInstrumentationConfiguration otherConfig)
-      return activeScopes.equals(otherConfig.activeScopes);
+      return activeRules.equals(otherConfig.activeRules)
+          && methodMatcher.equals(otherConfig.methodMatcher);
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(activeScopes);
+    return Objects.hash(activeRules, methodMatcher);
   }
 }

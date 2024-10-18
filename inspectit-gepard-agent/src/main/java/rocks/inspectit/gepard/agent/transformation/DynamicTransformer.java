@@ -49,7 +49,7 @@ public class DynamicTransformer implements AgentBuilder.Transformer {
       ClassLoader classLoader,
       JavaModule module,
       ProtectionDomain protectionDomain) {
-    InstrumentedType currentType = new InstrumentedType(typeDescription.getName(), classLoader);
+    InstrumentedType currentType = new InstrumentedType(typeDescription, classLoader);
     ClassInstrumentationConfiguration currentConfig =
         instrumentationState.resolveClassConfiguration(currentType);
     if (currentConfig.isActive()) {
