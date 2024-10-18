@@ -66,11 +66,16 @@ public class MethodHookManager implements IHookManager {
   public void updateHooksFor(Class<?> clazz, ClassInstrumentationConfiguration configuration) {
     String className = clazz.getName();
     log.debug("Updating hooks for {}", className);
-    Set<MethodDescription.InDefinedShape> instrumentedMethods =
-        getInstrumentedMethods(clazz, configuration);
+    Set<MethodDescription> instrumentedMethods = getInstrumentedMethods(clazz, configuration);
 
     ClassHookConfiguration classConfiguration = new ClassHookConfiguration();
-    instrumentedMethods.forEach(classConfiguration::putHookConfiguration);
+    for (MethodDescription method : instrumentedMethods) {
+      try {
+        classConfiguration.putHookConfiguration(method, configuration);
+      } catch (Exception e) {
+        log.error("Could not create hook configuration for {}.{}", className, method.getName(), e);
+      }
+    }
 
     int removeCounter = hookState.removeObsoleteHooks(clazz, instrumentedMethods);
     log.debug("Removed {} obsolete method hooks for {}", removeCounter, className);
@@ -88,7 +93,7 @@ public class MethodHookManager implements IHookManager {
    * @param configuration the instrumentation configuration for the class
    * @return the set of all instrumented methods of the class
    */
-  private Set<MethodDescription.InDefinedShape> getInstrumentedMethods(
+  private Set<MethodDescription> getInstrumentedMethods(
       Class<?> clazz, ClassInstrumentationConfiguration configuration) {
     if (configuration.equals(ClassInstrumentationConfiguration.NO_INSTRUMENTATION))
       return Collections.emptySet();

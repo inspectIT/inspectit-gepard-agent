@@ -1,10 +1,13 @@
-name: Feature Branch Continous Integration
+name: Feature Branch Continuous Integration
 
 on:
   push:
     branches:
       - "feature/**"
   pull_request:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build-and-test:
@@ -39,7 +42,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Package
-        path: build/libs
+        path: inspectit-gepard-agent/build/libs
 
   dependency-submission:
     runs-on: ubuntu-latest

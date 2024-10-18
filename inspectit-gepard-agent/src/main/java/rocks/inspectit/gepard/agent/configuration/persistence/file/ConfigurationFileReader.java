@@ -1,12 +1,13 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.configuration.persistence.file;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
 import rocks.inspectit.gepard.agent.internal.configuration.util.ConfigurationMapper;
 import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 
 /** Reads the agent configuration persistence file. */
 public class ConfigurationFileReader {
@@ -27,9 +28,11 @@ public class ConfigurationFileReader {
     try {
       String fileContent = configFileAccessor.readFile();
       return ConfigurationMapper.toObject(fileContent);
+    } catch (FileNotFoundException e) {
+      log.warn("No local configuration file found");
     } catch (IOException e) {
-      log.warn("No local configuration file found.");
-      return null;
+      log.error("Error while reading local configuration file", e);
     }
+    return null;
   }
 }

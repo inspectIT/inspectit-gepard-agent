@@ -1,21 +1,21 @@
 {
   "instrumentation": {
-    "scopes": [
-      {
+    "scopes": {
+      "s_webController_withSpan": {
+        "enabled": true,
         "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
-        "methods": ["withSpan"],
-        "enabled": true
+        "methods": ["withSpan"]
       },
-      {
+      "s_webController_greeting": {
+        "enabled": true,
         "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
-        "methods": ["greeting"],
-        "enabled": true
+        "methods": ["greeting"]
       },
-      {
+      "s_propagatingController": {
+        "enabled": true,
         "fqn": "io.opentelemetry.smoketest.springboot.controller.PropagatingController",
-        "methods": [],
-        "enabled": true
+        "methods": []
       }
-    ]
+    }
   }
 }

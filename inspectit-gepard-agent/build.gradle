@@ -19,8 +19,8 @@ plugins {
     id "com.palantir.docker" version "0.36.0"
 }
 
-group 'rocks.inspectit.gepard.agent'
-version = "0.0.1-SNAPSHOT"
+group 'rocks.inspectit.gepard'
+def configVersion = "3.0.2-dev"
 
 sourceCompatibility = "17"
 targetCompatibility = "17"
@@ -70,6 +70,7 @@ dependencies {
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${versions.opentelemetryJavaagentAlpha}"))
 
     // inspectit-gepard dependencies
+    implementation("rocks.inspectit.gepard:inspectit-gepard-config:${configVersion}")
     implementation("net.bytebuddy:byte-buddy:1.14.15")
     implementation("ch.qos.logback:logback-classic:1.5.6")
     implementation("org.slf4j:slf4j-api:2.0.16")
@@ -148,7 +149,7 @@ def mergeModules = tasks.register("mergeModules", Zip) {
     dependsOn(copyModules)
     from tasks.copyModules.destinationDir
     destinationDirectory = layout.buildDirectory.dir('libs').get().asFile
-    archiveFileName.set("inspectit-gepard-agent-extension-${version}.jar")
+    archiveFileName.set("inspectit-gepard-agent-extension-${configVersion}.jar")
 }
 
 // Copies the output of your submodules to a temporary directory
@@ -231,7 +232,7 @@ tasks {
         Provider<Directory> agentJar = layout.buildDirectory.dir("/libs/inspectit-gepard-agent.jar")
 
         name "inspectit/inspectit-gepard-agent"
-        tag 'versioned', "hub.docker.com/${name}:${version}"
+        tag 'versioned', "hub.docker.com/${name}:${configVersion}"
         dockerfile file('docker/Dockerfile')
         files 'docker/entrypoint.sh', agentJar.get().asFile
     }

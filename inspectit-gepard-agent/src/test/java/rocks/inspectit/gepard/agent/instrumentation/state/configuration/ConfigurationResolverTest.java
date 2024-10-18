@@ -3,19 +3,19 @@ package rocks.inspectit.gepard.agent.instrumentation.state.configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationUtil.createConfiguration;
-import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationUtil.createScope;
+import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil.createConfiguration;
+import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil.createScope;
 
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
-import rocks.inspectit.gepard.agent.internal.configuration.model.instrumentation.Scope;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 class ConfigurationResolverTest {
@@ -46,8 +46,8 @@ class ConfigurationResolverTest {
 
   @Test
   void typeShouldBeInstrumented() {
-    Scope scope = createScope(true, getClass().getName());
-    InspectitConfiguration configuration = createConfiguration(List.of(scope));
+    ScopeConfiguration scope = createScope(true, getClass().getName());
+    InspectitConfiguration configuration = createConfiguration(Map.of("s_scope", scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
     ClassInstrumentationConfiguration config =
@@ -59,8 +59,8 @@ class ConfigurationResolverTest {
 
   @Test
   void typeShouldBeDeinstrumented() {
-    Scope scope = createScope(false, getClass().getName());
-    InspectitConfiguration configuration = createConfiguration(List.of(scope));
+    ScopeConfiguration scope = createScope(false, getClass().getName());
+    InspectitConfiguration configuration = createConfiguration(Map.of("s_scope", scope));
     when(holder.getConfiguration()).thenReturn(configuration);
 
     ClassInstrumentationConfiguration config =
