@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.MatcherChainBuilder;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.rules.scopes.ScopeResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.InstrumentationRule;
@@ -18,6 +20,7 @@ import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConf
 
 /** This class is used to resolve {@link RuleConfiguration}s to {@link InstrumentationRule}s. */
 public class RuleResolver {
+  private static final Logger log = LoggerFactory.getLogger(RuleResolver.class);
 
   private final ScopeResolver scopeResolver;
 
@@ -42,12 +45,12 @@ public class RuleResolver {
         .getRules()
         .forEach(
             (name, rule) -> {
-              Set<InstrumentationScope> activeScopes = getActiveScopes(type, rule, scopes);
-              if (!activeScopes.isEmpty()) {
-                RuleTracingConfiguration tracing = rule.getTracing();
-                InstrumentationRule activeRule =
-                    new InstrumentationRule(name, activeScopes, tracing);
-                activeRules.add(activeRule);
+              if (rule.isEnabled()) {
+                InstrumentationRule activeRule = getActiveRule(name, rule, type, scopes);
+                if (Objects.nonNull(activeRule)) {
+                  activeRules.add(activeRule);
+                  log.debug("Added rule {} to type {}", name, type.getName());
+                }
               }
             });
 
@@ -55,23 +58,40 @@ public class RuleResolver {
   }
 
   /**
-   * Creates a matcher for each method name within a scope inside a rule. The matchers are chained
-   * using 'OR'.
+   * Creates a matcher for all method names within a class. The matchers are chained using 'OR'.
    *
-   * @param activeRules the rules containing scopes, which hold method matchers
-   * @return a matcher for the methods
+   * @param activeRules the rules, which hold method matchers
+   * @return a matcher for the methods of the class
    */
-  public ElementMatcher.Junction<MethodDescription> getMethodMatcher(
+  public ElementMatcher.Junction<MethodDescription> getClassMethodMatcher(
       Set<InstrumentationRule> activeRules) {
-    Set<InstrumentationScope> activeScopes =
-        activeRules.stream().flatMap(rule -> rule.scopes().stream()).collect(Collectors.toSet());
-    if (containsAllMethodsScope(activeScopes)) return InstrumentationScope.ALL_METHODS;
-
     MatcherChainBuilder<MethodDescription> matcherChainBuilder = new MatcherChainBuilder<>();
-    activeScopes.forEach(scope -> matcherChainBuilder.or(scope.getMethodMatcher()));
+    activeRules.forEach(rule -> matcherChainBuilder.or(rule.methodMatcher()));
 
     if (matcherChainBuilder.isEmpty()) return none();
     return matcherChainBuilder.build();
+  }
+
+  /**
+   * Creates a rule with only the relevant scopes and it's configuration.
+   *
+   * @param name the name of the rule
+   * @param ruleConfig the configuration of the rule
+   * @param type the type for which the rule applies
+   * @param scopes the configured scopes
+   * @return the created active rule or null, if no active scopes were found
+   */
+  private InstrumentationRule getActiveRule(
+      String name,
+      RuleConfiguration ruleConfig,
+      TypeDescription type,
+      Map<String, InstrumentationScope> scopes) {
+    Set<InstrumentationScope> activeScopes = getActiveScopes(type, ruleConfig, scopes);
+    if (activeScopes.isEmpty()) return null;
+
+    ElementMatcher.Junction<MethodDescription> methodMatcher = getRuleMethodMatcher(activeScopes);
+    RuleTracingConfiguration tracing = ruleConfig.getTracing();
+    return new InstrumentationRule(name, activeScopes, methodMatcher, tracing);
   }
 
   /**
@@ -97,15 +117,17 @@ public class RuleResolver {
   }
 
   /**
-   * Checks, if the provided set of scopes contains at least one whole class scope. Then we know,
-   * that all methods of the type should be instrumented and don't have to check each scope
-   * individually.
+   * Creates a matcher for all method names within a rule. The matchers are chained using 'OR'.
    *
-   * @param scopes the list of scopes to check
-   * @return true, if the set of scopes contains at least one whole class scope
+   * @param scopes the scopes, which hold method matchers
+   * @return a matcher for the methods of the rule
    */
-  private boolean containsAllMethodsScope(Set<InstrumentationScope> scopes) {
-    return scopes.stream()
-        .anyMatch(s -> s.getMethodMatcher().equals(InstrumentationScope.ALL_METHODS));
+  private ElementMatcher.Junction<MethodDescription> getRuleMethodMatcher(
+      Set<InstrumentationScope> scopes) {
+    MatcherChainBuilder<MethodDescription> matcherChainBuilder = new MatcherChainBuilder<>();
+    scopes.forEach(scope -> matcherChainBuilder.or(scope.getMethodMatcher()));
+
+    if (matcherChainBuilder.isEmpty()) return none();
+    return matcherChainBuilder.build();
   }
 }

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.util.MethodHookGenerator;
 
 /** Stores the method hook configurations of all instrumented classes. */
@@ -41,8 +42,7 @@ public class MethodHookState {
    * @param instrumentedMethods the methods, which should be hooked
    * @return the amount of hooks removed
    */
-  public int removeObsoleteHooks(
-      Class<?> clazz, Set<MethodDescription.InDefinedShape> instrumentedMethods) {
+  public int removeObsoleteHooks(Class<?> clazz, Set<MethodDescription> instrumentedMethods) {
     Set<String> matchedSignatures =
         instrumentedMethods.stream().map(this::getSignature).collect(Collectors.toSet());
 
@@ -73,16 +73,13 @@ public class MethodHookState {
     classConfiguration
         .asMap()
         .forEach(
-            (method, active) -> {
-              // Currently always true, later we should compare the current with the new config
-              if (active) {
-                String signature = getSignature(method);
-                Optional<MethodHook> maybeHook = getCurrentHook(clazz, signature);
-                if (maybeHook.isEmpty()) {
-                  MethodHook hook = MethodHookGenerator.createHook(method);
-                  setHook(clazz, signature, hook);
-                  operationCounter.addAndGet(1);
-                }
+            (method, newConfig) -> {
+              String signature = getSignature(method);
+              MethodHookConfiguration currentConfig = getCurrentHookConfiguration(clazz, signature);
+              if (!newConfig.equals(currentConfig)) {
+                MethodHook hook = MethodHookGenerator.createHook(newConfig);
+                setHook(clazz, signature, hook);
+                operationCounter.addAndGet(1);
               }
             });
     return operationCounter.get();
@@ -139,16 +136,18 @@ public class MethodHookState {
   }
 
   /**
-   * Returns the hook for the specific method of the provided class.
+   * Returns the hook configuration for the specific method of the provided class.
    *
    * @param clazz the class containing the method
    * @param methodSignature the method, which might be hooked
    * @return the hook of the method, if existing
    */
   @VisibleForTesting
-  Optional<MethodHook> getCurrentHook(Class<?> clazz, String methodSignature) {
+  MethodHookConfiguration getCurrentHookConfiguration(Class<?> clazz, String methodSignature) {
     HookedMethods hookedMethods = hooks.getIfPresent(clazz);
     return Optional.ofNullable(hookedMethods)
-        .map(methods -> methods.getActiveHook(methodSignature));
+        .map(methods -> methods.getActiveHook(methodSignature))
+        .map(MethodHook::getConfiguration)
+        .orElse(null);
   }
 }

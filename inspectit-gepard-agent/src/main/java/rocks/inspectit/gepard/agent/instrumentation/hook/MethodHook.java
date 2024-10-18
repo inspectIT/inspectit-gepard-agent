@@ -5,24 +5,33 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
 /**
  * Each {@link MethodHook} instance defines for a single method which actions are performed. This
- * defines for example which generic actions are executed or which metrics are collected. Currently,
- * we just log our method calls.
+ * defines for example which generic actions are executed or which metrics are collected.
  */
 public class MethodHook implements IMethodHook {
   private static final Logger log = LoggerFactory.getLogger(MethodHook.class);
 
-  private final String methodName;
+  /** The configuration of this method hook */
+  private final MethodHookConfiguration configuration;
 
   private final SpanAction spanAction;
 
-  public MethodHook(String methodName, SpanAction spanAction) {
-    this.methodName = methodName;
-    this.spanAction = spanAction;
+  public MethodHook(Builder builder) {
+    this.configuration = builder.configuration;
+    this.spanAction = builder.spanAction;
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public MethodHookConfiguration getConfiguration() {
+    return configuration;
   }
 
   @Override
@@ -33,17 +42,17 @@ public class MethodHook implements IMethodHook {
             instrumentedMethodArgs.length, thiz.getClass().getName());
     System.out.println(message);
 
-    String spanName = thiz.getClass().getSimpleName() + "." + methodName;
+    String spanName = getSpanName(thiz.getClass());
     AutoCloseable spanScope = null;
-
-    try {
-      spanScope = spanAction.startSpan(spanName);
-    } catch (Exception e) {
-      log.error("Could not execute start-span-action", e);
-    }
+    if (Objects.nonNull(spanAction))
+      try {
+        spanScope = spanAction.startSpan(spanName);
+      } catch (Exception e) {
+        log.error("Could not execute start-span-action", e);
+      }
 
     // Using our log4j here will not be visible in the target application...
-    System.out.println("HELLO GEPARD : " + methodName);
+    System.out.println("HELLO GEPARD : " + configuration.methodName());
     return new InternalInspectitContext(this, spanScope);
   }
 
@@ -63,13 +72,45 @@ public class MethodHook implements IMethodHook {
     System.out.println(message);
 
     AutoCloseable spanScope = context.getSpanScope();
-    try {
-      spanAction.endSpan(spanScope);
-    } catch (Exception e) {
-      log.error("Could not execute end-span-action", e);
-    }
+    if (Objects.nonNull(spanAction))
+      try {
+        spanAction.endSpan(spanScope);
+      } catch (Exception e) {
+        log.error("Could not execute end-span-action", e);
+      }
 
     // Using our log4j here will not be visible in the target application...
     System.out.println("BYE GEPARD");
+  }
+
+  /**
+   * @param clazz the class of the method for which a span will be started
+   * @return the span name in the format 'SimpleClassName.methodName', for instance
+   *     'MethodHook.getSpanName'
+   */
+  private String getSpanName(Class<?> clazz) {
+    String methodName = configuration.methodName();
+    return clazz.getSimpleName() + "." + methodName;
+  }
+
+  /** Builder-pattern for method hooks */
+  public static class Builder {
+    private MethodHookConfiguration configuration;
+
+    private SpanAction spanAction;
+
+    public Builder setConfiguration(MethodHookConfiguration configuration) {
+      this.configuration = configuration;
+      return this;
+    }
+
+    public Builder setSpanAction(SpanAction spanAction) {
+      this.spanAction = spanAction;
+      return this;
+    }
+
+    public MethodHook build() {
+      return new MethodHook(this);
+    }
   }
 }

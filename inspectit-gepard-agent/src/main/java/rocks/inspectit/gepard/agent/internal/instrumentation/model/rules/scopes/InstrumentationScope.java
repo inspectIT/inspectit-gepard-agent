@@ -22,10 +22,10 @@ public class InstrumentationScope {
   public static final ElementMatcher.Junction<MethodDescription> ALL_METHODS =
       isMethod().and(not(isSynthetic()));
 
-  /** Matcher for types */
+  /** Matcher for types of this scope */
   private final ElementMatcher.Junction<TypeDescription> typeMatcher;
 
-  /** Matcher for methods */
+  /** Matcher for methods of this scope */
   private final ElementMatcher.Junction<MethodDescription> methodMatcher;
 
   private InstrumentationScope(

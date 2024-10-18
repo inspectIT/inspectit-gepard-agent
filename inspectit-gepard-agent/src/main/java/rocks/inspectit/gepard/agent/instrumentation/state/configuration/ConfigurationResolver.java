@@ -12,10 +12,11 @@ import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.Instrum
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
 
 /**
- * Utility class to resolve the {@link InstrumentationConfiguration} and determine whether class
- * byte code needs updates.
+ * Resolves the {@link InstrumentationConfiguration} and determine whether a class's byte code needs
+ * updates.
  */
 public class ConfigurationResolver {
+
   private final InspectitConfigurationHolder holder;
 
   private final RuleResolver ruleResolver;
@@ -52,7 +53,7 @@ public class ConfigurationResolver {
     if (activeRules.isEmpty()) return ClassInstrumentationConfiguration.NO_INSTRUMENTATION;
 
     ElementMatcher.Junction<MethodDescription> methodMatcher =
-        ruleResolver.getMethodMatcher(activeRules);
+        ruleResolver.getClassMethodMatcher(activeRules);
     return new ClassInstrumentationConfiguration(activeRules, methodMatcher);
   }
 

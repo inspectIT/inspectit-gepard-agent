@@ -20,8 +20,10 @@ public class ScopeResolver {
 
     scopeConfigs.forEach(
         (name, scopeConfig) -> {
-          InstrumentationScope scope = InstrumentationScope.create(scopeConfig);
-          result.put(name, scope);
+          if (scopeConfig.isEnabled()) {
+            InstrumentationScope scope = InstrumentationScope.create(scopeConfig);
+            result.put(name, scope);
+          }
         });
     return result;
   }
