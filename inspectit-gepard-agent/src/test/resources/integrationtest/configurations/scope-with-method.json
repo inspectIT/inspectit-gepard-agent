@@ -2,10 +2,16 @@
   "instrumentation": {
     "scopes": {
       "s_controller_greeting": {
-        "enabled": true,
         "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
         "methods": ["greeting"]
       }
+    },
+    "rules": {
+      "r_controller_greeting": {
+        "scopes": {
+          "s_controller_greeting": true
+        }
       }
+    }
   }
 }

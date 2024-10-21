@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.resolver.MethodHookConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.bootstrap.Instances;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IHookManager;
@@ -68,7 +69,8 @@ public class MethodHookManager implements IHookManager {
     log.debug("Updating hooks for {}", className);
     Set<MethodDescription> instrumentedMethods = getInstrumentedMethods(clazz, configuration);
 
-    ClassHookConfiguration classConfiguration = new ClassHookConfiguration();
+    MethodHookConfigurationResolver hookResolver = new MethodHookConfigurationResolver();
+    ClassHookConfiguration classConfiguration = new ClassHookConfiguration(hookResolver);
     for (MethodDescription method : instrumentedMethods) {
       try {
         classConfiguration.putHookConfiguration(method, configuration);

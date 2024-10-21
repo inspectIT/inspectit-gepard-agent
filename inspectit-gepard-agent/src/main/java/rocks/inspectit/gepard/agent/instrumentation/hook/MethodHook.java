@@ -26,10 +26,16 @@ public class MethodHook implements IMethodHook {
     this.spanAction = builder.spanAction;
   }
 
+  /**
+   * @return builder for method hooks
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   * @return the configuration of this method hook
+   */
   public MethodHookConfiguration getConfiguration() {
     return configuration;
   }
@@ -93,11 +99,13 @@ public class MethodHook implements IMethodHook {
     return clazz.getSimpleName() + "." + methodName;
   }
 
-  /** Builder-pattern for method hooks */
+  /** Builder-pattern for method hooks, because not all properties have to be initialized. */
   public static class Builder {
     private MethodHookConfiguration configuration;
 
     private SpanAction spanAction;
+
+    private Builder() {}
 
     public Builder setConfiguration(MethodHookConfiguration configuration) {
       this.configuration = configuration;

@@ -4,20 +4,17 @@ package rocks.inspectit.gepard.agent.internal.configuration.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.configuration.exception.CouldNotDeserializeConfigurationException;
 import rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 class ConfigurationMapperTest {
 
   private static final String expectedString = InspectitConfigurationTestUtil.expectedString();
 
-  private static final InspectitConfiguration expectedConfig = expectedConfig();
+  private static final InspectitConfiguration expectedConfig =
+      InspectitConfigurationTestUtil.expectedConfiguration();
 
   @Test
   void validStringIsDeserialized() throws IOException {
@@ -57,13 +54,5 @@ class ConfigurationMapperTest {
   @Test
   void nullConfigThrowsException() {
     assertThrows(IllegalArgumentException.class, () -> ConfigurationMapper.toString(null));
-  }
-
-  private static InspectitConfiguration expectedConfig() {
-    ScopeConfiguration scope =
-        new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
-    InstrumentationConfiguration instrumentationConfiguration =
-        new InstrumentationConfiguration(Map.of("s_scope", scope), Map.of());
-    return new InspectitConfiguration(instrumentationConfiguration);
   }
 }

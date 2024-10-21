@@ -4,8 +4,6 @@ package rocks.inspectit.gepard.agent.configuration.persistence;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
-import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,9 +16,8 @@ import rocks.inspectit.gepard.agent.configuration.persistence.file.Configuration
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedEvent;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedObserver;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
+import rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationPersistenceTest {
@@ -46,7 +43,7 @@ public class ConfigurationPersistenceTest {
 
   @Test
   void configurationLoadNotifiesObservers() {
-    InspectitConfiguration configuration = createConfiguration();
+    InspectitConfiguration configuration = InspectitConfigurationTestUtil.expectedConfiguration();
     when(reader.readConfiguration()).thenReturn(configuration);
     ConfigurationReceivedEvent event = new ConfigurationReceivedEvent(this, configuration);
 
@@ -73,19 +70,11 @@ public class ConfigurationPersistenceTest {
 
   @Test
   void newConfigurationNotifiesObservers() {
-    InspectitConfiguration configuration = createConfiguration();
+    InspectitConfiguration configuration = InspectitConfigurationTestUtil.expectedConfiguration();
     ConfigurationReceivedEvent event = new ConfigurationReceivedEvent(this, configuration);
 
     persistence.handleConfiguration(event);
 
     verify(writer).writeConfiguration(configuration);
-  }
-
-  private static InspectitConfiguration createConfiguration() {
-    ScopeConfiguration scope =
-        new ScopeConfiguration(true, "com.example.Application", Collections.emptyList());
-    InstrumentationConfiguration instrumentationConfiguration =
-        new InstrumentationConfiguration(Map.of("s_scope", scope), Map.of());
-    return new InspectitConfiguration(instrumentationConfiguration);
   }
 }

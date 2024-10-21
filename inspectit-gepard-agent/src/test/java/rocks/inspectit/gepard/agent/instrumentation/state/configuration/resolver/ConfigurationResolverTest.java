@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state.configuration;
+package rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -7,11 +7,13 @@ import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestU
 import static rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil.createScope;
 
 import java.util.Map;
+import net.bytebuddy.description.type.TypeDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
@@ -24,8 +26,11 @@ class ConfigurationResolverTest {
 
   private ConfigurationResolver resolver;
 
-  private final InstrumentedType TEST_TYPE =
-      new InstrumentedType(getClass().getName(), getClass().getClassLoader());
+  private static final TypeDescription TYPE_DESCRIPTION =
+      TypeDescription.ForLoadedType.of(ConfigurationResolverTest.class);
+
+  private static final InstrumentedType TEST_TYPE =
+      new InstrumentedType(TYPE_DESCRIPTION, ConfigurationResolverTest.class.getClassLoader());
 
   @BeforeEach
   void beforeEach() {

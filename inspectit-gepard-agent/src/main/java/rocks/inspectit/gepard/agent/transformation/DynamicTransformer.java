@@ -12,7 +12,7 @@ import net.bytebuddy.utility.JavaModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.transformation.advice.InspectitAdvice;

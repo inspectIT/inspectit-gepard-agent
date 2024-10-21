@@ -2,19 +2,28 @@
   "instrumentation": {
     "scopes": {
       "s_webController_withSpan": {
-        "enabled": true,
         "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
         "methods": ["withSpan"]
       },
       "s_webController_greeting": {
-        "enabled": true,
         "fqn": "io.opentelemetry.smoketest.springboot.controller.WebController",
         "methods": ["greeting"]
       },
       "s_propagatingController": {
-        "enabled": true,
-        "fqn": "io.opentelemetry.smoketest.springboot.controller.PropagatingController",
-        "methods": []
+        "fqn": "io.opentelemetry.smoketest.springboot.controller.PropagatingController"
+      }
+    },
+    "rules": {
+      "r_webController": {
+        "scopes": {
+          "s_webController_withSpan": true,
+          "s_webController_greeting": true
+        }
+      },
+      "r_propagatingController": {
+        "scopes": {
+          "s_propagatingController": true
+        }
       }
     }
   }

@@ -13,10 +13,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.exception.CouldNotCloseSpanScopeException;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 
 @ExtendWith(MockitoExtension.class)
 class MethodHookTest {
+
+  @Mock private MethodHookConfiguration configuration;
 
   @Mock private SpanAction spanAction;
 
@@ -28,7 +31,8 @@ class MethodHookTest {
 
   @BeforeEach
   void beforeEach() {
-    hook = new MethodHook("method", spanAction);
+    lenient().when(configuration.methodName()).thenReturn("testMethod");
+    hook = MethodHook.builder().setConfiguration(configuration).setSpanAction(spanAction).build();
   }
 
   @Test

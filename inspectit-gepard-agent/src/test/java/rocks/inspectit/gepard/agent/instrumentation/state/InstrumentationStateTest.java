@@ -5,13 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import net.bytebuddy.description.type.TypeDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
@@ -28,8 +29,11 @@ class InstrumentationStateTest {
 
   private static final Class<?> TEST_CLASS = InstrumentationStateTest.class;
 
+  private static final TypeDescription TYPE_DESCRIPTION =
+      TypeDescription.ForLoadedType.of(TEST_CLASS);
+
   private static final InstrumentedType TEST_TYPE =
-      new InstrumentedType(TEST_CLASS.getName(), TEST_CLASS.getClassLoader());
+      new InstrumentedType(TYPE_DESCRIPTION, TEST_CLASS.getClassLoader());
 
   @BeforeEach
   void beforeEach() {
@@ -77,7 +81,7 @@ class InstrumentationStateTest {
 
   @Test
   void shouldNotRetransformWhenConfigurationEquals() {
-    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(resolver.getClassInstrumentationConfiguration(TEST_TYPE)).thenReturn(configuration);
     instrumentationState.addInstrumentedType(TEST_TYPE, configuration);
 
     boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
@@ -88,7 +92,7 @@ class InstrumentationStateTest {
   @Test
   void shouldNotRetransformWhenConfigurationDiffer() {
     ClassInstrumentationConfiguration oldConfig = mock(ClassInstrumentationConfiguration.class);
-    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(resolver.getClassInstrumentationConfiguration(TEST_TYPE)).thenReturn(configuration);
     instrumentationState.addInstrumentedType(TEST_TYPE, oldConfig);
 
     boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
@@ -98,7 +102,7 @@ class InstrumentationStateTest {
 
   @Test
   void shouldRetransformWhenConfigurationIsActive() {
-    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(resolver.getClassInstrumentationConfiguration(TEST_TYPE)).thenReturn(configuration);
     when(configuration.isActive()).thenReturn(true);
 
     boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
@@ -108,7 +112,7 @@ class InstrumentationStateTest {
 
   @Test
   void shouldNotRetransformWhenConfigurationIsInactive() {
-    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(resolver.getClassInstrumentationConfiguration(TEST_TYPE)).thenReturn(configuration);
     when(configuration.isActive()).thenReturn(false);
 
     boolean shouldRetransform = instrumentationState.shouldRetransform(TEST_CLASS);
@@ -118,7 +122,7 @@ class InstrumentationStateTest {
 
   @Test
   void shouldUpdateHooksWhenConfigurationIsActive() {
-    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(resolver.getClassInstrumentationConfiguration(TEST_TYPE)).thenReturn(configuration);
     when(configuration.isActive()).thenReturn(true);
 
     instrumentationState.shouldRetransform(TEST_CLASS);
@@ -128,7 +132,7 @@ class InstrumentationStateTest {
 
   @Test
   void shouldNotUpdateHooksWhenConfigurationIsInactive() {
-    when(resolver.getClassInstrumentationConfiguration(TEST_CLASS)).thenReturn(configuration);
+    when(resolver.getClassInstrumentationConfiguration(TEST_TYPE)).thenReturn(configuration);
     when(configuration.isActive()).thenReturn(false);
 
     instrumentationState.shouldRetransform(TEST_CLASS);

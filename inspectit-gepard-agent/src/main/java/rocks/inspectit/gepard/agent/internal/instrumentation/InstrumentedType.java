@@ -31,7 +31,6 @@ public class InstrumentedType {
   }
 
   public InstrumentedType(Class<?> clazz, @Nullable ClassLoader classLoader) {
-    // TODO Test, if this is actually working here
     this.typeDescription = TypeDescription.ForLoadedType.of(clazz);
     this.classLoader = classLoader;
   }

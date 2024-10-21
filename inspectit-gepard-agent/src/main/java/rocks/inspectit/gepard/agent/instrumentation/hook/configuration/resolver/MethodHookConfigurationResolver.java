@@ -1,9 +1,10 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.hook.configuration;
+package rocks.inspectit.gepard.agent.instrumentation.hook.configuration.resolver;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.exception.ConflictingConfigurationException;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.InstrumentationRule;
@@ -36,15 +37,18 @@ public class MethodHookConfigurationResolver {
   }
 
   /**
-   * Resolve the tracing configuration for a specific method hook.
+   * Resolve the tracing configuration for a specific method hook. Currently, if not all rules have
+   * the same tracing configuration, there is a conflict.
    *
    * @param rules the rules for the current method
    * @return the tracing configuration
    */
   private RuleTracingConfiguration resolveTracing(Set<InstrumentationRule> rules) {
-    boolean allMatch = rules.stream().allMatch(rule -> rule.tracing().getStartSpan());
+    if (rules.isEmpty()) return RuleTracingConfiguration.NO_TRACING;
 
-    if (allMatch && !rules.isEmpty()) return rules.stream().findFirst().get().tracing();
+    long distinctRules = rules.stream().map(InstrumentationRule::tracing).distinct().count();
+
+    if (distinctRules == 1) return rules.stream().findFirst().get().tracing();
     else throw new ConflictingConfigurationException("Conflict in rule tracing configuration");
   }
 }

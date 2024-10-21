@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,15 +16,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 class MethodHookStateTest {
 
   private MethodHookState methodHookState;
 
-  @Mock private MethodDescription.InDefinedShape methodDescription;
+  @Mock private MethodDescription methodDescription;
 
   @Mock private ClassHookConfiguration classHookConfiguration;
+
+  @Mock private MethodHookConfiguration methodHookConfiguration;
 
   @Mock private MethodHook methodHook;
 
@@ -78,7 +81,10 @@ class MethodHookStateTest {
   @Test
   void shouldUpdateHooksForClassWhenMethodsIsConfigured() {
     String expectedSignature = "method()";
-    when(classHookConfiguration.asMap()).thenReturn(Map.of(methodDescription, true));
+    RuleTracingConfiguration tracing = new RuleTracingConfiguration();
+    when(classHookConfiguration.asMap())
+        .thenReturn(Map.of(methodDescription, methodHookConfiguration));
+    when(methodHookConfiguration.tracing()).thenReturn(tracing);
     doReturn(expectedSignature).when(methodHookState).getSignature(methodDescription);
 
     int updatedHooks = methodHookState.updateHooks(TEST_CLASS, classHookConfiguration);
@@ -110,19 +116,22 @@ class MethodHookStateTest {
 
   @Test
   void shouldReturnEmptyOptionalWhenNoHookExists() {
-    Optional<MethodHook> result = methodHookState.getCurrentHook(TEST_CLASS, "");
+    MethodHookConfiguration configuration =
+        methodHookState.getCurrentHookConfiguration(TEST_CLASS, "");
 
-    assertTrue(result.isEmpty());
+    assertNull(configuration);
   }
 
   @Test
   void shouldReturnHookWhenExits() {
     String signature = "method()";
+    when(methodHook.getConfiguration()).thenReturn(methodHookConfiguration);
     methodHookState.setHook(TEST_CLASS, signature, methodHook);
 
-    Optional<MethodHook> result = methodHookState.getCurrentHook(TEST_CLASS, signature);
+    MethodHookConfiguration configuration =
+        methodHookState.getCurrentHookConfiguration(TEST_CLASS, signature);
 
-    assertTrue(result.isPresent());
-    assertEquals(methodHook, result.get());
+    assertNotNull(configuration);
+    assertEquals(methodHook.getConfiguration(), configuration);
   }
 }

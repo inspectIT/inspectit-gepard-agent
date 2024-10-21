@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.resolver.MethodHookConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
 /**
@@ -18,9 +19,9 @@ public class ClassHookConfiguration {
 
   private final MethodHookConfigurationResolver hookResolver;
 
-  public ClassHookConfiguration() {
+  public ClassHookConfiguration(MethodHookConfigurationResolver hookResolver) {
     this.hookConfigurations = new HashMap<>();
-    this.hookResolver = new MethodHookConfigurationResolver();
+    this.hookResolver = hookResolver;
   }
 
   /**

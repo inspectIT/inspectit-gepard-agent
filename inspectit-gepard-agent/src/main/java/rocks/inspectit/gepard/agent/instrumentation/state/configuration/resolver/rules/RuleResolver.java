@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state.configuration.rules;
+package rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.rules;
 
 import static net.bytebuddy.matcher.ElementMatchers.none;
 
@@ -11,7 +11,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.MatcherChainBuilder;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.rules.scopes.ScopeResolver;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.rules.scopes.ScopeResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.InstrumentationRule;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.scopes.InstrumentationScope;
 import rocks.inspectit.gepard.config.model.instrumentation.InstrumentationConfiguration;

@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.state.configuration.rules.scopes;
+package rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.rules.scopes;
 
 import java.util.*;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.scopes.InstrumentationScope;
