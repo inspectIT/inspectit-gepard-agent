@@ -1,15 +1,15 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.integrationtest.spring.trace;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static rocks.inspectit.gepard.agent.internal.otel.OpenTelemetryAccessor.INSTRUMENTATION_SCOPE_NAME;
 
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
+import io.opentelemetry.proto.trace.v1.ResourceSpans;
 import io.opentelemetry.proto.trace.v1.ScopeSpans;
 import io.opentelemetry.proto.trace.v1.Span;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.integrationtest.spring.SpringTestBase;
@@ -20,12 +20,6 @@ class TracingTest extends SpringTestBase {
   private static final String parentSpanName = "WebController.greeting";
 
   private static final String childSpanName = "WebController.withSpan";
-
-  @Override
-  protected Map<String, String> getExtraEnv() {
-    // We need to disable the OTel annotations to prevent span duplicates
-    return Map.of("OTEL_INSTRUMENTATION_OPENTELEMETRY_EXTENSION_ANNOTATIONS_ENABLED", "false");
-  }
 
   @Test
   void shouldSendSpansToBackendWhenScopesAreActive() throws Exception {
@@ -52,8 +46,8 @@ class TracingTest extends SpringTestBase {
   }
 
   /**
-   * This method asserts that spans with the given names exist and that the child's {@link
-   * Span#getParentSpanId()} equals the parent's {@link Span#getSpanId()}.
+   * This method asserts that spans with the given names exist, they appear in the same trace and
+   * that the child's {@link Span#getParentSpanId()} equals the parent's {@link Span#getSpanId()}.
    *
    * @param traces the collection of traces
    * @param parentSpanName the name of the parent span
@@ -61,26 +55,26 @@ class TracingTest extends SpringTestBase {
    */
   private void assertSpans(
       Collection<ExportTraceServiceRequest> traces, String parentSpanName, String childSpanName) {
-    Stream<List<Span>> spanLists = getSpanLists(traces);
+    List<Span> spans = getSpans(traces);
 
-    assertTrue(
-        spanLists.anyMatch(
-            spans -> {
-              Optional<Span> parentSpan = findSpan(spans, parentSpanName);
-              if (parentSpan.isEmpty()) return false;
+    Optional<Span> parentSpan = findSpan(spans, parentSpanName);
+    Optional<Span> childSpan = findSpan(spans, childSpanName);
+    boolean spansExist = parentSpan.isPresent() && childSpan.isPresent();
 
-              Optional<Span> childSpan = findSpan(spans, childSpanName);
-              if (childSpan.isEmpty()) return false;
+    assertTrue(spansExist);
 
-              // We cannot compare the ByteStrings directly, because they are different objects
-              String childParentId = childSpan.get().getParentSpanId().toStringUtf8();
-              String parentId = parentSpan.get().getSpanId().toStringUtf8();
-              return childParentId.equals(parentId);
-            }));
+    // We cannot compare the ByteStrings directly, because they are different objects
+    String parentId = parentSpan.get().getSpanId().toStringUtf8();
+    String childParentId = childSpan.get().getParentSpanId().toStringUtf8();
+    String parentTraceId = parentSpan.get().getTraceId().toStringUtf8();
+    String childTraceId = childSpan.get().getTraceId().toStringUtf8();
+
+    assertEquals(parentId, childParentId);
+    assertEquals(parentTraceId, childTraceId);
   }
 
   /**
-   * This method asserts that no spans with the given names exist.
+   * This method asserts that no spans from inspectIT with the given names exist.
    *
    * @param traces the collection of traces
    * @param parentSpanName the name of the parent span
@@ -88,33 +82,68 @@ class TracingTest extends SpringTestBase {
    */
   private void assertNoSpans(
       Collection<ExportTraceServiceRequest> traces, String parentSpanName, String childSpanName) {
-    Stream<List<Span>> spanLists = getSpanLists(traces);
+    List<Span> spans = getInspectItSpans(traces);
 
-    assertTrue(
-        spanLists.anyMatch(
-            spans -> {
-              Optional<Span> parentSpan = findSpan(spans, parentSpanName);
-              Optional<Span> childSpan = findSpan(spans, childSpanName);
+    Optional<Span> parentSpan = findSpan(spans, parentSpanName);
+    Optional<Span> childSpan = findSpan(spans, childSpanName);
+    boolean noSpanExist = parentSpan.isEmpty() && childSpan.isEmpty();
 
-              return parentSpan.isEmpty() && childSpan.isEmpty();
-            }));
+    assertTrue(noSpanExist);
   }
 
   /**
-   * Maps the provided traces to a collection of span lists.
+   * Maps the provided traces to a collection of spans.
    *
    * @param traces the collection of traces
-   * @return the collection of span lists within the provided traces
+   * @return the collection of span within the provided traces
    */
-  private Stream<List<Span>> getSpanLists(Collection<ExportTraceServiceRequest> traces) {
+  private List<Span> getSpans(Collection<ExportTraceServiceRequest> traces) {
+    Predicate<String> scopeFilter = (scopeName) -> true;
+    return getSpans(traces, scopeFilter);
+  }
+
+  /**
+   * Maps the provided traces to a collection of spans, which were created by inspectIT.
+   *
+   * @param traces the collection of traces
+   * @return the collection of span within the provided traces
+   */
+  private List<Span> getInspectItSpans(Collection<ExportTraceServiceRequest> traces) {
+    Predicate<String> scopeFilter = (scopeName) -> scopeName.equals(INSTRUMENTATION_SCOPE_NAME);
+    return getSpans(traces, scopeFilter);
+  }
+
+  /**
+   * Maps the provided traces to a collection of spans filtered by a specific instrumentation scope.
+   *
+   * @param traces the collection of traces
+   * @param scopeFilter the filter for the instrumentation scope
+   * @return the filtered collection of span within the provided traces
+   */
+  private List<Span> getSpans(
+      Collection<ExportTraceServiceRequest> traces, Predicate<String> scopeFilter) {
     return traces.stream()
         .flatMap(
             trace ->
                 trace.getResourceSpansList().stream()
                     .flatMap(
                         resourceSpans ->
-                            resourceSpans.getScopeSpansList().stream()
-                                .map(ScopeSpans::getSpansList)));
+                            filterAndExtractSpans(resourceSpans.getScopeSpansList(), scopeFilter)))
+        .toList();
+  }
+
+  /**
+   * Filters and extracts all {@link Span}s from {@link ScopeSpans}.
+   *
+   * @param scopeSpansList the list of {@link ScopeSpans} from {@link ResourceSpans}
+   * @param scopeFilter the filter for the instrumentation scope
+   * @return the collection of filtered spans as stream
+   */
+  private Stream<Span> filterAndExtractSpans(
+      List<ScopeSpans> scopeSpansList, Predicate<String> scopeFilter) {
+    return scopeSpansList.stream()
+        .filter(scopeSpans -> scopeFilter.test(scopeSpans.getScope().getName()))
+        .flatMap(scopeSpans -> scopeSpans.getSpansList().stream());
   }
 
   /**

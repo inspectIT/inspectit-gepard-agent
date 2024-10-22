@@ -1,9 +1,11 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.transformation;
 
-import static net.bytebuddy.matcher.ElementMatchers.any;
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
 import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 
 /** Responsible component for setting up class transformation for instrumentation */
@@ -34,7 +36,16 @@ public class TransformationManager {
     DynamicTransformer transformer = new DynamicTransformer(instrumentationState);
     InspectitListener listener = new InspectitListener();
 
-    // In the future, we might add a white- or black-list for types
-    return agentBuilder.type(any()).transform(transformer).with(listener);
+    return agentBuilder.type(typeMatcher()).transform(transformer).with(listener);
+  }
+
+  /**
+   * Defines all types, which should (or should not) be transformed. We don't want to transform our
+   * own classes.
+   *
+   * @return the type matcher for transformation
+   */
+  private ElementMatcher.Junction<TypeDescription> typeMatcher() {
+    return not(nameStartsWith("rocks.inspectit.gepard.agent"));
   }
 }
