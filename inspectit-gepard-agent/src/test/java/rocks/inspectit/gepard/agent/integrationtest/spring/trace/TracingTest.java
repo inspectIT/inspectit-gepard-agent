@@ -5,8 +5,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static rocks.inspectit.gepard.agent.internal.otel.OpenTelemetryAccessor.INSTRUMENTATION_SCOPE_NAME;
 
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
+import io.opentelemetry.proto.trace.v1.ResourceSpans;
+import io.opentelemetry.proto.trace.v1.ScopeSpans;
 import io.opentelemetry.proto.trace.v1.Span;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.integrationtest.spring.SpringTestBase;
 
@@ -94,15 +98,8 @@ class TracingTest extends SpringTestBase {
    * @return the collection of span within the provided traces
    */
   private List<Span> getSpans(Collection<ExportTraceServiceRequest> traces) {
-    return traces.stream()
-        .flatMap(
-            trace ->
-                trace.getResourceSpansList().stream()
-                    .flatMap(
-                        resourceSpans ->
-                            resourceSpans.getScopeSpansList().stream()
-                                .flatMap(scopeSpans -> scopeSpans.getSpansList().stream())))
-        .toList();
+    Predicate<String> scopeFilter = (scopeName) -> true;
+    return getSpans(traces, scopeFilter);
   }
 
   /**
@@ -112,21 +109,41 @@ class TracingTest extends SpringTestBase {
    * @return the collection of span within the provided traces
    */
   private List<Span> getInspectItSpans(Collection<ExportTraceServiceRequest> traces) {
+    Predicate<String> scopeFilter = (scopeName) -> scopeName.equals(INSTRUMENTATION_SCOPE_NAME);
+    return getSpans(traces, scopeFilter);
+  }
+
+  /**
+   * Maps the provided traces to a collection of spans filtered by a specific instrumentation scope.
+   *
+   * @param traces the collection of traces
+   * @param scopeFilter the filter for the instrumentation scope
+   * @return the filtered collection of span within the provided traces
+   */
+  private List<Span> getSpans(
+      Collection<ExportTraceServiceRequest> traces, Predicate<String> scopeFilter) {
     return traces.stream()
         .flatMap(
             trace ->
                 trace.getResourceSpansList().stream()
                     .flatMap(
                         resourceSpans ->
-                            resourceSpans.getScopeSpansList().stream()
-                                .filter(
-                                    scopeSpans ->
-                                        scopeSpans
-                                            .getScope()
-                                            .getName()
-                                            .equals(INSTRUMENTATION_SCOPE_NAME))
-                                .flatMap(scopeSpans -> scopeSpans.getSpansList().stream())))
+                            filterAndExtractSpans(resourceSpans.getScopeSpansList(), scopeFilter)))
         .toList();
+  }
+
+  /**
+   * Filters and extracts all {@link Span}s from {@link ScopeSpans}.
+   *
+   * @param scopeSpansList the list of {@link ScopeSpans} from {@link ResourceSpans}
+   * @param scopeFilter the filter for the instrumentation scope
+   * @return the collection of filtered spans as stream
+   */
+  private Stream<Span> filterAndExtractSpans(
+      List<ScopeSpans> scopeSpansList, Predicate<String> scopeFilter) {
+    return scopeSpansList.stream()
+        .filter(scopeSpans -> scopeFilter.test(scopeSpans.getScope().getName()))
+        .flatMap(scopeSpans -> scopeSpans.getSpansList().stream());
   }
 
   /**

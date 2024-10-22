@@ -46,6 +46,6 @@ public class TransformationManager {
    * @return the type matcher for transformation
    */
   private ElementMatcher.Junction<TypeDescription> typeMatcher() {
-    return not(nameStartsWith("rocks.inspectit"));
+    return not(nameStartsWith("rocks.inspectit.gepard.agent"));
   }
 }

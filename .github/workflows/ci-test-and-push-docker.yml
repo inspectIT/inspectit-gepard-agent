@@ -173,5 +173,4 @@ jobs:
 
       - name: Inspect image
         run: |
-          IMAGE_TAG=$(echo "${{ github.ref_name }}" | sed 's/\//-/g') 
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:$IMAGE_TAG
+          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
