@@ -46,7 +46,7 @@ public class TransformationManager {
    */
   private ElementMatcher.Junction<TypeDescription> typeMatcher() {
     return not(
-        nameStartsWith("rocks.inspectit")
+        nameStartsWith("rocks.inspectit.gepard.agent")
             .or(nameStartsWith("java.lang.invoke"))
             .or(nameStartsWith("net.bytebuddy")));
   }
