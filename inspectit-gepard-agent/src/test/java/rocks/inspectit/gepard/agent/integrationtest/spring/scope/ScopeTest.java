@@ -10,7 +10,7 @@ public class ScopeTest extends SpringTestBase {
 
   @Test
   void scopeWithoutMethodInstrumentsAllMethods() throws Exception {
-    configurationServerMock.configServerSetup(configDir + "simple-scope.json");
+    configurationServerMock.configServerSetup(configDir + "simple-config.json");
     startTarget("/opentelemetry-extensions.jar");
     awaitInstrumentationUpdate(1);
 
@@ -49,7 +49,7 @@ public class ScopeTest extends SpringTestBase {
 
   @Test
   void emptyConfigurationDoesntInstrument() throws Exception {
-    configurationServerMock.configServerSetup(configDir + "empty-configuration.json");
+    configurationServerMock.configServerSetup(configDir + "empty-config.json");
     startTarget("/opentelemetry-extensions.jar");
     awaitInstrumentationUpdate(1);
 
