@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.internal.configuration.model.InspectitConfiguration;
+import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 
 class ConfigurationReceivedSubjectTest {
 

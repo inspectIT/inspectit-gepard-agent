@@ -20,7 +20,7 @@ plugins {
 }
 
 group 'rocks.inspectit.gepard'
-version = "0.0.1-SNAPSHOT"
+def configVersion = "3.0.1-dev"
 
 sourceCompatibility = "17"
 targetCompatibility = "17"
@@ -70,6 +70,7 @@ dependencies {
     implementation(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:${versions.opentelemetryJavaagentAlpha}"))
 
     // inspectit-gepard dependencies
+    implementation("rocks.inspectit.gepard:inspectit-gepard-config:${configVersion}")
     implementation("net.bytebuddy:byte-buddy:1.14.15")
     implementation("ch.qos.logback:logback-classic:1.5.6")
     implementation("org.slf4j:slf4j-api:2.0.16")

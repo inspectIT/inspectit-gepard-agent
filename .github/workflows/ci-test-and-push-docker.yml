@@ -21,6 +21,7 @@ on:
 
 env:
   REGISTRY_IMAGE: inspectit/inspectit-gepard-agent
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build-agent-jar:

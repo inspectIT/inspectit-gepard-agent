@@ -5,6 +5,14 @@ allprojects {
             name = "sonatype"
             url = uri("https://oss.sonatype.org/content/repositories/snapshots")
         }
+        maven {
+            name = "inspectit-gepard-config"
+            url = uri("https://maven.pkg.github.com/inspectIT/inspectit-gepard-config")
+            credentials {
+                username = project.findProperty("gpr.inspectit.gepard.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.inspectit.gepard.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     apply plugin: "java"
