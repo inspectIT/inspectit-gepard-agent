@@ -5,15 +5,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.internal.file.FileAccessor;
+import rocks.inspectit.gepard.agent.testutils.InspectitConfigurationTestUtil;
 import rocks.inspectit.gepard.config.model.InspectitConfiguration;
-import rocks.inspectit.gepard.config.model.instrumentation.ScopeConfiguration;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfigurationFileReaderTest {
@@ -29,14 +30,15 @@ public class ConfigurationFileReaderTest {
 
   @Test
   void fileContentIsMappedToConfiguration() throws IOException {
-    String expectedString = expectedString();
+    String expectedString = InspectitConfigurationTestUtil.expectedString();
     String expectedScope = "com.example.Application";
     when(fileAccessor.readFile()).thenReturn(expectedString);
 
     InspectitConfiguration configuration = reader.readConfiguration();
-    List<ScopeConfiguration> scopes = configuration.getInstrumentation().getScopes();
+    Map<String, ScopeConfiguration> scopes = configuration.getInstrumentation().getScopes();
 
-    boolean foundScope = scopes.stream().anyMatch(scope -> expectedScope.equals(scope.getFqn()));
+    boolean foundScope =
+        scopes.values().stream().anyMatch(scope -> expectedScope.equals(scope.getFqn()));
     assertTrue(foundScope);
   }
 
@@ -47,9 +49,5 @@ public class ConfigurationFileReaderTest {
     InspectitConfiguration configuration = reader.readConfiguration();
 
     assertNull(configuration);
-  }
-
-  private static String expectedString() {
-    return "{\"instrumentation\":{\"scopes\":[{\"fqn\":\"com.example.Application\",\"enabled\":true}]}}";
   }
 }

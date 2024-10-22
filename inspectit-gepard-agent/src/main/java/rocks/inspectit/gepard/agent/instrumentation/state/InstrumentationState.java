@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.ConfigurationResolver;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
@@ -48,16 +48,12 @@ public class InstrumentationState {
    * @return true, if the provided class should be retransformed
    */
   public boolean shouldRetransform(Class<?> clazz) {
-    InstrumentedType type = new InstrumentedType(clazz.getName(), clazz.getClassLoader());
+    InstrumentedType type = new InstrumentedType(clazz, clazz.getClassLoader());
     ClassInstrumentationConfiguration currentConfig = activeInstrumentations.getIfPresent(type);
     ClassInstrumentationConfiguration newConfig =
-        configurationResolver.getClassInstrumentationConfiguration(clazz);
+        configurationResolver.getClassInstrumentationConfiguration(type);
 
-    try {
-      updateHooks(clazz, currentConfig, newConfig);
-    } catch (Exception e) {
-      log.error("Could not update method hooks", e);
-    }
+    updateMethodHooks(clazz, currentConfig, newConfig);
 
     if (Objects.nonNull(currentConfig)) return !currentConfig.equals(newConfig);
     return newConfig.isActive();
@@ -114,7 +110,7 @@ public class InstrumentationState {
    * @param currentConfig the current instrumentation configuration of the class
    * @param newConfig the new instrumentation configuration of the class
    */
-  private void updateHooks(
+  private void updateMethodHooks(
       Class<?> clazz,
       ClassInstrumentationConfiguration currentConfig,
       ClassInstrumentationConfiguration newConfig) {

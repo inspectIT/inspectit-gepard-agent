@@ -259,7 +259,7 @@ public abstract class IntegrationTestBase {
   /**
    * Waits until a certain update message was logged again. This happens via checking the container
    * logs. First the method counts the current amount of update messages. If the amount of update
-   * messages has increased, it is assumed that a new configuration has been pooled.
+   * messages has increased, we assume an event has occurred.
    *
    * @param updateMessage the message, which will be waited for
    */
