@@ -1,103 +1,78 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.rules.scopes;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.scopes.InstrumentationScope.ALL_METHODS;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
+import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.scopes.InstrumentationScope;
+import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 @ExtendWith(MockitoExtension.class)
 class ScopeResolverTest {
 
-  @Mock private InspectitConfigurationHolder holder;
+  @Mock private ScopeConfiguration scopeConfig;
 
-  @InjectMocks private ScopeResolver resolver;
+  private final ScopeResolver resolver = new ScopeResolver();
 
-  private static final String CLASS_NAME = ScopeResolverTest.class.getName();
+  private static final TypeDescription TEST_TYPE =
+      TypeDescription.ForLoadedType.of(ScopeResolverTest.class);
 
-  // TODO
+  @Test
+  void shouldCreateScopeWhichMatchesTypeAndAllMethods() {
+    Map<String, ScopeConfiguration> scopeConfigs = Map.of("s_scope", scopeConfig);
+    when(scopeConfig.isEnabled()).thenReturn(true);
+    when(scopeConfig.getFqn()).thenReturn(TEST_TYPE.getName());
+    when(scopeConfig.getMethods()).thenReturn(Collections.emptyList());
 
-  //  @Test
-  //  void returnsOnlyActiveScopes() {
-  //    ScopeConfiguration matchingScope = createScope(true, CLASS_NAME, List.of("method"));
-  //    ScopeConfiguration nonMatchingScope1 = createScope(false, CLASS_NAME);
-  //    ScopeConfiguration nonMatchingScope2 = createScope(true, "dummyName");
-  //    Map<String, ScopeConfiguration> scopes =
-  //        Map.of(
-  //            "s_scope1",
-  //            matchingScope,
-  //            "s_scope2",
-  //            nonMatchingScope1,
-  //            "s_scope3",
-  //            nonMatchingScope2);
-  //    InspectitConfiguration configuration = createConfiguration(scopes);
-  //    when(holder.getConfiguration()).thenReturn(configuration);
-  //
-  //    Set<InstrumentationScope> activeScopes = resolver.getActiveScopes(CLASS_NAME);
-  //    InstrumentationScope activeScope = activeScopes.iterator().next();
-  //
-  //    assertEquals(1, activeScopes.size());
-  //    assertEquals(matchingScope.getFqn(), activeScope.fqn());
-  //    assertEquals(matchingScope.getMethods(), activeScope.methods());
-  //  }
-  //
-  //  @Test
-  //  void methodIsNullShouldReturnIsMethodMatcher() {
-  //    InstrumentationScope instrumentationScope =
-  //        new InstrumentationScope(CLASS_NAME, Collections.emptyList());
-  //
-  //    ElementMatcher.Junction<MethodDescription> elementMatcher =
-  //        resolver.getMethodMatcher(Set.of(instrumentationScope));
-  //
-  //    assertEquals(elementMatcher, ElementMatchers.isMethod());
-  //  }
-  //
-  //  @Test
-  //  void methodIsSpecifiedShouldReturnMatcherForOneMethod() throws NoSuchMethodException {
-  //    InstrumentationScope instrumentationScope =
-  //        new InstrumentationScope(CLASS_NAME, List.of("create"));
-  //
-  //    ElementMatcher.Junction<MethodDescription> elementMatcher =
-  //        resolver.getMethodMatcher(Set.of(instrumentationScope));
-  //
-  //    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
-  //  }
-  //
-  //  @Test
-  //  void multipleMethodsAreSpecifiedReturnMatcherForMultipleMethods() throws NoSuchMethodException
-  // {
-  //    InstrumentationScope instrumentationScope =
-  //        new InstrumentationScope(CLASS_NAME, List.of("create", "use"));
-  //
-  //    ElementMatcher.Junction<MethodDescription> elementMatcher =
-  //        resolver.getMethodMatcher(Set.of(instrumentationScope));
-  //
-  //    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "use");
-  //    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
-  //  }
-  //
-  //  @Test
-  //  void multipleScopesAreSpecifiedAndOneIsWholeClassCreatesMatcherForAllMethods()
-  //      throws NoSuchMethodException {
-  //    InstrumentationScope instMethodedScope =
-  //        new InstrumentationScope(CLASS_NAME, List.of("create"));
-  //    InstrumentationScope instFullClassScope =
-  //        new InstrumentationScope(CLASS_NAME, Collections.emptyList());
-  //
-  //    ElementMatcher.Junction<MethodDescription> elementMatcher =
-  //        resolver.getMethodMatcher(Set.of(instMethodedScope, instFullClassScope));
-  //
-  //    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "use");
-  //    assertMethodDescriptionMatcherMatches(elementMatcher, this.getClass(), "create");
-  //  }
+    Map<String, InstrumentationScope> scopes = resolver.resolveScopes(scopeConfigs);
+    InstrumentationScope resultScope = scopes.get("s_scope");
 
-  // Mock methods for the matcher test. Has to be public to be visible.
-  public void create() {
-    System.out.println("create");
+    assertEquals(1, scopes.size());
+    assertEquals(ALL_METHODS, resultScope.getMethodMatcher());
+    assertTrue(resultScope.getTypeMatcher().matches(TEST_TYPE));
   }
 
-  public void use() {
-    System.out.println("use");
+  @Test
+  void shouldCreateScopeWhichMatchesSpecificMethod() {
+    String methodName1 = "method1";
+    MethodDescription method1 = mock(MethodDescription.class);
+    when(method1.getActualName()).thenReturn(methodName1);
+    String methodName2 = "method2";
+    MethodDescription method2 = mock(MethodDescription.class);
+    when(method2.getActualName()).thenReturn(methodName2);
+
+    Map<String, ScopeConfiguration> scopeConfigs = Map.of("s_scope", scopeConfig);
+    when(scopeConfig.isEnabled()).thenReturn(true);
+    when(scopeConfig.getFqn()).thenReturn(TEST_TYPE.getName());
+    when(scopeConfig.getMethods()).thenReturn(List.of(methodName1));
+
+    Map<String, InstrumentationScope> scopes = resolver.resolveScopes(scopeConfigs);
+    InstrumentationScope resultScope = scopes.get("s_scope");
+
+    assertEquals(1, scopes.size());
+    assertTrue(resultScope.getMethodMatcher().matches(method1));
+    assertFalse(resultScope.getMethodMatcher().matches(method2));
+    assertTrue(resultScope.getTypeMatcher().matches(TEST_TYPE));
+  }
+
+  @Test
+  void shouldNotCreateScopeWhenInactive() {
+    Map<String, ScopeConfiguration> scopeConfigs = Map.of("s_scope", scopeConfig);
+    when(scopeConfig.isEnabled()).thenReturn(false);
+
+    Map<String, InstrumentationScope> scopes = resolver.resolveScopes(scopeConfigs);
+
+    assertEquals(0, scopes.size());
   }
 }

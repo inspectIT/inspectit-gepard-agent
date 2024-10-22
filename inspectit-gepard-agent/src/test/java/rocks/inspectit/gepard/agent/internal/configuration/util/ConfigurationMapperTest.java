@@ -11,14 +11,14 @@ import rocks.inspectit.gepard.config.model.InspectitConfiguration;
 
 class ConfigurationMapperTest {
 
-  private static final String expectedString = InspectitConfigurationTestUtil.expectedString();
+  private static final String EXPECTED_STRING = InspectitConfigurationTestUtil.expectedString();
 
-  private static final InspectitConfiguration expectedConfig =
+  private static final InspectitConfiguration EXPECTED_CONFIG =
       InspectitConfigurationTestUtil.expectedConfiguration();
 
   @Test
   void validStringIsDeserialized() throws IOException {
-    InspectitConfiguration result = ConfigurationMapper.toObject(expectedString);
+    InspectitConfiguration result = ConfigurationMapper.toObject(EXPECTED_STRING);
 
     assertNotNull(result);
   }
@@ -46,9 +46,9 @@ class ConfigurationMapperTest {
 
   @Test
   void validObjectIsSerialized() throws IOException {
-    String result = ConfigurationMapper.toString(expectedConfig);
+    String result = ConfigurationMapper.toString(EXPECTED_CONFIG);
 
-    assertEquals(result, expectedString);
+    assertEquals(result, EXPECTED_STRING);
   }
 
   @Test

@@ -7,6 +7,7 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.rules.RuleResolver;
+import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.rules.scopes.ScopeResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.InstrumentationRule;
@@ -22,18 +23,20 @@ public class ConfigurationResolver {
 
   private final RuleResolver ruleResolver;
 
-  private ConfigurationResolver(InspectitConfigurationHolder holder) {
+  private ConfigurationResolver(InspectitConfigurationHolder holder, RuleResolver ruleResolver) {
     this.holder = holder;
-    this.ruleResolver = new RuleResolver();
+    this.ruleResolver = ruleResolver;
   }
 
   /**
-   * Factory method to create an {@link ConfigurationResolver}
+   * Factory method to create an {@link ConfigurationResolver}.
    *
    * @return the created resolver
    */
   public static ConfigurationResolver create(InspectitConfigurationHolder holder) {
-    return new ConfigurationResolver(holder);
+    ScopeResolver scopeResolver = new ScopeResolver();
+    RuleResolver ruleResolver = new RuleResolver(scopeResolver);
+    return new ConfigurationResolver(holder, ruleResolver);
   }
 
   /**

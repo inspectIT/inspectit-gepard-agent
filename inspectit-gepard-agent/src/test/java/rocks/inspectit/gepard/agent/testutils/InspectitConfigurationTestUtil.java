@@ -73,7 +73,7 @@ public class InspectitConfigurationTestUtil {
    * @param scopes the scopes for the rule
    * @return the rule with scopes and enabled tracing
    */
-  private static RuleConfiguration createRule(Map<String, ScopeConfiguration> scopes) {
+  public static RuleConfiguration createRule(Map<String, ScopeConfiguration> scopes) {
     Map<String, Boolean> enabledScopes = new HashMap<>();
     scopes.forEach((name, scope) -> enabledScopes.put(name, true));
     RuleTracingConfiguration tracing = new RuleTracingConfiguration(true);

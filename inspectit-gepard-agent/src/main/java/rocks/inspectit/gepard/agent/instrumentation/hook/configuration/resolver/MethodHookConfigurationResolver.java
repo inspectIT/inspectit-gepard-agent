@@ -26,6 +26,8 @@ public class MethodHookConfigurationResolver {
   public MethodHookConfiguration resolve(
       MethodDescription method, ClassInstrumentationConfiguration classConfig) {
 
+    // Why the hell steht hier null???
+
     Set<InstrumentationRule> matchedRules =
         classConfig.activeRules().stream()
             .filter(rule -> rule.methodMatcher().matches(method))

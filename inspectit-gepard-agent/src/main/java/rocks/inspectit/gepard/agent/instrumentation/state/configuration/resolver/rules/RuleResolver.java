@@ -24,8 +24,8 @@ public class RuleResolver {
 
   private final ScopeResolver scopeResolver;
 
-  public RuleResolver() {
-    this.scopeResolver = new ScopeResolver();
+  public RuleResolver(ScopeResolver scopeResolver) {
+    this.scopeResolver = scopeResolver;
   }
 
   /**

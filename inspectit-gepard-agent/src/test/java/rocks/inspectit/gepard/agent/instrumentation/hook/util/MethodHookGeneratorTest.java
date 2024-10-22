@@ -1,7 +1,7 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook.util;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
@@ -18,13 +18,31 @@ class MethodHookGeneratorTest {
   @Mock private MethodHookConfiguration hookConfiguration;
 
   @Test
-  void shouldCreateMethodHook() {
+  void shouldCreateMethodHookWithoutTracing() {
+    String methodName = "method";
+    when(hookConfiguration.methodName()).thenReturn(methodName);
     when(hookConfiguration.tracing()).thenReturn(RuleTracingConfiguration.NO_TRACING);
 
     MethodHook hook = MethodHookGenerator.createHook(hookConfiguration);
+    boolean tracingEnabled = hook.getConfiguration().tracing().getStartSpan();
 
     assertNotNull(hook);
+    assertEquals(methodName, hook.getConfiguration().methodName());
+    assertFalse(tracingEnabled);
   }
 
-  // TODO
+  @Test
+  void shouldCreateMethodHookWithTracing() {
+    String methodName = "method";
+    RuleTracingConfiguration tracing = new RuleTracingConfiguration(true);
+    when(hookConfiguration.methodName()).thenReturn(methodName);
+    when(hookConfiguration.tracing()).thenReturn(tracing);
+
+    MethodHook hook = MethodHookGenerator.createHook(hookConfiguration);
+    boolean tracingEnabled = hook.getConfiguration().tracing().getStartSpan();
+
+    assertNotNull(hook);
+    assertEquals(methodName, hook.getConfiguration().methodName());
+    assertTrue(tracingEnabled);
+  }
 }
