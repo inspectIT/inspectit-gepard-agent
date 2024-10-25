@@ -40,7 +40,8 @@ public class RuleResolver {
     Map<String, InstrumentationScope> scopes =
         scopeResolver.resolveScopes(configuration.getScopes());
 
-    Set<InstrumentationRule> activeRules = new HashSet<>();
+    int rulesSize = configuration.getRules().size();
+    Set<InstrumentationRule> activeRules = new HashSet<>(rulesSize);
     configuration
         .getRules()
         .forEach(
@@ -49,7 +50,7 @@ public class RuleResolver {
                 InstrumentationRule activeRule = getActiveRule(name, rule, type, scopes);
                 if (Objects.nonNull(activeRule)) {
                   activeRules.add(activeRule);
-                  log.debug("Added rule {} to type {}", name, type.getName());
+                  log.debug("Added rule {} to {}", name, type.getName());
                 }
               }
             });
@@ -66,7 +67,7 @@ public class RuleResolver {
   public ElementMatcher.Junction<MethodDescription> getClassMethodMatcher(
       Set<InstrumentationRule> activeRules) {
     MatcherChainBuilder<MethodDescription> matcherChainBuilder = new MatcherChainBuilder<>();
-    activeRules.forEach(rule -> matcherChainBuilder.or(rule.methodMatcher()));
+    activeRules.forEach(rule -> matcherChainBuilder.or(rule.getMethodMatcher()));
 
     if (matcherChainBuilder.isEmpty()) return none();
     return matcherChainBuilder.build();

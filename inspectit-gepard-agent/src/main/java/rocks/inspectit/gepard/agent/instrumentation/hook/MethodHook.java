@@ -58,7 +58,7 @@ public class MethodHook implements IMethodHook {
       }
 
     // Using our log4j here will not be visible in the target application...
-    System.out.println("HELLO GEPARD : " + configuration.methodName());
+    System.out.println("HELLO GEPARD : " + configuration.getMethodName());
     return new InternalInspectitContext(this, spanScope);
   }
 
@@ -95,7 +95,7 @@ public class MethodHook implements IMethodHook {
    *     'MethodHook.getSpanName'
    */
   private String getSpanName(Class<?> clazz) {
-    String methodName = configuration.methodName();
+    String methodName = configuration.getMethodName();
     return clazz.getSimpleName() + "." + methodName;
   }
 

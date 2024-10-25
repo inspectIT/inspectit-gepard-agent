@@ -6,9 +6,9 @@ import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
 
 /** Creates method hook objects */
-public class MethodHookGenerator {
+public class MethodHookFactory {
 
-  private MethodHookGenerator() {}
+  private MethodHookFactory() {}
 
   /**
    * Creates an executable method hook based on the given configuration.
@@ -19,7 +19,7 @@ public class MethodHookGenerator {
   public static MethodHook createHook(MethodHookConfiguration hookConfig) {
     MethodHook.Builder builder = MethodHook.builder().setConfiguration(hookConfig);
 
-    if (hookConfig.tracing().getStartSpan()) builder.setSpanAction(new SpanAction());
+    if (hookConfig.getTracing().getStartSpan()) builder.setSpanAction(new SpanAction());
 
     return builder.build();
   }

@@ -4,6 +4,8 @@ package rocks.inspectit.gepard.agent.instrumentation.hook.configuration.resolver
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.exception.ConflictingConfigurationException;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
@@ -11,10 +13,14 @@ import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.Instrum
 import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConfiguration;
 
 /**
- * Resolves a {@link ClassInstrumentationConfiguration} to a {@link MethodHookConfiguration} of a
- * specific method.
+ * Resolves a {@link ClassInstrumentationConfiguration} to a {@link MethodHookConfiguration} for a
+ * specific {@link MethodDescription}. <br>
+ * Every {@link ClassInstrumentationConfiguration} has a set of rules. The configurations of each
+ * rule, which match for a specific {@link MethodDescription}, are resolved into the {@link
+ * MethodHookConfiguration}.
  */
 public class MethodHookConfigurationResolver {
+  private static final Logger log = LoggerFactory.getLogger(MethodHookConfigurationResolver.class);
 
   /**
    * Resolve the configuration for a specific method hook.
@@ -25,32 +31,35 @@ public class MethodHookConfigurationResolver {
    */
   public MethodHookConfiguration resolve(
       MethodDescription method, ClassInstrumentationConfiguration classConfig) {
-
-    // Why the hell steht hier null???
-
     Set<InstrumentationRule> matchedRules =
-        classConfig.activeRules().stream()
-            .filter(rule -> rule.methodMatcher().matches(method))
+        classConfig.getActiveRules().stream()
+            .filter(rule -> rule.getMethodMatcher().matches(method))
             .collect(Collectors.toSet());
-
     String methodName = method.getName();
+
+    if (matchedRules.isEmpty()) {
+      log.debug("No matching rules found for {}", methodName);
+      return new MethodHookConfiguration(methodName);
+    }
+
     RuleTracingConfiguration tracing = resolveTracing(matchedRules);
     return new MethodHookConfiguration(methodName, tracing);
   }
 
   /**
    * Resolve the tracing configuration for a specific method hook. Currently, if not all rules have
-   * the same tracing configuration, there is a conflict.
+   * the same tracing configuration, there is a conflict, which we cannot resolve. <br>
+   * For example, we cannot apply two different rules with {@code startSpan: true} and {@code
+   * startSpan: false}.
    *
    * @param rules the rules for the current method
-   * @return the tracing configuration
+   * @return the tracing configuration, if there was no conflict
    */
   private RuleTracingConfiguration resolveTracing(Set<InstrumentationRule> rules) {
-    if (rules.isEmpty()) return RuleTracingConfiguration.NO_TRACING;
+    long distinctConfigurations =
+        rules.stream().map(InstrumentationRule::getTracing).distinct().count();
 
-    long distinctRules = rules.stream().map(InstrumentationRule::tracing).distinct().count();
-
-    if (distinctRules == 1) return rules.stream().findFirst().get().tracing();
+    if (distinctConfigurations == 1) return rules.stream().findFirst().get().getTracing();
     else throw new ConflictingConfigurationException("Conflict in rule tracing configuration");
   }
 }

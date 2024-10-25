@@ -31,7 +31,7 @@ class MethodHookTest {
 
   @BeforeEach
   void beforeEach() {
-    lenient().when(configuration.methodName()).thenReturn("testMethod");
+    lenient().when(configuration.getMethodName()).thenReturn("testMethod");
     hook = MethodHook.builder().setConfiguration(configuration).setSpanAction(spanAction).build();
   }
 

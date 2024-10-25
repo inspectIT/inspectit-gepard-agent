@@ -13,21 +13,21 @@ import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHoo
 import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConfiguration;
 
 @ExtendWith(MockitoExtension.class)
-class MethodHookGeneratorTest {
+class MethodHookFactoryTest {
 
   @Mock private MethodHookConfiguration hookConfiguration;
 
   @Test
   void shouldCreateMethodHookWithoutTracing() {
     String methodName = "method";
-    when(hookConfiguration.methodName()).thenReturn(methodName);
-    when(hookConfiguration.tracing()).thenReturn(RuleTracingConfiguration.NO_TRACING);
+    when(hookConfiguration.getMethodName()).thenReturn(methodName);
+    when(hookConfiguration.getTracing()).thenReturn(RuleTracingConfiguration.NO_TRACING);
 
-    MethodHook hook = MethodHookGenerator.createHook(hookConfiguration);
-    boolean tracingEnabled = hook.getConfiguration().tracing().getStartSpan();
+    MethodHook hook = MethodHookFactory.createHook(hookConfiguration);
+    boolean tracingEnabled = hook.getConfiguration().getTracing().getStartSpan();
 
     assertNotNull(hook);
-    assertEquals(methodName, hook.getConfiguration().methodName());
+    assertEquals(methodName, hook.getConfiguration().getMethodName());
     assertFalse(tracingEnabled);
   }
 
@@ -35,14 +35,14 @@ class MethodHookGeneratorTest {
   void shouldCreateMethodHookWithTracing() {
     String methodName = "method";
     RuleTracingConfiguration tracing = new RuleTracingConfiguration(true);
-    when(hookConfiguration.methodName()).thenReturn(methodName);
-    when(hookConfiguration.tracing()).thenReturn(tracing);
+    when(hookConfiguration.getMethodName()).thenReturn(methodName);
+    when(hookConfiguration.getTracing()).thenReturn(tracing);
 
-    MethodHook hook = MethodHookGenerator.createHook(hookConfiguration);
-    boolean tracingEnabled = hook.getConfiguration().tracing().getStartSpan();
+    MethodHook hook = MethodHookFactory.createHook(hookConfiguration);
+    boolean tracingEnabled = hook.getConfiguration().getTracing().getStartSpan();
 
     assertNotNull(hook);
-    assertEquals(methodName, hook.getConfiguration().methodName());
+    assertEquals(methodName, hook.getConfiguration().getMethodName());
     assertTrue(tracingEnabled);
   }
 }

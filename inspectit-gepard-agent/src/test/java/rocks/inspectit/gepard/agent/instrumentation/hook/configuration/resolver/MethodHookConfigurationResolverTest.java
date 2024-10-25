@@ -36,8 +36,8 @@ class MethodHookConfigurationResolverTest {
   @BeforeEach
   void beforeEach() {
     when(methodDescription.getName()).thenReturn(methodName);
-    when(activeRule.methodMatcher()).thenReturn(matcher);
-    when(classConfiguration.activeRules()).thenReturn(Set.of(activeRule));
+    when(activeRule.getMethodMatcher()).thenReturn(matcher);
+    when(classConfiguration.getActiveRules()).thenReturn(Set.of(activeRule));
   }
 
   @Test
@@ -45,12 +45,12 @@ class MethodHookConfigurationResolverTest {
     RuleTracingConfiguration tracing = new RuleTracingConfiguration(true);
 
     when(methodDescription.isMethod()).thenReturn(true);
-    when(activeRule.tracing()).thenReturn(tracing);
+    when(activeRule.getTracing()).thenReturn(tracing);
 
     MethodHookConfiguration hookConfig = resolver.resolve(methodDescription, classConfiguration);
-    boolean tracingEnabled = hookConfig.tracing().getStartSpan();
+    boolean tracingEnabled = hookConfig.getTracing().getStartSpan();
 
-    assertEquals(methodName, hookConfig.methodName());
+    assertEquals(methodName, hookConfig.getMethodName());
     assertTrue(tracingEnabled);
   }
 
@@ -59,12 +59,12 @@ class MethodHookConfigurationResolverTest {
     RuleTracingConfiguration tracing = RuleTracingConfiguration.NO_TRACING;
 
     when(methodDescription.isMethod()).thenReturn(true);
-    when(activeRule.tracing()).thenReturn(tracing);
+    when(activeRule.getTracing()).thenReturn(tracing);
 
     MethodHookConfiguration hookConfig = resolver.resolve(methodDescription, classConfiguration);
-    boolean tracingEnabled = hookConfig.tracing().getStartSpan();
+    boolean tracingEnabled = hookConfig.getTracing().getStartSpan();
 
-    assertEquals(methodName, hookConfig.methodName());
+    assertEquals(methodName, hookConfig.getMethodName());
     assertFalse(tracingEnabled);
   }
 
@@ -73,9 +73,9 @@ class MethodHookConfigurationResolverTest {
     when(methodDescription.isMethod()).thenReturn(false);
 
     MethodHookConfiguration hookConfig = resolver.resolve(methodDescription, classConfiguration);
-    boolean tracingEnabled = hookConfig.tracing().getStartSpan();
+    boolean tracingEnabled = hookConfig.getTracing().getStartSpan();
 
-    assertEquals(methodName, hookConfig.methodName());
+    assertEquals(methodName, hookConfig.getMethodName());
     assertFalse(tracingEnabled);
   }
 }

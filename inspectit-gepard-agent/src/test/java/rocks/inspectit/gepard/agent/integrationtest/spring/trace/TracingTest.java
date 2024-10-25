@@ -34,7 +34,7 @@ class TracingTest extends SpringTestBase {
   }
 
   @Test
-  void shouldNotSendSpansToBackendWhenNoScopesAreActive() throws Exception {
+  void shouldNotSendSpansToBackendWhenScopesAreInactive() throws Exception {
     configurationServerMock.configServerSetup(configDir + "empty-config.json");
     startTarget("/opentelemetry-extensions.jar");
     awaitInstrumentationUpdate(1);

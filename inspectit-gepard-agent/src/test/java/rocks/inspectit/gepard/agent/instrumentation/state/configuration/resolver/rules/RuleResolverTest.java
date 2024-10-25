@@ -78,10 +78,10 @@ class RuleResolverTest {
 
       assertEquals(1, activeRules.size());
       assertTrue(activeRule.isPresent());
-      assertEquals(1, activeRule.get().scopes().size());
-      assertTrue(activeRule.get().scopes().contains(scope1));
-      assertTrue(activeRule.get().tracing().getStartSpan());
-      assertEquals(methodMatcher, activeRule.get().methodMatcher());
+      assertEquals(1, activeRule.get().getScopes().size());
+      assertTrue(activeRule.get().getScopes().contains(scope1));
+      assertTrue(activeRule.get().getTracing().getStartSpan());
+      assertEquals(methodMatcher, activeRule.get().getMethodMatcher());
     }
 
     @Test
@@ -110,10 +110,10 @@ class RuleResolverTest {
 
       assertEquals(1, activeRules.size());
       assertTrue(activeRule.isPresent());
-      assertEquals(2, activeRule.get().scopes().size());
-      assertTrue(activeRule.get().scopes().contains(scope1));
-      assertTrue(activeRule.get().scopes().contains(scope2));
-      assertFalse(activeRule.get().tracing().getStartSpan());
+      assertEquals(2, activeRule.get().getScopes().size());
+      assertTrue(activeRule.get().getScopes().contains(scope1));
+      assertTrue(activeRule.get().getScopes().contains(scope2));
+      assertFalse(activeRule.get().getTracing().getStartSpan());
       verify(methodMatcher).or(methodMatcher); // method matchers of scopes were combined
     }
 
@@ -178,21 +178,21 @@ class RuleResolverTest {
 
       Set<InstrumentationRule> activeRules = ruleResolver.getActiveRules(TEST_TYPE, configuration);
       Optional<InstrumentationRule> activeRule1 =
-          activeRules.stream().filter(rule -> rule.name().equals("r_rule1")).findFirst();
+          activeRules.stream().filter(rule -> rule.getName().equals("r_rule1")).findFirst();
       Optional<InstrumentationRule> activeRule2 =
-          activeRules.stream().filter(rule -> rule.name().equals("r_rule2")).findFirst();
+          activeRules.stream().filter(rule -> rule.getName().equals("r_rule2")).findFirst();
 
       assertEquals(2, activeRules.size());
       assertTrue(activeRule1.isPresent());
-      assertEquals(1, activeRule1.get().scopes().size());
-      assertTrue(activeRule1.get().scopes().contains(scope1));
-      assertTrue(activeRule1.get().tracing().getStartSpan());
-      assertEquals(methodMatcher, activeRule1.get().methodMatcher());
+      assertEquals(1, activeRule1.get().getScopes().size());
+      assertTrue(activeRule1.get().getScopes().contains(scope1));
+      assertTrue(activeRule1.get().getTracing().getStartSpan());
+      assertEquals(methodMatcher, activeRule1.get().getMethodMatcher());
       assertTrue(activeRule2.isPresent());
-      assertEquals(1, activeRule2.get().scopes().size());
-      assertTrue(activeRule2.get().scopes().contains(scope2));
-      assertFalse(activeRule2.get().tracing().getStartSpan());
-      assertEquals(methodMatcher, activeRule2.get().methodMatcher());
+      assertEquals(1, activeRule2.get().getScopes().size());
+      assertTrue(activeRule2.get().getScopes().contains(scope2));
+      assertFalse(activeRule2.get().getTracing().getStartSpan());
+      assertEquals(methodMatcher, activeRule2.get().getMethodMatcher());
     }
   }
 
@@ -207,8 +207,8 @@ class RuleResolverTest {
     void shouldCombineMethodMatcherOfRules() {
       ElementMatcher.Junction<MethodDescription> methodMatcher = isMethod();
 
-      when(rule1.methodMatcher()).thenReturn(methodMatcher);
-      when(rule2.methodMatcher()).thenReturn(methodMatcher);
+      when(rule1.getMethodMatcher()).thenReturn(methodMatcher);
+      when(rule2.getMethodMatcher()).thenReturn(methodMatcher);
       Set<InstrumentationRule> activeRules = Set.of(rule1, rule2);
 
       ElementMatcher.Junction<MethodDescription> resultMatcher =
@@ -219,8 +219,8 @@ class RuleResolverTest {
 
     @Test
     void shouldReturnNoneMatcherWhenRulesHaveNoMatcher() {
-      when(rule1.methodMatcher()).thenReturn(null);
-      when(rule2.methodMatcher()).thenReturn(null);
+      when(rule1.getMethodMatcher()).thenReturn(null);
+      when(rule2.getMethodMatcher()).thenReturn(null);
       Set<InstrumentationRule> activeRules = Set.of(rule1, rule2);
 
       ElementMatcher.Junction<MethodDescription> resultMatcher =

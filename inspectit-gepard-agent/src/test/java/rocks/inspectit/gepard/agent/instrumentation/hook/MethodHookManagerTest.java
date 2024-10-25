@@ -72,7 +72,7 @@ class MethodHookManagerTest {
 
   @Test
   void shouldUpdateHooksForClassWhenMethodsAreInstrumented() {
-    when(classConfiguration.methodMatcher()).thenReturn(isMethod());
+    when(classConfiguration.getMethodMatcher()).thenReturn(isMethod());
 
     methodHookManager.updateHooksFor(TEST_CLASS, classConfiguration);
 

@@ -5,6 +5,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -29,8 +30,8 @@ public class InstrumentationScope {
   private final ElementMatcher.Junction<MethodDescription> methodMatcher;
 
   private InstrumentationScope(
-      ElementMatcher.Junction<TypeDescription> typeMatcher,
-      ElementMatcher.Junction<MethodDescription> methodMatcher) {
+      @Nonnull ElementMatcher.Junction<TypeDescription> typeMatcher,
+      @Nonnull ElementMatcher.Junction<MethodDescription> methodMatcher) {
     this.typeMatcher = typeMatcher;
     this.methodMatcher = methodMatcher;
   }
@@ -97,5 +98,15 @@ public class InstrumentationScope {
   @Override
   public int hashCode() {
     return Objects.hash(typeMatcher, methodMatcher);
+  }
+
+  @Override
+  public String toString() {
+    return "InstrumentationScope {"
+        + "typeMatcher = "
+        + typeMatcher
+        + ", methodMatcher = "
+        + methodMatcher
+        + '}';
   }
 }

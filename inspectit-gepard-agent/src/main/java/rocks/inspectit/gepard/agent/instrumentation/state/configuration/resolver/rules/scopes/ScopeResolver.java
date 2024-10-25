@@ -16,7 +16,8 @@ public class ScopeResolver {
    */
   public Map<String, InstrumentationScope> resolveScopes(
       Map<String, ScopeConfiguration> scopeConfigs) {
-    Map<String, InstrumentationScope> result = new HashMap<>();
+    int scopesSize = scopeConfigs.size();
+    Map<String, InstrumentationScope> result = new HashMap<>(scopesSize);
 
     scopeConfigs.forEach(
         (name, scopeConfig) -> {

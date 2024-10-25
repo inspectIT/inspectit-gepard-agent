@@ -39,6 +39,9 @@ import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
  * Server Mock as Testcontainers. We can define a target application to test by extending this class
  * and implementing the abstract methods. The target application is also started as a Testcontainer
  * and an agent is attached to it.
+ *
+ * <p>The source code of the test applications can be found here: <a
+ * href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/smoke-tests/images">GitHub</a>
  */
 public abstract class IntegrationTestBase {
 

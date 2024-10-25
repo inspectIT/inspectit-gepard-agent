@@ -41,8 +41,8 @@ public class InstrumentationState {
 
   /**
    * Checks, if the provided class should be retransformed. A retransformation is necessary, if the
-   * new configuration differs from the current configuration. Additionally, we trigger the update
-   * of the classes method hooks, if necessary.
+   * new configuration differs from the current configuration. <br>
+   * <b>SIDE EFFECT</b>: We trigger the update of the method hooks of the class, if necessary.
    *
    * @param clazz the class
    * @return true, if the provided class should be retransformed

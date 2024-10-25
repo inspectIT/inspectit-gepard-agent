@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,7 +85,7 @@ class MethodHookStateTest {
     RuleTracingConfiguration tracing = new RuleTracingConfiguration();
     when(classHookConfiguration.asMap())
         .thenReturn(Map.of(methodDescription, methodHookConfiguration));
-    when(methodHookConfiguration.tracing()).thenReturn(tracing);
+    when(methodHookConfiguration.getTracing()).thenReturn(tracing);
     doReturn(expectedSignature).when(methodHookState).getSignature(methodDescription);
 
     int updatedHooks = methodHookState.updateHooks(TEST_CLASS, classHookConfiguration);
@@ -116,10 +117,10 @@ class MethodHookStateTest {
 
   @Test
   void shouldReturnEmptyOptionalWhenNoHookExists() {
-    MethodHookConfiguration configuration =
+    Optional<MethodHookConfiguration> configuration =
         methodHookState.getCurrentHookConfiguration(TEST_CLASS, "");
 
-    assertNull(configuration);
+    assertTrue(configuration.isEmpty());
   }
 
   @Test
@@ -128,10 +129,10 @@ class MethodHookStateTest {
     when(methodHook.getConfiguration()).thenReturn(methodHookConfiguration);
     methodHookState.setHook(TEST_CLASS, signature, methodHook);
 
-    MethodHookConfiguration configuration =
+    Optional<MethodHookConfiguration> configuration =
         methodHookState.getCurrentHookConfiguration(TEST_CLASS, signature);
 
-    assertNotNull(configuration);
-    assertEquals(methodHook.getConfiguration(), configuration);
+    assertTrue(configuration.isPresent());
+    assertEquals(methodHook.getConfiguration(), configuration.get());
   }
 }
