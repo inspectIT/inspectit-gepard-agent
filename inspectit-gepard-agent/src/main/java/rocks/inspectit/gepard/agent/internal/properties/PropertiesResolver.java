@@ -4,7 +4,10 @@ package rocks.inspectit.gepard.agent.internal.properties;
 import io.opentelemetry.javaagent.bootstrap.JavaagentFileHolder;
 import java.io.File;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * This resolver provides configurable properties or their default values. Currently, it is possible
@@ -27,6 +30,10 @@ public class PropertiesResolver {
       "inspectit.config.http.polling-interval";
   public static final String POLLING_INTERVAL_ENV_PROPERTY =
       "INSPECTIT_CONFIG_HTTP_POLLING_INTERVAL";
+
+  public static final String ATTRIBUTES_SYSTEM_PROPERTY_PREFIX =
+      "inspectit.config.http.attributes.";
+  public static final String ATTRIBUTES_ENV_PROPERTY_PREFIX = "INSPECTIT_CONFIG_HTTP_ATTRIBUTES_";
 
   private PropertiesResolver() {}
 
@@ -89,5 +96,42 @@ public class PropertiesResolver {
     return Objects.nonNull(pollingIntervalEnvProperty)
         ? Duration.parse(pollingIntervalEnvProperty)
         : Duration.ofSeconds(10);
+  }
+
+  /**
+   * Get the attributes which should be sent to the configuration server. When an attribute is
+   * configured via both system properties and environmental properties, the system property will be
+   * used.
+   *
+   * @return the attributes to be sent to the configuration server
+   */
+  public static Map<String, String> getAttributes() {
+
+    Map<String, String> attributes = new HashMap<>(getAttributesFromEnv());
+
+    // Override with system properties where available
+    attributes.putAll(getAttributesFromSystemProperties());
+
+    return attributes;
+  }
+
+  private static Map<String, String> getAttributesFromEnv() {
+    return System.getenv().entrySet().stream()
+        .filter(entry -> entry.getKey().startsWith(ATTRIBUTES_ENV_PROPERTY_PREFIX))
+        .collect(
+            Collectors.toMap(
+                entry ->
+                    entry.getKey().substring(ATTRIBUTES_ENV_PROPERTY_PREFIX.length()).toLowerCase(),
+                Map.Entry::getValue));
+  }
+
+  private static Map<String, String> getAttributesFromSystemProperties() {
+    return System.getProperties().entrySet().stream()
+        .filter(entry -> entry.getKey().toString().startsWith(ATTRIBUTES_SYSTEM_PROPERTY_PREFIX))
+        .collect(
+            Collectors.toMap(
+                entry ->
+                    entry.getKey().toString().substring(ATTRIBUTES_SYSTEM_PROPERTY_PREFIX.length()),
+                entry -> entry.getValue().toString()));
   }
 }
