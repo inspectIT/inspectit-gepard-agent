@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.hook.configuration;
+package rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +9,11 @@ import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.resolver.
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
 /**
- * Stores the hook configuration of all methods for a specific class. Currently, there is no complex
- * hook configuration, thus we only use booleans.
+ * Stores the hook configuration of all methods for a specific class, which is used to update hooks.
  */
 public class ClassHookConfiguration {
 
-  /** Set of methods and their hook configuration. Currently, just true. */
+  /** Set of methods and their hook configuration. */
   private final Map<MethodDescription, MethodHookConfiguration> hookConfigurations;
 
   private final MethodHookConfigurationResolver hookResolver;

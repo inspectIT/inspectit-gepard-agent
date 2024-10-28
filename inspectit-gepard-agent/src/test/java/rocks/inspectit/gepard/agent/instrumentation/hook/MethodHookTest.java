@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.exception.CouldNotCloseSpanScopeException;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 
 @ExtendWith(MockitoExtension.class)

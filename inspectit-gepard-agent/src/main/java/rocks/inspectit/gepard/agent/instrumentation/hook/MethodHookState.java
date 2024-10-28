@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.ClassHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.util.MethodHookFactory;
 
 /** Stores the method hook configurations of all instrumented classes. */

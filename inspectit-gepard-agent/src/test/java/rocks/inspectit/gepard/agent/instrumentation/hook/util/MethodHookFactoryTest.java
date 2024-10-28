@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHook;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConfiguration;
 
 @ExtendWith(MockitoExtension.class)

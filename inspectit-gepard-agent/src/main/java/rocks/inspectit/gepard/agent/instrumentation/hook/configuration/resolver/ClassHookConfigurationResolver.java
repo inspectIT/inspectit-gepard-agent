@@ -5,8 +5,8 @@ import java.util.Set;
 import net.bytebuddy.description.method.MethodDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.ClassHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 
 /**

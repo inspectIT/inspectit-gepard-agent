@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
