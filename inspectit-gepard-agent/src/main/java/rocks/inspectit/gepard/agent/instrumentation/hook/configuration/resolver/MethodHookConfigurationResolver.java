@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import net.bytebuddy.description.method.MethodDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.MethodHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.exception.ConflictingConfigurationException;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.InstrumentationRule;
 import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConfiguration;
@@ -50,16 +50,19 @@ public class MethodHookConfigurationResolver {
    * Resolve the tracing configuration for a specific method hook. Currently, if not all rules have
    * the same tracing configuration, there is a conflict, which we cannot resolve. <br>
    * For example, we cannot apply two different rules with {@code startSpan: true} and {@code
-   * startSpan: false}.
+   * startSpan: false}.<br>
+   * If there is no conflict, we use the tracing configuration of the first rule, which should be
+   * the same as in all other rules.
    *
-   * @param rules the rules for the current method
+   * @param rules the rules for the current method, not empty
    * @return the tracing configuration, if there was no conflict
    */
   private RuleTracingConfiguration resolveTracing(Set<InstrumentationRule> rules) {
-    long distinctConfigurations =
-        rules.stream().map(InstrumentationRule::getTracing).distinct().count();
+    InstrumentationRule firstRule = rules.iterator().next();
+    for (InstrumentationRule rule : rules)
+      if (!firstRule.getTracing().equals(rule.getTracing()))
+        throw new ConflictingConfigurationException("Conflict in rule tracing configuration");
 
-    if (distinctConfigurations == 1) return rules.stream().findFirst().get().getTracing();
-    else throw new ConflictingConfigurationException("Conflict in rule tracing configuration");
+    return firstRule.getTracing();
   }
 }
