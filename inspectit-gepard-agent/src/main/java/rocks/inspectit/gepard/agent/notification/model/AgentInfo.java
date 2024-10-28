@@ -9,7 +9,9 @@ import io.opentelemetry.javaagent.bootstrap.internal.InstrumentationConfig;
 import io.opentelemetry.javaagent.tooling.AgentVersion;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.Map;
 import java.util.Objects;
+import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 
 /** Meta-information about the current agent */
 public class AgentInfo {
@@ -31,6 +33,8 @@ public class AgentInfo {
 
   private final long pid;
 
+  private final Map<String, String> attributes;
+
   private AgentInfo() {
     this.serviceName = getServiceNameFromSdk();
     this.gepardVersion = "0.0.1";
@@ -39,6 +43,7 @@ public class AgentInfo {
     RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
     this.startTime = runtime.getStartTime();
     this.pid = runtime.getPid();
+    this.attributes = PropertiesResolver.getAttributes();
   }
 
   /**
