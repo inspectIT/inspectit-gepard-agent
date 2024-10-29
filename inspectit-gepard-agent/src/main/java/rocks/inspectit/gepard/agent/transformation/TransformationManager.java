@@ -40,12 +40,15 @@ public class TransformationManager {
   }
 
   /**
-   * Defines all types, which should (or should not) be transformed. We don't want to transform our
-   * own classes.
+   * Defines all types, which should (or should not) be transformed.
    *
    * @return the type matcher for transformation
    */
   private ElementMatcher.Junction<TypeDescription> typeMatcher() {
-    return not(nameStartsWith("rocks.inspectit.gepard.agent"));
+    return not(
+        nameStartsWith("rocks.inspectit.gepard.agent")
+            .or(nameStartsWith("rocks.inspectit.gepard.bootstrap"))
+            .or(nameStartsWith("java.lang.invoke"))
+            .or(nameStartsWith("net.bytebuddy")));
   }
 }

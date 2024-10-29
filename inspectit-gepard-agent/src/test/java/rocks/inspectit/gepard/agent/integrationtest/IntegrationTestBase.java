@@ -39,6 +39,9 @@ import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
  * Server Mock as Testcontainers. We can define a target application to test by extending this class
  * and implementing the abstract methods. The target application is also started as a Testcontainer
  * and an agent is attached to it.
+ *
+ * <p>The source code of the test applications can be found here: <a
+ * href="https://github.com/open-telemetry/opentelemetry-java-instrumentation/tree/main/smoke-tests/images">GitHub</a>
  */
 public abstract class IntegrationTestBase {
 
@@ -259,7 +262,7 @@ public abstract class IntegrationTestBase {
   /**
    * Waits until a certain update message was logged again. This happens via checking the container
    * logs. First the method counts the current amount of update messages. If the amount of update
-   * messages has increased, it is assumed that a new configuration has been pooled.
+   * messages has increased, we assume an event has occurred.
    *
    * @param updateMessage the message, which will be waited for
    */

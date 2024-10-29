@@ -25,16 +25,17 @@ class DynamicTransformerTest {
 
   private static final Class<?> TEST_CLASS = DynamicTransformerTest.class;
 
+  private static final TypeDescription TEST_TYPE = TypeDescription.ForLoadedType.of(TEST_CLASS);
+
   @Test
   void testTransformTransformsOnShouldInstrumentTrue() {
     DynamicTransformer transformer = new DynamicTransformer(instrumentationState);
-    InstrumentedType type = new InstrumentedType(TEST_CLASS.getName(), TEST_CLASS.getClassLoader());
-    TypeDescription typeDescription = TypeDescription.ForLoadedType.of(TEST_CLASS);
+    InstrumentedType type = new InstrumentedType(TEST_TYPE, TEST_CLASS.getClassLoader());
 
     when(instrumentationState.resolveClassConfiguration(type)).thenReturn(configuration);
     when(configuration.isActive()).thenReturn(true);
 
-    transformer.transform(builder, typeDescription, TEST_CLASS.getClassLoader(), null, null);
+    transformer.transform(builder, TEST_TYPE, TEST_CLASS.getClassLoader(), null, null);
 
     verify(builder).visit(any());
     verify(instrumentationState).addInstrumentedType(type, configuration);
@@ -43,7 +44,7 @@ class DynamicTransformerTest {
   @Test
   void testTransformerDoesNotTransformOnShouldInstrumentFalse() {
     DynamicTransformer transformer = new DynamicTransformer(instrumentationState);
-    InstrumentedType type = new InstrumentedType(TEST_CLASS.getName(), TEST_CLASS.getClassLoader());
+    InstrumentedType type = new InstrumentedType(TEST_TYPE, TEST_CLASS.getClassLoader());
     TypeDescription typeDescription = TypeDescription.ForLoadedType.of(TEST_CLASS);
 
     when(instrumentationState.resolveClassConfiguration(type)).thenReturn(configuration);

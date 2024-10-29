@@ -8,8 +8,10 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.ClassHookConfiguration;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.HookedMethods;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.ClassHookConfiguration;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.resolver.ClassHookConfigurationResolver;
+import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.resolver.MethodHookConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
 import rocks.inspectit.gepard.bootstrap.Instances;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IHookManager;
@@ -33,8 +35,13 @@ public class MethodHookManager implements IHookManager {
   /** Stores classes and all of their hooked methods. Will be kept up-to-date during runtime. */
   private final MethodHookState hookState;
 
-  private MethodHookManager(MethodHookState hookState) {
+  /** Resolves {@link ClassInstrumentationConfiguration}s to {@link ClassHookConfiguration}s */
+  private final ClassHookConfigurationResolver classHookResolver;
+
+  private MethodHookManager(
+      MethodHookState hookState, ClassHookConfigurationResolver classHookResolver) {
     this.hookState = hookState;
+    this.classHookResolver = classHookResolver;
   }
 
   /**
@@ -46,7 +53,10 @@ public class MethodHookManager implements IHookManager {
     log.debug("Creating MethodHookManager...");
     if (isAlreadySet()) throw new IllegalStateException("Global HookManager already set");
 
-    MethodHookManager methodHookManager = new MethodHookManager(hookState);
+    MethodHookConfigurationResolver methodHookResolver = new MethodHookConfigurationResolver();
+    ClassHookConfigurationResolver classHookResolver =
+        new ClassHookConfigurationResolver(methodHookResolver);
+    MethodHookManager methodHookManager = new MethodHookManager(hookState, classHookResolver);
     Instances.hookManager = methodHookManager;
     addShutdownHook();
     return methodHookManager;
@@ -66,11 +76,9 @@ public class MethodHookManager implements IHookManager {
   public void updateHooksFor(Class<?> clazz, ClassInstrumentationConfiguration configuration) {
     String className = clazz.getName();
     log.debug("Updating hooks for {}", className);
-    Set<MethodDescription.InDefinedShape> instrumentedMethods =
-        getInstrumentedMethods(clazz, configuration);
-
-    ClassHookConfiguration classConfiguration = new ClassHookConfiguration();
-    instrumentedMethods.forEach(classConfiguration::putHookConfiguration);
+    Set<MethodDescription> instrumentedMethods = getInstrumentedMethods(clazz, configuration);
+    ClassHookConfiguration classConfiguration =
+        classHookResolver.resolve(instrumentedMethods, configuration, className);
 
     int removeCounter = hookState.removeObsoleteHooks(clazz, instrumentedMethods);
     log.debug("Removed {} obsolete method hooks for {}", removeCounter, className);
@@ -88,12 +96,12 @@ public class MethodHookManager implements IHookManager {
    * @param configuration the instrumentation configuration for the class
    * @return the set of all instrumented methods of the class
    */
-  private Set<MethodDescription.InDefinedShape> getInstrumentedMethods(
+  private Set<MethodDescription> getInstrumentedMethods(
       Class<?> clazz, ClassInstrumentationConfiguration configuration) {
     if (configuration.equals(ClassInstrumentationConfiguration.NO_INSTRUMENTATION))
       return Collections.emptySet();
 
-    ElementMatcher.Junction<MethodDescription> methodMatcher = configuration.methodMatcher();
+    ElementMatcher.Junction<MethodDescription> methodMatcher = configuration.getMethodMatcher();
     TypeDescription type = TypeDescription.ForLoadedType.of(clazz);
 
     return type.getDeclaredMethods().stream()
