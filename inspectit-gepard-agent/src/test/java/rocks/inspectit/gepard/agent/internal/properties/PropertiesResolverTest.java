@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver.*;
 
 import java.time.Duration;
+import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,9 @@ class PropertiesResolverTest {
   private static final String INTERVAL = "PT1S";
 
   private static final String PERSISTENCE_FILE = "/path/to/file.json";
+
+  private static final String TEST_ATTRIBUTE_HOST = "localhost";
+  private static final String TEST_ATTRIBUTE_PORT = "8080";
 
   @Nested
   class ServerUrl {
@@ -163,6 +167,46 @@ class PropertiesResolverTest {
       String file = PropertiesResolver.getPersistenceFile();
 
       assertEquals(expected, file);
+    }
+  }
+
+  @Nested
+  class Attributes {
+    @Test
+    void resolverReturnsAttributesIfSystemPropertyExists() throws Exception {
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(ATTRIBUTES_SYSTEM_PROPERTY_PREFIX + "host", TEST_ATTRIBUTE_HOST);
+
+            Map<String, String> attributes = PropertiesResolver.getAttributes();
+            assertTrue(attributes.containsKey("host"));
+            assertEquals(TEST_ATTRIBUTE_HOST, attributes.get("host"));
+          });
+    }
+
+    @Test
+    void resolverReturnsAttributesIfEnvironmentPropertyExists() throws Exception {
+      Map<String, String> attributes =
+          withEnvironmentVariable(ATTRIBUTES_ENV_PROPERTY_PREFIX + "PORT", TEST_ATTRIBUTE_PORT)
+              .execute(PropertiesResolver::getAttributes);
+      assertTrue(attributes.containsKey("port"));
+      assertEquals(TEST_ATTRIBUTE_PORT, attributes.get("port"));
+    }
+
+    @Test
+    void resolverReturnsSystemPropertyIfSystemAndEnvPropertyExist() throws Exception {
+      String envTestHost = TEST_ATTRIBUTE_HOST + "1";
+      restoreSystemProperties(
+          () -> {
+            System.setProperty(ATTRIBUTES_SYSTEM_PROPERTY_PREFIX + "host", TEST_ATTRIBUTE_HOST);
+
+            Map<String, String> attributes =
+                withEnvironmentVariable(ATTRIBUTES_ENV_PROPERTY_PREFIX + "HOST", envTestHost)
+                    .execute(PropertiesResolver::getAttributes);
+
+            assertTrue(attributes.containsKey("host"));
+            assertEquals(TEST_ATTRIBUTE_HOST, attributes.get("host"));
+          });
     }
   }
 }
