@@ -24,6 +24,8 @@ class AgentInfoTest {
     assertTrue(info.contains("javaVersion"));
     assertTrue(info.contains("startTime"));
     assertTrue(info.contains("pid"));
+    assertTrue(info.contains("hostname"));
+    assertTrue(info.contains("agentId"));
     assertTrue(info.contains("attributes"));
   }
 }
