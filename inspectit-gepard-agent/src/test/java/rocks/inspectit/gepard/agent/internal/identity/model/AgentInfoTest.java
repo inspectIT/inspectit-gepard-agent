@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.notification.model;
+package rocks.inspectit.gepard.agent.internal.identity.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +23,8 @@ class AgentInfoTest {
     assertTrue(info.contains("otelVersion"));
     assertTrue(info.contains("javaVersion"));
     assertTrue(info.contains("startTime"));
-    assertTrue(info.contains("pid"));
+    assertTrue(info.contains("vmId"));
+    assertTrue(info.contains("agentId"));
     assertTrue(info.contains("attributes"));
   }
 }

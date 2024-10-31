@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.notification.model;
+package rocks.inspectit.gepard.agent.internal.identity.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -11,6 +11,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Map;
 import java.util.Objects;
+import rocks.inspectit.gepard.agent.internal.identity.IdentityManager;
 import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 
 /** Meta-information about the current agent */
@@ -31,18 +32,24 @@ public class AgentInfo {
 
   private final long startTime;
 
-  private final long pid;
+  private final String vmId;
+
+  private final String agentId;
 
   private final Map<String, String> attributes;
 
   private AgentInfo() {
+    IdentityManager identityManager = IdentityManager.getInstance();
+    IdentityInfo identityInfo = identityManager.getIdentityInfo();
+    RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+
     this.serviceName = getServiceNameFromSdk();
     this.gepardVersion = "0.0.1";
     this.otelVersion = AgentVersion.VERSION;
     this.javaVersion = System.getProperty("java.version");
-    RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
     this.startTime = runtime.getStartTime();
-    this.pid = runtime.getPid();
+    this.vmId = identityInfo.vmId();
+    this.agentId = identityInfo.agentId();
     this.attributes = PropertiesResolver.getAttributes();
   }
 
@@ -66,16 +73,5 @@ public class AgentInfo {
     return Objects.isNull(configuredServiceName) || configuredServiceName.isBlank()
         ? "inspectit-gepard-agent"
         : configuredServiceName;
-  }
-
-  /**
-   * @return the service name of the agent.
-   */
-  public String getServiceName() {
-    return serviceName;
-  }
-
-  public long getPid() {
-    return pid;
   }
 }
