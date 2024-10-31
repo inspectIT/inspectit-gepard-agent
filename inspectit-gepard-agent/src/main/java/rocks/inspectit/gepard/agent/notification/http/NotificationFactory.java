@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.core5.http.ContentType;
-import rocks.inspectit.gepard.agent.notification.model.AgentInfo;
+import rocks.inspectit.gepard.agent.internal.identity.model.AgentInfo;
 
 /** This factory should create different HTTP requests for the configuration server */
 public class NotificationFactory {

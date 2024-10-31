@@ -3,50 +3,33 @@ package rocks.inspectit.gepard.agent.internal.identity;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.identity.model.IdentityInfo;
 
+/** Responsible for generating the agentId. */
 public class IdentityManager {
 
-  private static final Logger log = LoggerFactory.getLogger(IdentityManager.class);
+  private static IdentityManager instance;
 
   private final IdentityInfo identityInfo;
 
   private IdentityManager() {
     RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-    long pid = runtime.getPid();
-    String localHostName = getLocalHostname();
-    this.identityInfo = new IdentityInfo(pid, localHostName, hash(pid + localHostName));
+    String pidAtHostname = runtime.getName();
+    this.identityInfo =
+        new IdentityInfo(runtime.getPid(), pidAtHostname.split("@")[1], hash(pidAtHostname));
   }
 
   public static IdentityManager getInstance() {
-    return new IdentityManager();
+    if (Objects.isNull(instance)) instance = new IdentityManager();
+    return instance;
   }
 
   public IdentityInfo getIdentityInfo() {
     return this.identityInfo;
-  }
-
-  /**
-   * Determines the current hostname.
-   *
-   * @return the hostname or if the operation is not allowed by the security check, the textual
-   *     representation of the IP address. The default value is "0.0.0.0".
-   */
-  private String getLocalHostname() {
-    String localHostName = "0.0.0.0";
-    try {
-      localHostName = InetAddress.getLocalHost().getHostName();
-    } catch (UnknownHostException e) {
-      log.info("Could not determine hostname", e);
-    }
-    return localHostName;
   }
 
   /**

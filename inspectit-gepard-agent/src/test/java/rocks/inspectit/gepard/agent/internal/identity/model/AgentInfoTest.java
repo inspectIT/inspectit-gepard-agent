@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.notification.model;
+package rocks.inspectit.gepard.agent.internal.identity.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 

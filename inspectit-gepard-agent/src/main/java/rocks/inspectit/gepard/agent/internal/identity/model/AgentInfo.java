@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.notification.model;
+package rocks.inspectit.gepard.agent.internal.identity.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -12,7 +12,6 @@ import java.lang.management.RuntimeMXBean;
 import java.util.Map;
 import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.identity.IdentityManager;
-import rocks.inspectit.gepard.agent.internal.identity.model.IdentityInfo;
 import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 
 /** Meta-information about the current agent */

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.junit.jupiter.api.Test;
-import rocks.inspectit.gepard.agent.notification.model.AgentInfo;
+import rocks.inspectit.gepard.agent.internal.identity.model.AgentInfo;
 
 class NotificationFactoryTest {
 
