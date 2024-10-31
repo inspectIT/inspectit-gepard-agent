@@ -3,22 +3,16 @@ package rocks.inspectit.gepard.agent.internal.identity.model;
 
 public final class IdentityInfo {
 
-  private final long pid;
-  private final String hostname;
+  private final String vmId;
   private final String agentId;
 
-  public IdentityInfo(long pid, String hostname, String agentId) {
-    this.pid = pid;
-    this.hostname = hostname;
+  public IdentityInfo(String vmId, String agentId) {
+    this.vmId = vmId;
     this.agentId = agentId;
   }
 
-  public long pid() {
-    return pid;
-  }
-
-  public String hostname() {
-    return hostname;
+  public String vmId() {
+    return vmId;
   }
 
   public String agentId() {

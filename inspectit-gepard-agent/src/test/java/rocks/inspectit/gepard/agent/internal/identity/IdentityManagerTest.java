@@ -20,7 +20,6 @@ class IdentityManagerTest {
   @Test
   void testCreateIdentityManagerSuccessfully() {
     RuntimeMXBean mockRuntimeMXBean = mock(RuntimeMXBean.class);
-    when(mockRuntimeMXBean.getPid()).thenReturn(12345L);
     when(mockRuntimeMXBean.getName()).thenReturn("12345@mockedHostName");
 
     try (MockedStatic<ManagementFactory> managementFactoryMockedStatic =
@@ -33,8 +32,7 @@ class IdentityManagerTest {
       IdentityInfo identityInfo = identityManager.getIdentityInfo();
 
       assertNotNull(identityInfo);
-      assertEquals("mockedHostName", identityInfo.hostname());
-      assertEquals(12345L, identityInfo.pid());
+      assertEquals("12345@mockedHostName", identityInfo.vmId());
       assertEquals(
           "d29aca592fc2071bcef6577d649071d4d54a8ae6cd5c0be0e51f28af2867f207",
           identityInfo.agentId());

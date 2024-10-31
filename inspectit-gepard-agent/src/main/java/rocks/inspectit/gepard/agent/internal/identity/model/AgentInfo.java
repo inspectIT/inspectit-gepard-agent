@@ -32,9 +32,7 @@ public class AgentInfo {
 
   private final long startTime;
 
-  private final long pid;
-
-  private final String hostname;
+  private final String vmId;
 
   private final String agentId;
 
@@ -50,8 +48,7 @@ public class AgentInfo {
     this.otelVersion = AgentVersion.VERSION;
     this.javaVersion = System.getProperty("java.version");
     this.startTime = runtime.getStartTime();
-    this.pid = identityInfo.pid();
-    this.hostname = identityInfo.hostname();
+    this.vmId = identityInfo.vmId();
     this.agentId = identityInfo.agentId();
     this.attributes = PropertiesResolver.getAttributes();
   }

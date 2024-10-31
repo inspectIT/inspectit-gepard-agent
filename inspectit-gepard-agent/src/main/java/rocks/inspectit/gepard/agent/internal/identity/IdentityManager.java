@@ -18,9 +18,8 @@ public class IdentityManager {
 
   private IdentityManager() {
     RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-    String pidAtHostname = runtime.getName();
-    this.identityInfo =
-        new IdentityInfo(runtime.getPid(), pidAtHostname.split("@")[1], hash(pidAtHostname));
+    String vmId = runtime.getName();
+    this.identityInfo = new IdentityInfo(vmId, hash(vmId));
   }
 
   public static IdentityManager getInstance() {
