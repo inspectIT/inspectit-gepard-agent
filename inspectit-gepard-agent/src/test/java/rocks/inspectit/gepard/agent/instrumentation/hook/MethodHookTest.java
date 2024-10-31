@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import io.opentelemetry.api.common.Attributes;
+import java.lang.reflect.Method;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +29,8 @@ class MethodHookTest {
 
   @Mock private InternalInspectitContext internalContext;
 
+  @Mock private Method method;
+
   private MethodHook hook;
 
   @BeforeEach
@@ -37,22 +41,24 @@ class MethodHookTest {
 
   @Test
   void shouldStartSpanAndCreateContext() {
-    when(spanAction.startSpan(anyString())).thenReturn(closeable);
+    when(spanAction.startSpan(anyString(), any(Attributes.class))).thenReturn(closeable);
 
-    InternalInspectitContext context = hook.onEnter(new Object[] {}, this);
+    InternalInspectitContext context = hook.onEnter(getClass(), this, method, new Object[] {});
 
-    verify(spanAction).startSpan(anyString());
+    verify(spanAction).startSpan(anyString(), any(Attributes.class));
     assertEquals(closeable, context.getSpanScope());
     assertEquals(hook, context.getHook());
   }
 
   @Test
   void shouldNotReturnSpanScopeWhenExceptionThrown() {
-    doThrow(CouldNotCloseSpanScopeException.class).when(spanAction).startSpan(anyString());
+    doThrow(CouldNotCloseSpanScopeException.class)
+        .when(spanAction)
+        .startSpan(anyString(), any(Attributes.class));
 
-    InternalInspectitContext context = hook.onEnter(new Object[] {}, this);
+    InternalInspectitContext context = hook.onEnter(getClass(), this, method, new Object[] {});
 
-    verify(spanAction).startSpan(anyString());
+    verify(spanAction).startSpan(anyString(), any(Attributes.class));
     assertNull(context.getSpanScope());
   }
 
@@ -60,7 +66,7 @@ class MethodHookTest {
   void shouldEndSpan() {
     when(internalContext.getSpanScope()).thenReturn(closeable);
 
-    hook.onExit(internalContext, new Object[] {}, this, null, null);
+    hook.onExit(internalContext, null, null);
 
     verify(spanAction).endSpan(closeable);
   }

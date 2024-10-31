@@ -1,10 +1,13 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook;
 
+import io.opentelemetry.api.common.Attributes;
+import java.lang.reflect.Method;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
+import rocks.inspectit.gepard.agent.instrumentation.hook.action.util.SpanUtil;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
@@ -41,21 +44,9 @@ public class MethodHook implements IMethodHook {
   }
 
   @Override
-  public InternalInspectitContext onEnter(Object[] instrumentedMethodArgs, Object thiz) {
-    String message =
-        String.format(
-            "inspectIT: Enter MethodHook with %d args in %s",
-            instrumentedMethodArgs.length, thiz.getClass().getName());
-    System.out.println(message);
-
-    String spanName = getSpanName(thiz.getClass());
-    AutoCloseable spanScope = null;
-    if (Objects.nonNull(spanAction))
-      try {
-        spanScope = spanAction.startSpan(spanName);
-      } catch (Exception e) {
-        log.error("Could not execute start-span-action", e);
-      }
+  public InternalInspectitContext onEnter(
+      Class<?> clazz, Object thiz, Method method, Object[] instrumentedMethodArgs) {
+    AutoCloseable spanScope = startSpanAction(clazz, method, instrumentedMethodArgs);
 
     // Using our log4j here will not be visible in the target application...
     System.out.println("HELLO GEPARD : " + configuration.getMethodName());
@@ -63,12 +54,7 @@ public class MethodHook implements IMethodHook {
   }
 
   @Override
-  public void onExit(
-      InternalInspectitContext context,
-      Object[] instrumentedMethodArgs,
-      Object thiz,
-      Object returnValue,
-      Throwable thrown) {
+  public void onExit(InternalInspectitContext context, Object returnValue, Throwable thrown) {
     String exceptionMessage = Objects.nonNull(thrown) ? thrown.getMessage() : "no exception";
     String returnMessage = Objects.nonNull(returnValue) ? returnValue.toString() : "nothing";
     String message =
@@ -97,6 +83,20 @@ public class MethodHook implements IMethodHook {
   private String getSpanName(Class<?> clazz) {
     String methodName = configuration.getMethodName();
     return clazz.getSimpleName() + "." + methodName;
+  }
+
+  private AutoCloseable startSpanAction(Class<?> clazz, Method method, Object[] methodArgs) {
+    AutoCloseable spanScope = null;
+    if (Objects.nonNull(spanAction)) {
+      String spanName = getSpanName(clazz);
+      try {
+        Attributes spanAttributes = SpanUtil.createSpanAttributes(method, methodArgs);
+        spanScope = spanAction.startSpan(spanName, spanAttributes);
+      } catch (Exception e) {
+        log.error("Could not execute start-span-action", e);
+      }
+    }
+    return spanScope;
   }
 
   /** Builder-pattern for method hooks, because not all properties have to be initialized. */

@@ -1,11 +1,16 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook.action;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.ReadableSpan;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +28,38 @@ class SpanActionTest {
 
   @BeforeAll
   static void beforeAll() {
+    // Build our own OpenTelemetrySdk, so we don't use the NOOP implementations
+    OpenTelemetrySdk.builder().buildAndRegisterGlobal();
     OpenTelemetryAccessor.setOpenTelemetry(GlobalOpenTelemetry.get());
   }
 
   @Test
-  void shouldCreateScope() {
+  void shouldCreateScope() throws Exception {
     String spanName = "Test.method";
+    Attributes attributes = Attributes.empty();
 
-    AutoCloseable scope = action.startSpan(spanName);
+    AutoCloseable scope = action.startSpan(spanName, attributes);
+    ReadableSpan currentSpan = (ReadableSpan) Span.current();
 
     assertNotNull(scope);
+    assertTrue(currentSpan.getAttributes().isEmpty());
+
+    scope.close();
+  }
+
+  @Test
+  void shouldSetAttributes() throws Exception {
+    String spanName = "Test.method";
+    AttributeKey<String> key = stringKey("key");
+    String value = "value";
+    Attributes attributes = Attributes.builder().put(key, value).build();
+
+    AutoCloseable scope = action.startSpan(spanName, attributes);
+    ReadableSpan currentSpan = (ReadableSpan) Span.current();
+
+    assertEquals(currentSpan.getAttribute(key), value);
+
+    scope.close();
   }
 
   @Test
