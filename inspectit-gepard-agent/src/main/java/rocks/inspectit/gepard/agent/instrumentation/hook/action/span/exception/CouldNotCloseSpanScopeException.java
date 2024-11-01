@@ -1,5 +1,5 @@
 /* (C) 2024 */
-package rocks.inspectit.gepard.agent.instrumentation.hook.action.exception;
+package rocks.inspectit.gepard.agent.instrumentation.hook.action.span.exception;
 
 import io.opentelemetry.context.Scope;
 

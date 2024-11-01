@@ -10,7 +10,7 @@ import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.scopes.
 import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConfiguration;
 
 /** Internal model, which combines scopes with tracing configurations. */
-public class InstrumentationRule {
+public final class InstrumentationRule {
 
   private final String name;
 

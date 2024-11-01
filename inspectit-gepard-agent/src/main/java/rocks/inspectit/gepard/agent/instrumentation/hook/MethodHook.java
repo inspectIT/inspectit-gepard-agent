@@ -1,13 +1,12 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook;
 
-import io.opentelemetry.api.common.Attributes;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
-import rocks.inspectit.gepard.agent.instrumentation.hook.action.util.SpanUtil;
+import rocks.inspectit.gepard.agent.instrumentation.hook.action.MethodExecutionContext;
+import rocks.inspectit.gepard.agent.instrumentation.hook.action.span.SpanAction;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
@@ -23,6 +22,8 @@ public class MethodHook implements IMethodHook {
   private final MethodHookConfiguration configuration;
 
   private final SpanAction spanAction;
+
+  // Later: entryActions, exitActions
 
   public MethodHook(Builder builder) {
     this.configuration = builder.configuration;
@@ -46,7 +47,9 @@ public class MethodHook implements IMethodHook {
   @Override
   public InternalInspectitContext onEnter(
       Class<?> clazz, Object thiz, Method method, Object[] instrumentedMethodArgs) {
-    AutoCloseable spanScope = startSpanAction(clazz, method, instrumentedMethodArgs);
+    MethodExecutionContext executionContext =
+        new MethodExecutionContext(clazz, method, instrumentedMethodArgs);
+    AutoCloseable spanScope = startSpanAction(executionContext);
 
     // Using our log4j here will not be visible in the target application...
     System.out.println("HELLO GEPARD : " + configuration.getMethodName());
@@ -63,6 +66,36 @@ public class MethodHook implements IMethodHook {
             returnMessage, exceptionMessage);
     System.out.println(message);
 
+    endSpanAction(context);
+
+    // Using our log4j here will not be visible in the target application...
+    System.out.println("BYE GEPARD");
+  }
+
+  /**
+   * Executes the startSpan-action, if existing
+   *
+   * @param executionContext the context of the current method
+   * @return the scope of the started span or null, if no span was started
+   */
+  private AutoCloseable startSpanAction(MethodExecutionContext executionContext) {
+    AutoCloseable spanScope = null;
+    if (Objects.nonNull(spanAction)) {
+      try {
+        spanScope = spanAction.startSpan(executionContext);
+      } catch (Exception e) {
+        log.error("Could not execute start-span-action", e);
+      }
+    }
+    return spanScope;
+  }
+
+  /**
+   * Executes the endSpan-action, if existing
+   *
+   * @param context the internal inspectIT context of the method
+   */
+  private void endSpanAction(InternalInspectitContext context) {
     AutoCloseable spanScope = context.getSpanScope();
     if (Objects.nonNull(spanAction))
       try {
@@ -70,33 +103,6 @@ public class MethodHook implements IMethodHook {
       } catch (Exception e) {
         log.error("Could not execute end-span-action", e);
       }
-
-    // Using our log4j here will not be visible in the target application...
-    System.out.println("BYE GEPARD");
-  }
-
-  /**
-   * @param clazz the class of the method for which a span will be started
-   * @return the span name in the format 'SimpleClassName.methodName', for instance
-   *     'MethodHook.getSpanName'
-   */
-  private String getSpanName(Class<?> clazz) {
-    String methodName = configuration.getMethodName();
-    return clazz.getSimpleName() + "." + methodName;
-  }
-
-  private AutoCloseable startSpanAction(Class<?> clazz, Method method, Object[] methodArgs) {
-    AutoCloseable spanScope = null;
-    if (Objects.nonNull(spanAction)) {
-      String spanName = getSpanName(clazz);
-      try {
-        Attributes spanAttributes = SpanUtil.createSpanAttributes(method, methodArgs);
-        spanScope = spanAction.startSpan(spanName, spanAttributes);
-      } catch (Exception e) {
-        log.error("Could not execute start-span-action", e);
-      }
-    }
-    return spanScope;
   }
 
   /** Builder-pattern for method hooks, because not all properties have to be initialized. */

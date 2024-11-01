@@ -15,7 +15,7 @@ import rocks.inspectit.gepard.agent.internal.instrumentation.model.rules.Instrum
  * Stores the instrumentation configuration for a specific class. The configuration is linked to a
  * class via the cache in {@link InstrumentationState}.
  */
-public class ClassInstrumentationConfiguration {
+public final class ClassInstrumentationConfiguration {
 
   /** The configuration representing that no instrumentation of the class if performed. */
   public static final ClassInstrumentationConfiguration NO_INSTRUMENTATION =
