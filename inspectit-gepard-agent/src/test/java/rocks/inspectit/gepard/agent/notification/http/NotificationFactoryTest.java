@@ -25,9 +25,31 @@ class NotificationFactoryTest {
   }
 
   @Test
-  void invalidUrlThrowsException() {
+  void invalidStartNotificationUrlThrowsException() {
     String url = "invalid url";
 
     assertThrows(URISyntaxException.class, () -> NotificationFactory.createStartNotification(url));
+  }
+
+  @Test
+  void validUrlCreatesShutdownNotification() throws Exception {
+    String baseUrl = "http://localhost:8080";
+    String url = "http://localhost:8080/connections";
+    String contentType = "application/json";
+    String info = AgentInfo.getAsString();
+
+    SimpleHttpRequest request = NotificationFactory.createShutdownNotification(baseUrl);
+
+    assertEquals(url, request.getUri().toString());
+    assertEquals(contentType, request.getHeader("content-type").getValue());
+    assertEquals(info, request.getBodyText());
+  }
+
+  @Test
+  void invalidShutdownUrlThrowsException() {
+    String url = "invalid url";
+
+    assertThrows(
+        URISyntaxException.class, () -> NotificationFactory.createShutdownNotification(url));
   }
 }

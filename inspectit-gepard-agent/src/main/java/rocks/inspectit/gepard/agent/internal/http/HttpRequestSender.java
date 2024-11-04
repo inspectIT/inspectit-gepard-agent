@@ -28,7 +28,7 @@ public class HttpRequestSender {
    *
    * @param request the HTTP request
    * @param callback the callback function
-   * @return True, if the HTTP request returned a status code in {@link successfulStatusCodes}
+   * @return True, if the HTTP request returned a status code in {@link #successfulStatusCodes}
    */
   public static boolean send(
       SimpleHttpRequest request, FutureCallback<SimpleHttpResponse> callback) {

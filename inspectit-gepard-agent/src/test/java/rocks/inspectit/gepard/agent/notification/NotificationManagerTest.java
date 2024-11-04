@@ -2,19 +2,27 @@
 package rocks.inspectit.gepard.agent.notification;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver.SERVER_URL_ENV_PROPERTY;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.model.HttpError;
 import rocks.inspectit.gepard.agent.MockServerTestBase;
+import rocks.inspectit.gepard.agent.internal.shutdown.ShutdownHookManager;
 
 class NotificationManagerTest extends MockServerTestBase {
 
   private NotificationManager manager;
+
+  private final ShutdownHookManager shutdownHookManager = ShutdownHookManager.getInstance();
+
+  @BeforeEach
+  void beforeEach() {
+    shutdownHookManager.clearShutdownHooks();
+  }
 
   @Test
   void sendsStartNotificationIfServerUrlWasProvided() throws Exception {
@@ -61,5 +69,27 @@ class NotificationManagerTest extends MockServerTestBase {
     boolean successful = manager.sendStartNotification();
 
     assertFalse(successful);
+  }
+
+  @Test
+  void shouldSetUpShutdownNotificationWithProvidedServerUrl() throws Exception {
+    withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, SERVER_URL)
+        .execute(
+            () -> {
+              manager = NotificationManager.create();
+            });
+
+    manager.setUpShutdownNotification();
+
+    assertEquals(1, shutdownHookManager.getShutdownHookCount());
+  }
+
+  @Test
+  void shouldNotSetUpShutdownNotificationWithoutServerUrl() {
+    manager = NotificationManager.create();
+
+    manager.setUpShutdownNotification();
+
+    assertEquals(0, shutdownHookManager.getShutdownHookCount());
   }
 }

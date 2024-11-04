@@ -4,16 +4,22 @@ package rocks.inspectit.gepard.agent.internal.schedule;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class InspectitSchedulerTest {
 
   private final InspectitScheduler scheduler = InspectitScheduler.getInstance();
 
+  private final Duration duration = Duration.ofMillis(1);
+
+  @BeforeEach
+  void beforeEach() {
+    scheduler.clearScheduledFutures();
+  }
+
   @Test
   void runnableCanBeScheduledOnlyOnce() {
-    Duration duration = Duration.ofMillis(1);
-
     NamedRunnable dummyRunnable =
         new NamedRunnable() {
           @Override
@@ -34,8 +40,6 @@ class InspectitSchedulerTest {
 
   @Test
   void illegalRunnableNameThrowsException() {
-    Duration duration = Duration.ofMillis(1);
-
     NamedRunnable illegalRunnable =
         new NamedRunnable() {
           @Override
