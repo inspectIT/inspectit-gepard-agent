@@ -1,10 +1,6 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.internal.identity.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.javaagent.bootstrap.internal.InstrumentationConfig;
 import io.opentelemetry.javaagent.tooling.AgentVersion;
 import java.lang.management.ManagementFactory;
@@ -15,12 +11,9 @@ import rocks.inspectit.gepard.agent.internal.identity.IdentityManager;
 import rocks.inspectit.gepard.agent.internal.properties.PropertiesResolver;
 
 /** Meta-information about the current agent */
-public class AgentInfo {
+public final class AgentInfo {
 
   public static final AgentInfo INFO = new AgentInfo();
-
-  private static final ObjectMapper mapper =
-      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
 
   private final String serviceName;
 
@@ -54,11 +47,10 @@ public class AgentInfo {
   }
 
   /**
-   * @return The agent information as JSON string
-   * @throws JsonProcessingException corrupted agent information
+   * @return the agent id
    */
-  public static String getAsString() throws JsonProcessingException {
-    return mapper.writeValueAsString(INFO);
+  public String getAgentId() {
+    return agentId;
   }
 
   /**

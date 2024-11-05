@@ -1,16 +1,23 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.notification.http;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.core5.http.ContentType;
 import rocks.inspectit.gepard.agent.internal.identity.model.AgentInfo;
+import rocks.inspectit.gepard.agent.notification.http.model.ShutdownNotification;
 
 /** This factory should create different HTTP requests for the configuration server */
 public class NotificationFactory {
+
+  private static final ObjectMapper mapper =
+      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
   private NotificationFactory() {}
 
@@ -26,7 +33,7 @@ public class NotificationFactory {
   public static SimpleHttpRequest createStartNotification(String baseUrl)
       throws URISyntaxException, JsonProcessingException {
     URI uri = new URI(baseUrl + "/connections");
-    String agentInfoString = AgentInfo.getAsString();
+    String agentInfoString = mapper.writeValueAsString(AgentInfo.INFO);
 
     return SimpleRequestBuilder.post(uri)
         .setBody(agentInfoString, ContentType.APPLICATION_JSON)
@@ -45,10 +52,10 @@ public class NotificationFactory {
   public static SimpleHttpRequest createShutdownNotification(String baseUrl)
       throws URISyntaxException, JsonProcessingException {
     URI uri = new URI(baseUrl + "/connections");
-    String agentInfoString = AgentInfo.getAsString();
+    String notificationBody = mapper.writeValueAsString(ShutdownNotification.INSTANCE);
 
     return SimpleRequestBuilder.put(uri)
-        .setBody(agentInfoString, ContentType.APPLICATION_JSON)
+        .setBody(notificationBody, ContentType.APPLICATION_JSON)
         .setHeader("content-type", "application/json")
         .build();
   }

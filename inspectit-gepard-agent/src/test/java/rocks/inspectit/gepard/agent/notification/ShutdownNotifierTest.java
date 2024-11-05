@@ -18,7 +18,7 @@ class ShutdownNotifierTest extends MockServerTestBase {
   void notificationIsSentSuccessfully() {
     mockServer
         .when(request().withMethod("PUT").withPath("/api/v1/connections"))
-        .respond(response().withStatusCode(204));
+        .respond(response().withStatusCode(200));
 
     boolean successful = notifier.sendNotification(SERVER_URL);
 
