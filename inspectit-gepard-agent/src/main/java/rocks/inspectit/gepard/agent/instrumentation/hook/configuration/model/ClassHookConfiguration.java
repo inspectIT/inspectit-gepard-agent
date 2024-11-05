@@ -11,7 +11,7 @@ import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrume
 /**
  * Stores the hook configuration of all methods for a specific class, which is used to update hooks.
  */
-public class ClassHookConfiguration {
+public final class ClassHookConfiguration {
 
   /** Set of methods and their hook configuration. */
   private final Map<MethodDescription, MethodHookConfiguration> hookConfigurations;

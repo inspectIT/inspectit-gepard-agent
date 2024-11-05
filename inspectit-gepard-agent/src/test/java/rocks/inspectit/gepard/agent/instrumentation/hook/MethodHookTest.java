@@ -1,18 +1,17 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Method;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
-import rocks.inspectit.gepard.agent.instrumentation.hook.action.exception.CouldNotCloseSpanScopeException;
+import rocks.inspectit.gepard.agent.instrumentation.hook.action.span.SpanAction;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 
@@ -27,6 +26,8 @@ class MethodHookTest {
 
   @Mock private InternalInspectitContext internalContext;
 
+  @Mock private Method method;
+
   private MethodHook hook;
 
   @BeforeEach
@@ -37,30 +38,31 @@ class MethodHookTest {
 
   @Test
   void shouldStartSpanAndCreateContext() {
-    when(spanAction.startSpan(anyString())).thenReturn(closeable);
+    when(spanAction.startSpan(any())).thenReturn(Optional.of(closeable));
 
-    InternalInspectitContext context = hook.onEnter(new Object[] {}, this);
+    InternalInspectitContext context = hook.onEnter(getClass(), this, method, new Object[] {});
 
-    verify(spanAction).startSpan(anyString());
-    assertEquals(closeable, context.getSpanScope());
+    verify(spanAction).startSpan(any());
+    assertTrue(context.getSpanScope().isPresent());
+    assertEquals(closeable, context.getSpanScope().get());
     assertEquals(hook, context.getHook());
   }
 
   @Test
   void shouldNotReturnSpanScopeWhenExceptionThrown() {
-    doThrow(CouldNotCloseSpanScopeException.class).when(spanAction).startSpan(anyString());
+    doThrow(IllegalStateException.class).when(spanAction).startSpan(any());
 
-    InternalInspectitContext context = hook.onEnter(new Object[] {}, this);
+    InternalInspectitContext context = hook.onEnter(getClass(), this, method, new Object[] {});
 
-    verify(spanAction).startSpan(anyString());
-    assertNull(context.getSpanScope());
+    verify(spanAction).startSpan(any());
+    assertTrue(context.getSpanScope().isEmpty());
   }
 
   @Test
   void shouldEndSpan() {
-    when(internalContext.getSpanScope()).thenReturn(closeable);
+    when(internalContext.getSpanScope()).thenReturn(Optional.of(closeable));
 
-    hook.onExit(internalContext, new Object[] {}, this, null, null);
+    hook.onExit(internalContext, null, null);
 
     verify(spanAction).endSpan(closeable);
   }

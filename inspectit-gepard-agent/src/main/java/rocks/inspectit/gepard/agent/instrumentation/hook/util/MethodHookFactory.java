@@ -2,7 +2,7 @@
 package rocks.inspectit.gepard.agent.instrumentation.hook.util;
 
 import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHook;
-import rocks.inspectit.gepard.agent.instrumentation.hook.action.SpanAction;
+import rocks.inspectit.gepard.agent.instrumentation.hook.action.span.SpanAction;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 
 /** Creates method hook objects */
