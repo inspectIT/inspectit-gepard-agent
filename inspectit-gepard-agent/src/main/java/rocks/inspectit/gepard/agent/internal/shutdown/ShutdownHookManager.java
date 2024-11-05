@@ -42,7 +42,9 @@ public class ShutdownHookManager {
 
   /** Sets up the registered shutdown hooks, to be executed at shutdown */
   private void setUpShutdownHooks() {
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdownHooks.forEach(Runnable::run)));
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(() -> shutdownHooks.forEach(Runnable::run), "inspectit-shutdown"));
   }
 
   /**

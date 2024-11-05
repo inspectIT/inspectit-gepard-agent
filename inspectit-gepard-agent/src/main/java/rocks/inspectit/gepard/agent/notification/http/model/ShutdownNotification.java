@@ -10,5 +10,5 @@ public final class ShutdownNotification {
 
   private final String agentId = AgentInfo.INFO.getAgentId();
 
-  private final String connectionStatus = "DISCONNECTED";
+  private static final String connectionStatus = "DISCONNECTED";
 }
