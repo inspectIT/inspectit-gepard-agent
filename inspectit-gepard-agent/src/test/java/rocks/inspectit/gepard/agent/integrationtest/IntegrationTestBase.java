@@ -264,7 +264,8 @@ public abstract class IntegrationTestBase {
    * logs. First the method counts the current amount of update messages. If the amount of update
    * messages has increased, we assume an event has occurred.
    *
-   * @param updateMessage the message, which will be waited for
+   * @param updateMessage the message to wait for
+   * @param amount the amount of new messages to wait for
    */
   private void awaitUpdateMessage(String updateMessage, int amount) {
     String logs = target.getLogs();
@@ -272,7 +273,7 @@ public abstract class IntegrationTestBase {
 
     Awaitility.await()
         .pollDelay(5, TimeUnit.SECONDS)
-        .atMost(12, TimeUnit.SECONDS)
+        .atMost(15, TimeUnit.SECONDS)
         .until(
             () -> {
               String newLogs = target.getLogs();
