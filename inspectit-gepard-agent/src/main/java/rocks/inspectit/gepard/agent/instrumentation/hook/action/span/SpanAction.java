@@ -5,7 +5,7 @@ import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
-import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.MethodExecutionContext;
@@ -23,9 +23,9 @@ public class SpanAction {
    * be called before {@link SpanAction#endSpan}.
    *
    * @param executionContext the execution context of the current method
-   * @return the scope of the started span or null, if the current span has the same name
+   * @return the scope of the started span or empty, if the current span has the same name
    */
-  public AutoCloseable startSpan(MethodExecutionContext executionContext) {
+  public Optional<AutoCloseable> startSpan(MethodExecutionContext executionContext) {
     String spanName = getSpanName(executionContext);
     Attributes methodAttributes = SpanUtil.createMethodAttributes(executionContext);
 
@@ -35,25 +35,23 @@ public class SpanAction {
       Span otelSpan = Span.current();
       // We overwrite the OTel attributes, if they use the same key
       otelSpan.setAllAttributes(methodAttributes);
-      return null;
+      return Optional.empty();
     }
 
-    // Create new span
+    // Create new inspectIT span
     Tracer tracer = OpenTelemetryAccessor.getTracer();
     Span span = tracer.spanBuilder(spanName).setParent(Context.current()).startSpan();
     span.setAllAttributes(methodAttributes);
-    return span.makeCurrent();
+    return Optional.of(span.makeCurrent());
   }
 
   /**
-   * Ends the current span and closes its scope. Should be called after {@link
-   * SpanAction#startSpan}. If the scope is null, we won't do anything.
+   * Ends the current span and closes the provided scope. Should be called after {@link
+   * SpanAction#startSpan}.
    *
    * @param spanScope the scope of the span, which should be finished
    */
   public void endSpan(AutoCloseable spanScope) {
-    if (Objects.isNull(spanScope)) return;
-
     Span current = Span.current();
     try {
       spanScope.close();

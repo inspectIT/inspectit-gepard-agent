@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.bootstrap.context;
 
+import java.util.Optional;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
 /**
@@ -31,7 +32,7 @@ public class InternalInspectitContext {
   /**
    * @return the current span scope
    */
-  public AutoCloseable getSpanScope() {
-    return spanScope;
+  public Optional<AutoCloseable> getSpanScope() {
+    return Optional.ofNullable(spanScope);
   }
 }

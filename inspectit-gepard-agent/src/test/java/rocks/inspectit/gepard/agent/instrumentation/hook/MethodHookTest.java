@@ -1,18 +1,17 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.instrumentation.hook;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.span.SpanAction;
-import rocks.inspectit.gepard.agent.instrumentation.hook.action.span.exception.CouldNotCloseSpanScopeException;
 import rocks.inspectit.gepard.agent.instrumentation.hook.configuration.model.MethodHookConfiguration;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 
@@ -39,28 +38,29 @@ class MethodHookTest {
 
   @Test
   void shouldStartSpanAndCreateContext() {
-    when(spanAction.startSpan(any())).thenReturn(closeable);
+    when(spanAction.startSpan(any())).thenReturn(Optional.of(closeable));
 
     InternalInspectitContext context = hook.onEnter(getClass(), this, method, new Object[] {});
 
     verify(spanAction).startSpan(any());
-    assertEquals(closeable, context.getSpanScope());
+    assertTrue(context.getSpanScope().isPresent());
+    assertEquals(closeable, context.getSpanScope().get());
     assertEquals(hook, context.getHook());
   }
 
   @Test
   void shouldNotReturnSpanScopeWhenExceptionThrown() {
-    doThrow(CouldNotCloseSpanScopeException.class).when(spanAction).startSpan(any());
+    doThrow(IllegalStateException.class).when(spanAction).startSpan(any());
 
     InternalInspectitContext context = hook.onEnter(getClass(), this, method, new Object[] {});
 
     verify(spanAction).startSpan(any());
-    assertNull(context.getSpanScope());
+    assertTrue(context.getSpanScope().isEmpty());
   }
 
   @Test
   void shouldEndSpan() {
-    when(internalContext.getSpanScope()).thenReturn(closeable);
+    when(internalContext.getSpanScope()).thenReturn(Optional.of(closeable));
 
     hook.onExit(internalContext, null, null);
 

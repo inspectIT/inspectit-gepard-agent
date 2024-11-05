@@ -13,6 +13,7 @@ import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.ReadableSpan;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,13 +65,13 @@ class SpanActionTest {
 
   @Test
   void shouldCreateScopeAndWriteAttributesWhenNoSpanExist() throws Exception {
-    AutoCloseable scope = action.startSpan(executionContext);
+    Optional<AutoCloseable> scope = action.startSpan(executionContext);
     ReadableSpan currentSpan = (ReadableSpan) Span.current();
 
-    assertNotNull(scope);
+    assertTrue(scope.isPresent());
     assertEquals(currentSpan.getAttribute(stringKey(key)), value);
 
-    scope.close();
+    scope.get().close();
   }
 
   @Test
@@ -79,14 +80,27 @@ class SpanActionTest {
     Span otelSpan = tracer.spanBuilder(spanName).startSpan();
     Scope otelScope = otelSpan.makeCurrent();
 
-    AutoCloseable scope = action.startSpan(executionContext);
+    Optional<AutoCloseable> scope = action.startSpan(executionContext);
     ReadableSpan currentSpan = (ReadableSpan) Span.current();
 
-    assertNull(scope);
+    assertTrue(scope.isEmpty());
     assertEquals(currentSpan.getAttribute(stringKey(key)), value);
 
     otelScope.close();
     otelSpan.end();
+  }
+
+  @Test
+  void shouldCreateEmptyAttributesForNoMethodArguments() throws Exception {
+    executionContext = new MethodExecutionContext(SpanActionTest.class, method, new Object[] {});
+
+    Optional<AutoCloseable> scope = action.startSpan(executionContext);
+    ReadableSpan currentSpan = (ReadableSpan) Span.current();
+
+    assertTrue(scope.isPresent());
+    assertTrue(currentSpan.getAttributes().isEmpty());
+
+    scope.get().close();
   }
 
   @Test

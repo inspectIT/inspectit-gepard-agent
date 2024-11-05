@@ -3,6 +3,7 @@ package rocks.inspectit.gepard.agent.instrumentation.hook;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.action.MethodExecutionContext;
@@ -49,7 +50,7 @@ public class MethodHook implements IMethodHook {
       Class<?> clazz, Object thiz, Method method, Object[] instrumentedMethodArgs) {
     MethodExecutionContext executionContext =
         new MethodExecutionContext(clazz, method, instrumentedMethodArgs);
-    AutoCloseable spanScope = startSpanAction(executionContext);
+    AutoCloseable spanScope = startSpanAction(executionContext).orElse(null);
 
     // Using our log4j here will not be visible in the target application...
     System.out.println("HELLO GEPARD : " + configuration.getMethodName());
@@ -76,18 +77,18 @@ public class MethodHook implements IMethodHook {
    * Executes the startSpan-action, if existing
    *
    * @param executionContext the context of the current method
-   * @return the scope of the started span or null, if no span was started
+   * @return the scope of the started span or empty, if no span was started
    */
-  private AutoCloseable startSpanAction(MethodExecutionContext executionContext) {
-    AutoCloseable spanScope = null;
+  private Optional<AutoCloseable> startSpanAction(MethodExecutionContext executionContext) {
+    Optional<AutoCloseable> maybeSpanScope = Optional.empty();
     if (Objects.nonNull(spanAction)) {
       try {
-        spanScope = spanAction.startSpan(executionContext);
+        maybeSpanScope = spanAction.startSpan(executionContext);
       } catch (Exception e) {
         log.error("Could not execute start-span-action", e);
       }
     }
-    return spanScope;
+    return maybeSpanScope;
   }
 
   /**
@@ -96,10 +97,10 @@ public class MethodHook implements IMethodHook {
    * @param context the internal inspectIT context of the method
    */
   private void endSpanAction(InternalInspectitContext context) {
-    AutoCloseable spanScope = context.getSpanScope();
-    if (Objects.nonNull(spanAction))
+    Optional<AutoCloseable> maybeSpanScope = context.getSpanScope();
+    if (Objects.nonNull(spanAction) && maybeSpanScope.isPresent())
       try {
-        spanAction.endSpan(spanScope);
+        spanAction.endSpan(maybeSpanScope.get());
       } catch (Exception e) {
         log.error("Could not execute end-span-action", e);
       }

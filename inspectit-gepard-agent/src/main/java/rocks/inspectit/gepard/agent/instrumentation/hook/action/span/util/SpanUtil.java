@@ -42,8 +42,7 @@ public class SpanUtil {
    */
   public static Attributes createMethodAttributes(MethodExecutionContext executionContext) {
     Object[] arguments = executionContext.getArguments();
-    AttributesBuilder builder = Attributes.builder();
-    if (arguments.length == 0) return builder.build();
+    if (arguments.length == 0) return Attributes.empty();
 
     Method method = executionContext.getMethod();
     Parameter[] parameters = method.getParameters();
@@ -52,6 +51,7 @@ public class SpanUtil {
           "Number of passed method arguments does not match with number of parameter in method definition of "
               + method.getName());
 
+    AttributesBuilder builder = Attributes.builder();
     for (int i = 0; i < parameters.length; i++) {
       String argumentName = parameters[i].getName();
       Object argumentValue = arguments[i];

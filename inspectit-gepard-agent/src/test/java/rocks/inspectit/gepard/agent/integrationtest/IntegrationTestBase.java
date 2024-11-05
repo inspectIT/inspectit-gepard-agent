@@ -272,7 +272,7 @@ public abstract class IntegrationTestBase {
 
     Awaitility.await()
         .pollDelay(5, TimeUnit.SECONDS)
-        .atMost(15, TimeUnit.SECONDS)
+        .atMost(12, TimeUnit.SECONDS)
         .until(
             () -> {
               String newLogs = target.getLogs();
