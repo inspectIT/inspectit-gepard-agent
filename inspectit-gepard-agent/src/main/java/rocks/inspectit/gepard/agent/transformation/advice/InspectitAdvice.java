@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.agent.transformation.advice;
 
+import java.lang.reflect.Method;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
 import rocks.inspectit.gepard.bootstrap.Instances;
@@ -26,6 +27,7 @@ public class InspectitAdvice {
       @Advice.AllArguments Object[] args,
       @Advice.This Object thiz,
       @Advice.Origin("#t") Class<?> declaringClass,
+      @Advice.Origin("#m") Method method,
       @Advice.Origin("#m#s") String signature) {
     System.out.println(
         "Executing ENTRY Advice in method: "
@@ -34,24 +36,20 @@ public class InspectitAdvice {
             + thiz.getClass().getName());
 
     IMethodHook hook = Instances.hookManager.getHook(declaringClass, signature);
-    return hook.onEnter(args, thiz);
+    return hook.onEnter(declaringClass, thiz, method, args);
   }
 
   @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
   public static void onExit(
-      @Advice.AllArguments Object[] args,
-      @Advice.This Object thiz,
       @Advice.Thrown Throwable throwable,
       @Advice.Return(typing = Assigner.Typing.DYNAMIC) Object returnValue,
       @Advice.Enter InternalInspectitContext context,
+      @Advice.Origin("#t") Class<?> declaringClass,
       @Advice.Origin("#m#s") String signature) {
     System.out.println(
-        "Executing EXIT Advice in method: "
-            + signature
-            + " of class: "
-            + thiz.getClass().getName());
+        "Executing EXIT Advice in method: " + signature + " of class: " + declaringClass.getName());
 
     IMethodHook hook = context.getHook();
-    hook.onExit(context, args, thiz, returnValue, throwable);
+    hook.onExit(context, returnValue, throwable);
   }
 }

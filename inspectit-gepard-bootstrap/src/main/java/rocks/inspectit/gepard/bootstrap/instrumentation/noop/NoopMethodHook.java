@@ -1,6 +1,7 @@
 /* (C) 2024 */
 package rocks.inspectit.gepard.bootstrap.instrumentation.noop;
 
+import java.lang.reflect.Method;
 import rocks.inspectit.gepard.bootstrap.context.InternalInspectitContext;
 import rocks.inspectit.gepard.bootstrap.instrumentation.IMethodHook;
 
@@ -12,15 +13,11 @@ public class NoopMethodHook implements IMethodHook {
   private NoopMethodHook() {}
 
   @Override
-  public InternalInspectitContext onEnter(Object[] instrumentedMethodArgs, Object thiz) {
+  public InternalInspectitContext onEnter(
+      Class<?> clazz, Object thiz, Method method, Object[] instrumentedMethodArgs) {
     return null;
   }
 
   @Override
-  public void onExit(
-      InternalInspectitContext context,
-      Object[] instrumentedMethodArgs,
-      Object thiz,
-      Object returnValue,
-      Throwable thrown) {}
+  public void onExit(InternalInspectitContext context, Object returnValue, Throwable thrown) {}
 }

@@ -8,7 +8,7 @@ import rocks.inspectit.gepard.config.model.instrumentation.rules.RuleTracingConf
  * Configuration for one specific method hook, which is used to update hooks. Currently just for
  * tracing. Later we will add entry-/exit-actions and metrics.
  */
-public class MethodHookConfiguration {
+public final class MethodHookConfiguration {
 
   private final String methodName;
 

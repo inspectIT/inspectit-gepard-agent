@@ -200,6 +200,7 @@ tasks.register('extendedAgent', Jar) {
 
 tasks {
     test {
+        dependsOn(jar)
         // we need to merge our submodules before running tests,
         // so all classes are accessible for integration tests
         dependsOn(mergeModules)

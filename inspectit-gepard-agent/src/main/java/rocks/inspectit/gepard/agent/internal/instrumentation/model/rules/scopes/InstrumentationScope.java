@@ -14,7 +14,7 @@ import rocks.inspectit.gepard.agent.instrumentation.state.configuration.matcher.
 import rocks.inspectit.gepard.config.model.instrumentation.scopes.ScopeConfiguration;
 
 /** Internal model, which holds type and method matchers to instrument a scope. */
-public class InstrumentationScope {
+public final class InstrumentationScope {
 
   /**
    * The method matcher we use in inspectIT, that indicates that all methods should be matched.
