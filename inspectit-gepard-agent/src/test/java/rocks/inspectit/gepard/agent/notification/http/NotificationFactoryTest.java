@@ -40,8 +40,9 @@ class NotificationFactoryTest {
 
   @Test
   void validUrlCreatesShutdownNotification() throws Exception {
+    String agentId = AgentInfo.INFO.getAgentId();
     String baseUrl = "http://localhost:8080";
-    String url = "http://localhost:8080/connections";
+    String url = "http://localhost:8080/connections/" + agentId;
     String contentType = "application/json";
     String body = mapper.writeValueAsString(ShutdownNotification.INSTANCE);
 
