@@ -51,7 +51,8 @@ public class NotificationFactory {
    */
   public static SimpleHttpRequest createShutdownNotification(String baseUrl)
       throws URISyntaxException, JsonProcessingException {
-    URI uri = new URI(baseUrl + "/connections");
+    String agentId = AgentInfo.INFO.getAgentId();
+    URI uri = new URI(baseUrl + "/connections/" + agentId);
     String notificationBody = mapper.writeValueAsString(ShutdownNotification.INSTANCE);
 
     return SimpleRequestBuilder.put(uri)
