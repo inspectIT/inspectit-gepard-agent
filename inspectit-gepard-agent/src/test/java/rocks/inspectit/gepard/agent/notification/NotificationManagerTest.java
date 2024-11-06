@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.model.HttpError;
 import rocks.inspectit.gepard.agent.MockServerTestBase;
+import rocks.inspectit.gepard.agent.internal.identity.model.AgentInfo;
 import rocks.inspectit.gepard.agent.internal.shutdown.ShutdownHookManager;
 
 class NotificationManagerTest extends MockServerTestBase {
@@ -19,15 +20,17 @@ class NotificationManagerTest extends MockServerTestBase {
 
   private final ShutdownHookManager shutdownHookManager = ShutdownHookManager.getInstance();
 
+  private final String agentId = AgentInfo.INFO.getAgentId();
+
   @BeforeEach
   void beforeEach() {
-    shutdownHookManager.clearShutdownHooks();
+    shutdownHookManager.reset();
   }
 
   @Test
   void sendsStartNotificationIfServerUrlWasProvided() throws Exception {
     mockServer
-        .when(request().withMethod("POST").withPath("/api/v1/connections"))
+        .when(request().withMethod("POST").withPath("/api/v1/connections/" + agentId))
         .respond(response().withStatusCode(201));
 
     withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, SERVER_URL)
@@ -44,7 +47,7 @@ class NotificationManagerTest extends MockServerTestBase {
   @Test
   void startNotificationFailsWithServerError() throws Exception {
     mockServer
-        .when(request().withMethod("POST").withPath("/api/v1/connections"))
+        .when(request().withMethod("POST").withPath("/api/v1/connections/" + agentId))
         .error(HttpError.error().withDropConnection(true));
 
     withEnvironmentVariable(SERVER_URL_ENV_PROPERTY, SERVER_URL)
@@ -61,7 +64,7 @@ class NotificationManagerTest extends MockServerTestBase {
   @Test
   void sendsNoStartNotificationWithoutProvidedServerUrl() {
     mockServer
-        .when(request().withMethod("POST").withPath("/api/v1/connections"))
+        .when(request().withMethod("POST").withPath("/api/v1/connections/" + agentId))
         .respond(response().withStatusCode(201));
 
     manager = NotificationManager.create();

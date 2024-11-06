@@ -17,10 +17,12 @@ class NotificationFactoryTest {
   private static final ObjectMapper mapper =
       new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
+  private final String agentId = AgentInfo.INFO.getAgentId();
+
   @Test
   void validUrlCreatesStartNotification() throws Exception {
     String baseUrl = "http://localhost:8080";
-    String url = "http://localhost:8080/connections";
+    String url = "http://localhost:8080/connections/" + agentId;
     String contentType = "application/json";
     String info = mapper.writeValueAsString(AgentInfo.INFO);
 
@@ -40,7 +42,6 @@ class NotificationFactoryTest {
 
   @Test
   void validUrlCreatesShutdownNotification() throws Exception {
-    String agentId = AgentInfo.INFO.getAgentId();
     String baseUrl = "http://localhost:8080";
     String url = "http://localhost:8080/connections/" + agentId;
     String contentType = "application/json";

@@ -20,7 +20,7 @@ class ShutdownNotifierTest extends MockServerTestBase {
   @Test
   void notificationIsSentSuccessfully() {
     mockServer
-        .when(request().withMethod("PUT").withPath("/api/v1/connections/" + agentId))
+        .when(request().withMethod("PATCH").withPath("/api/v1/connections/" + agentId))
         .respond(response().withStatusCode(200));
 
     boolean successful = notifier.sendNotification(SERVER_URL);
@@ -31,7 +31,7 @@ class ShutdownNotifierTest extends MockServerTestBase {
   @Test
   void serverIsNotAvailable() {
     mockServer
-        .when(request().withMethod("PUT").withPath("/api/v1/connections/" + agentId))
+        .when(request().withMethod("PATCH").withPath("/api/v1/connections/" + agentId))
         .respond(response().withStatusCode(503));
 
     boolean successful = notifier.sendNotification(SERVER_URL);
@@ -42,7 +42,7 @@ class ShutdownNotifierTest extends MockServerTestBase {
   @Test
   void serverReturnsError() {
     mockServer
-        .when(request().withMethod("PUT").withPath("/api/v1/connections/" + agentId))
+        .when(request().withMethod("PATCH").withPath("/api/v1/connections/" + agentId))
         .error(HttpError.error().withDropConnection(true));
 
     boolean successful = notifier.sendNotification(SERVER_URL);

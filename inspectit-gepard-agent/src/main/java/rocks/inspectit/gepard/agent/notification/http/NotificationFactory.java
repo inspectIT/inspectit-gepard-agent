@@ -32,7 +32,8 @@ public class NotificationFactory {
    */
   public static SimpleHttpRequest createStartNotification(String baseUrl)
       throws URISyntaxException, JsonProcessingException {
-    URI uri = new URI(baseUrl + "/connections");
+    String agentId = AgentInfo.INFO.getAgentId();
+    URI uri = new URI(baseUrl + "/connections/" + agentId);
     String agentInfoString = mapper.writeValueAsString(AgentInfo.INFO);
 
     return SimpleRequestBuilder.post(uri)
@@ -55,7 +56,7 @@ public class NotificationFactory {
     URI uri = new URI(baseUrl + "/connections/" + agentId);
     String notificationBody = mapper.writeValueAsString(ShutdownNotification.INSTANCE);
 
-    return SimpleRequestBuilder.put(uri)
+    return SimpleRequestBuilder.patch(uri)
         .setBody(notificationBody, ContentType.APPLICATION_JSON)
         .setHeader("content-type", "application/json")
         .build();

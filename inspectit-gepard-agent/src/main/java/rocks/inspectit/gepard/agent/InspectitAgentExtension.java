@@ -42,10 +42,6 @@ public class InspectitAgentExtension implements AgentExtension {
     BootstrapManager bootstrapManager = BootstrapManager.create();
     bootstrapManager.appendToBootstrapClassLoader();
 
-    // Notify configuration server about this agent
-    NotificationManager notificationManager = NotificationManager.create();
-    notificationManager.sendStartNotification();
-
     // Set our global OpenTelemetry instance. For now, we use the Agent SDK
     OpenTelemetryAccessor.setOpenTelemetry(GlobalOpenTelemetry.get());
 
@@ -73,6 +69,9 @@ public class InspectitAgentExtension implements AgentExtension {
     ConfigurationManager configurationManager = ConfigurationManager.create();
     configurationManager.loadConfiguration();
 
+    // Notify configuration server about this agent
+    NotificationManager notificationManager = NotificationManager.create();
+    notificationManager.sendStartNotification();
     // Set up shutdown notification to configuration server
     notificationManager.setUpShutdownNotification();
 
