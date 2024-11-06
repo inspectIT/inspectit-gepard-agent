@@ -4,7 +4,6 @@ package rocks.inspectit.gepard.agent.configuration.persistence;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,12 +32,8 @@ public class ConfigurationPersistenceTest {
   @BeforeEach
   void setUp() {
     persistence = ConfigurationPersistence.create(reader, writer);
+    subject.clear();
     subject.addObserver(observer);
-  }
-
-  @AfterEach
-  void clear() {
-    subject.removeObserver(observer);
   }
 
   @Test

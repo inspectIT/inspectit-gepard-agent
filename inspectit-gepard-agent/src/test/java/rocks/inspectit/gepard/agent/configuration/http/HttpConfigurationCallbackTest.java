@@ -18,12 +18,15 @@ class HttpConfigurationCallbackTest {
 
   @Mock private ConfigurationReceivedObserver observer;
 
+  private final ConfigurationReceivedSubject subject = ConfigurationReceivedSubject.getInstance();
+
   private HttpConfigurationCallback callback;
 
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-    ConfigurationReceivedSubject.getInstance().addObserver(observer);
+    subject.clear();
+    subject.addObserver(observer);
     callback = new HttpConfigurationCallback();
   }
 
