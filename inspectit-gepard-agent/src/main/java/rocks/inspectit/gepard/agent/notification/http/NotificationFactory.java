@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
@@ -17,7 +18,9 @@ import rocks.inspectit.gepard.agent.notification.http.model.ShutdownNotification
 public class NotificationFactory {
 
   private static final ObjectMapper mapper =
-      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+      new ObjectMapper()
+          .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+          .registerModule(new JavaTimeModule());
 
   private NotificationFactory() {}
 
@@ -34,7 +37,7 @@ public class NotificationFactory {
       throws URISyntaxException, JsonProcessingException {
     String agentId = AgentInfo.INFO.getAgentId();
     URI uri = new URI(baseUrl + "/connections/" + agentId);
-    String agentInfoString = mapper.writeValueAsString(AgentInfo.INFO);
+    String agentInfoString = mapper.writeValueAsString(AgentInfo.INFO.getAgent());
 
     return SimpleRequestBuilder.post(uri)
         .setBody(agentInfoString, ContentType.APPLICATION_JSON)

@@ -48,7 +48,7 @@ class MethodHookConfigurationResolverTest {
     when(activeRule.getTracing()).thenReturn(tracing);
 
     MethodHookConfiguration hookConfig = resolver.resolve(methodDescription, classConfiguration);
-    boolean tracingEnabled = hookConfig.getTracing().getStartSpan();
+    boolean tracingEnabled = hookConfig.getTracing().isStartSpan();
 
     assertEquals(methodName, hookConfig.getMethodName());
     assertTrue(tracingEnabled);
@@ -62,7 +62,7 @@ class MethodHookConfigurationResolverTest {
     when(activeRule.getTracing()).thenReturn(tracing);
 
     MethodHookConfiguration hookConfig = resolver.resolve(methodDescription, classConfiguration);
-    boolean tracingEnabled = hookConfig.getTracing().getStartSpan();
+    boolean tracingEnabled = hookConfig.getTracing().isStartSpan();
 
     assertEquals(methodName, hookConfig.getMethodName());
     assertFalse(tracingEnabled);
@@ -73,7 +73,7 @@ class MethodHookConfigurationResolverTest {
     when(methodDescription.isMethod()).thenReturn(false);
 
     MethodHookConfiguration hookConfig = resolver.resolve(methodDescription, classConfiguration);
-    boolean tracingEnabled = hookConfig.getTracing().getStartSpan();
+    boolean tracingEnabled = hookConfig.getTracing().isStartSpan();
 
     assertEquals(methodName, hookConfig.getMethodName());
     assertFalse(tracingEnabled);

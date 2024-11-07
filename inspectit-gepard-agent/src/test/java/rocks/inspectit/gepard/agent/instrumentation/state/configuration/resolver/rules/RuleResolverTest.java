@@ -80,7 +80,7 @@ class RuleResolverTest {
       assertTrue(activeRule.isPresent());
       assertEquals(1, activeRule.get().getScopes().size());
       assertTrue(activeRule.get().getScopes().contains(scope1));
-      assertTrue(activeRule.get().getTracing().getStartSpan());
+      assertTrue(activeRule.get().getTracing().isStartSpan());
       assertEquals(methodMatcher, activeRule.get().getMethodMatcher());
     }
 
@@ -113,7 +113,7 @@ class RuleResolverTest {
       assertEquals(2, activeRule.get().getScopes().size());
       assertTrue(activeRule.get().getScopes().contains(scope1));
       assertTrue(activeRule.get().getScopes().contains(scope2));
-      assertFalse(activeRule.get().getTracing().getStartSpan());
+      assertFalse(activeRule.get().getTracing().isStartSpan());
       verify(methodMatcher).or(methodMatcher); // method matchers of scopes were combined
     }
 
@@ -186,12 +186,12 @@ class RuleResolverTest {
       assertTrue(activeRule1.isPresent());
       assertEquals(1, activeRule1.get().getScopes().size());
       assertTrue(activeRule1.get().getScopes().contains(scope1));
-      assertTrue(activeRule1.get().getTracing().getStartSpan());
+      assertTrue(activeRule1.get().getTracing().isStartSpan());
       assertEquals(methodMatcher, activeRule1.get().getMethodMatcher());
       assertTrue(activeRule2.isPresent());
       assertEquals(1, activeRule2.get().getScopes().size());
       assertTrue(activeRule2.get().getScopes().contains(scope2));
-      assertFalse(activeRule2.get().getTracing().getStartSpan());
+      assertFalse(activeRule2.get().getTracing().isStartSpan());
       assertEquals(methodMatcher, activeRule2.get().getMethodMatcher());
     }
   }

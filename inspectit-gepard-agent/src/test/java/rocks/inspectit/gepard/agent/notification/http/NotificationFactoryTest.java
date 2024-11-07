@@ -24,13 +24,13 @@ class NotificationFactoryTest {
     String baseUrl = "http://localhost:8080";
     String url = "http://localhost:8080/connections/" + agentId;
     String contentType = "application/json";
-    String info = mapper.writeValueAsString(AgentInfo.INFO);
+    String agent = mapper.writeValueAsString(AgentInfo.INFO.getAgent());
 
     SimpleHttpRequest request = NotificationFactory.createStartNotification(baseUrl);
 
     assertEquals(url, request.getUri().toString());
     assertEquals(contentType, request.getHeader("content-type").getValue());
-    assertEquals(info, request.getBodyText());
+    assertEquals(agent, request.getBodyText());
   }
 
   @Test

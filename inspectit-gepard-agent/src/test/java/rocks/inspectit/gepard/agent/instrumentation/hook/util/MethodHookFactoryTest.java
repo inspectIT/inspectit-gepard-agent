@@ -24,7 +24,7 @@ class MethodHookFactoryTest {
     when(hookConfiguration.getTracing()).thenReturn(RuleTracingConfiguration.NO_TRACING);
 
     MethodHook hook = MethodHookFactory.createHook(hookConfiguration);
-    boolean tracingEnabled = hook.getConfiguration().getTracing().getStartSpan();
+    boolean tracingEnabled = hook.getConfiguration().getTracing().isStartSpan();
 
     assertNotNull(hook);
     assertEquals(methodName, hook.getConfiguration().getMethodName());
@@ -39,7 +39,7 @@ class MethodHookFactoryTest {
     when(hookConfiguration.getTracing()).thenReturn(tracing);
 
     MethodHook hook = MethodHookFactory.createHook(hookConfiguration);
-    boolean tracingEnabled = hook.getConfiguration().getTracing().getStartSpan();
+    boolean tracingEnabled = hook.getConfiguration().getTracing().isStartSpan();
 
     assertNotNull(hook);
     assertEquals(methodName, hook.getConfiguration().getMethodName());
