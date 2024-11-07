@@ -15,7 +15,7 @@ import rocks.inspectit.gepard.commons.model.agent.Agent;
 /** Meta-information about the current agent */
 public final class AgentInfo {
 
-  public static AgentInfo INFO = new AgentInfo();
+  public static final AgentInfo INFO = new AgentInfo();
 
   private final Agent agent;
 
