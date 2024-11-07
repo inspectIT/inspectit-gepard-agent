@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.concurrent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rocks.inspectit.gepard.agent.internal.shutdown.ShutdownHookManager;
 
 /**
  * Global manager, who starts scheduled task and keeps track of them. At shutdown all scheduled
@@ -58,17 +59,16 @@ public class InspectitScheduler {
     return true;
   }
 
-  /** Add hook, so every scheduled future will be cancelled at shutdown */
+  /** Add hook, so every scheduled future will be cancelled at shutdown. */
   private void addShutdownHook() {
-    Runtime.getRuntime()
-        .addShutdownHook(
-            new Thread(
-                () ->
-                    scheduledFutures.forEach(
-                        (name, future) -> {
-                          log.info("Shutting down {}...", name);
-                          future.cancel(true);
-                        })));
+    Runnable shutdownHook =
+        () ->
+            scheduledFutures.forEach(
+                (name, future) -> {
+                  log.info("Shutting down {}...", name);
+                  future.cancel(true);
+                });
+    ShutdownHookManager.getInstance().addShutdownHook(shutdownHook);
   }
 
   /**
@@ -82,9 +82,16 @@ public class InspectitScheduler {
   }
 
   /**
+   * Method for testing
+   *
    * @return the number of scheduled futures
    */
   public int getNumberOfScheduledFutures() {
     return scheduledFutures.size();
+  }
+
+  /** Method for testing. */
+  public void clearScheduledFutures() {
+    scheduledFutures.clear();
   }
 }

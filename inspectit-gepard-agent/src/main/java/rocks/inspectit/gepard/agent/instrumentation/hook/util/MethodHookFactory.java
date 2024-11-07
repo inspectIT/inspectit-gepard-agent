@@ -19,7 +19,7 @@ public class MethodHookFactory {
   public static MethodHook createHook(MethodHookConfiguration hookConfig) {
     MethodHook.Builder builder = MethodHook.builder().setConfiguration(hookConfig);
 
-    if (hookConfig.getTracing().getStartSpan()) builder.setSpanAction(new SpanAction());
+    if (hookConfig.getTracing().isStartSpan()) builder.setSpanAction(new SpanAction());
 
     return builder.build();
   }

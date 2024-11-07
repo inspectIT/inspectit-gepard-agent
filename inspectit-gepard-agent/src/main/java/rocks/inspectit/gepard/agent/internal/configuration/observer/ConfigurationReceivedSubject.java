@@ -54,4 +54,9 @@ public class ConfigurationReceivedSubject {
       observer.handleConfiguration(event);
     }
   }
+
+  /** Method for testing. */
+  public void clear() {
+    observers.clear();
+  }
 }

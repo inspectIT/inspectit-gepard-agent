@@ -17,6 +17,7 @@ import rocks.inspectit.gepard.agent.instrumentation.state.InstrumentationState;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.InspectitConfigurationHolder;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.otel.OpenTelemetryAccessor;
+import rocks.inspectit.gepard.agent.internal.shutdown.ShutdownHookManager;
 import rocks.inspectit.gepard.agent.notification.NotificationManager;
 import rocks.inspectit.gepard.agent.transformation.TransformationManager;
 
@@ -40,10 +41,6 @@ public class InspectitAgentExtension implements AgentExtension {
     // Append the bootstrap classloader with inspectIT interfaces
     BootstrapManager bootstrapManager = BootstrapManager.create();
     bootstrapManager.appendToBootstrapClassLoader();
-
-    // Notify configuration server about this agent
-    NotificationManager notificationManager = NotificationManager.create();
-    notificationManager.sendStartNotification();
 
     // Set our global OpenTelemetry instance. For now, we use the Agent SDK
     OpenTelemetryAccessor.setOpenTelemetry(GlobalOpenTelemetry.get());
@@ -72,6 +69,12 @@ public class InspectitAgentExtension implements AgentExtension {
     ConfigurationManager configurationManager = ConfigurationManager.create();
     configurationManager.loadConfiguration();
 
+    // Notify configuration server about this agent
+    NotificationManager notificationManager = NotificationManager.create();
+    notificationManager.sendStartNotification();
+    // Set up shutdown notification to configuration server
+    notificationManager.setUpShutdownNotification();
+
     addShutdownHook();
 
     return agentBuilder;
@@ -82,12 +85,9 @@ public class InspectitAgentExtension implements AgentExtension {
     return "inspectit-gepard";
   }
 
+  /** This should be the last log message of the agent at shutdown. */
   private void addShutdownHook() {
-    Runtime.getRuntime()
-        .addShutdownHook(
-            new Thread(
-                () -> {
-                  log.info("Shutting down inspectIT Gepard agent extension...");
-                }));
+    Runnable shutdownHook = () -> log.info("Shutting down inspectIT Gepard agent extension...");
+    ShutdownHookManager.getInstance().addShutdownHookLast(shutdownHook);
   }
 }

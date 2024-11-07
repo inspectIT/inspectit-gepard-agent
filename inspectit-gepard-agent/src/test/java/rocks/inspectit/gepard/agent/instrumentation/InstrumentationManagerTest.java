@@ -3,18 +3,17 @@ package rocks.inspectit.gepard.agent.instrumentation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.lang.reflect.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.internal.schedule.InspectitScheduler;
 
 class InstrumentationManagerTest {
 
+  private final InspectitScheduler scheduler = InspectitScheduler.getInstance();
+
   @BeforeEach
-  void setUp() throws NoSuchFieldException, IllegalAccessException {
-    Field field = InspectitScheduler.class.getDeclaredField("instance");
-    field.setAccessible(true);
-    field.set(null, null);
+  void beforeEach() {
+    scheduler.clearScheduledFutures();
   }
 
   @Test
@@ -27,13 +26,13 @@ class InstrumentationManagerTest {
   void startClassDiscovery() {
     InstrumentationManager manager = InstrumentationManager.create();
     manager.startClassDiscovery();
-    assertEquals(1, InspectitScheduler.getInstance().getNumberOfScheduledFutures());
+    assertEquals(1, scheduler.getNumberOfScheduledFutures());
   }
 
   @Test
   void startBatchInstrumentation() {
     InstrumentationManager manager = InstrumentationManager.create();
     manager.startBatchInstrumentation(null);
-    assertEquals(1, InspectitScheduler.getInstance().getNumberOfScheduledFutures());
+    assertEquals(1, scheduler.getNumberOfScheduledFutures());
   }
 }
