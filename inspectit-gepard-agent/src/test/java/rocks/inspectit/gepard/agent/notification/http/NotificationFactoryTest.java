@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.net.URISyntaxException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,9 @@ import rocks.inspectit.gepard.agent.notification.http.model.ShutdownNotification
 class NotificationFactoryTest {
 
   private static final ObjectMapper mapper =
-      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+      new ObjectMapper()
+          .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+          .registerModule(new JavaTimeModule());
 
   private final String agentId = AgentInfo.INFO.getAgentId();
 

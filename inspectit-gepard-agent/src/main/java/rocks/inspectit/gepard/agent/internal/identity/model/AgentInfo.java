@@ -15,6 +15,7 @@ import rocks.inspectit.gepard.commons.model.agent.Agent;
 /** Meta-information about the current agent */
 public final class AgentInfo {
 
+  /** Global instance of agent information */
   public static final AgentInfo INFO = new AgentInfo();
 
   private final Agent agent;
@@ -29,6 +30,12 @@ public final class AgentInfo {
     this.agentId = identityInfo.agentId();
   }
 
+  /**
+   * Creates an agent model with the current meta-information.
+   *
+   * @param identityInfo the agent's identity info
+   * @return the created agent model
+   */
   private Agent createAgent(IdentityInfo identityInfo) {
     RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
 
