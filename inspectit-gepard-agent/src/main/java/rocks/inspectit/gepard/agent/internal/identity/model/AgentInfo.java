@@ -48,7 +48,7 @@ public final class AgentInfo {
     Map<String, String> attributes = PropertiesResolver.getAttributes();
 
     return new Agent(
-        serviceName, gepardVersion, otelVersion, javaVersion, startTime, vmId, attributes);
+        serviceName, vmId, gepardVersion, otelVersion, startTime, javaVersion, attributes);
   }
 
   /**
