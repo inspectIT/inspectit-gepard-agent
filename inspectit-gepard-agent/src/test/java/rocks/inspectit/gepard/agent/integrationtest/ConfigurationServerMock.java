@@ -56,7 +56,7 @@ public class ConfigurationServerMock {
     String body = FileUtils.readFileToString(file, "UTF-8");
 
     serverClient
-        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
+        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration/.*"))
         .respond(response().withStatusCode(200).withBody(body));
 
     serverClient

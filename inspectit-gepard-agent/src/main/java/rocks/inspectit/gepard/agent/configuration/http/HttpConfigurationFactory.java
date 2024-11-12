@@ -3,9 +3,12 @@ package rocks.inspectit.gepard.agent.configuration.http;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.core5.net.URIBuilder;
+import rocks.inspectit.gepard.agent.internal.identity.model.AgentInfo;
+import rocks.inspectit.gepard.commons.model.agent.Agent;
 
 /**
  * This factory should create different HTTP requests for the configuration server to fetch
@@ -23,8 +26,32 @@ public class HttpConfigurationFactory {
    */
   public static SimpleHttpRequest createConfigurationRequest(String baseUrl)
       throws URISyntaxException {
-    URI uri = new URIBuilder(baseUrl + "/agent-configuration").build();
 
-    return SimpleRequestBuilder.get(uri).build();
+    AgentInfo agentInfo = AgentInfo.INFO;
+
+    URI uri = new URIBuilder(baseUrl + "/agent-configuration/" + agentInfo.getAgentId()).build();
+
+    SimpleRequestBuilder requestBuilder = SimpleRequestBuilder.get(uri);
+
+    return buildRequestWithHeaders(requestBuilder, agentInfo.getAgent()).build();
+  }
+
+  private static SimpleRequestBuilder buildRequestWithHeaders(
+      SimpleRequestBuilder requestBuilder, Agent agent) {
+    Map<String, String> headers =
+        Map.of(
+            "x-gepard-service-Name", agent.getServiceName(),
+            "x-gepard-vm-id", agent.getVmId(),
+            "x-gepard-gepard-version", agent.getGepardVersion(),
+            "x-gepard-otel-version", agent.getOtelVersion(),
+            "x-gepard-java-version", agent.getJavaVersion(),
+            "x-gepard-start-time", agent.getStartTime().toString());
+
+    headers.forEach(requestBuilder::addHeader);
+    agent
+        .getAttributes()
+        .forEach((key, value) -> requestBuilder.addHeader("X-Gepard-Attribute-" + key, value));
+
+    return requestBuilder;
   }
 }
