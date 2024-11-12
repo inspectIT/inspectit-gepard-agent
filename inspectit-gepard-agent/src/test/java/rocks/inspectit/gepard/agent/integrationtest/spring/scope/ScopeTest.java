@@ -23,7 +23,7 @@ public class ScopeTest extends SpringTestBase {
 
   @Test
   void scopeWithOneMethodInstrumentsOneMethod() throws Exception {
-    configurationServerMock.configServerSetup( configDir + "scope-with-method.json");
+    configurationServerMock.configServerSetup(configDir + "scope-with-method.json");
     startTarget("/opentelemetry-extensions.jar");
     awaitInstrumentationUpdate(1);
 
@@ -36,8 +36,7 @@ public class ScopeTest extends SpringTestBase {
 
   @Test
   void scopeWithTwoMethodsInstrumentsTwoMethods() throws Exception {
-    configurationServerMock.configServerSetup(
-        configDir + "scope-with-multiple-methods.json");
+    configurationServerMock.configServerSetup(configDir + "scope-with-multiple-methods.json");
     startTarget("/opentelemetry-extensions.jar");
     awaitInstrumentationUpdate(1);
 
@@ -50,7 +49,7 @@ public class ScopeTest extends SpringTestBase {
 
   @Test
   void emptyConfigurationDoesntInstrument() throws Exception {
-    configurationServerMock.configServerSetup( configDir + "empty-config.json");
+    configurationServerMock.configServerSetup(configDir + "empty-config.json");
     startTarget("/opentelemetry-extensions.jar");
     awaitInstrumentationUpdate(1);
 

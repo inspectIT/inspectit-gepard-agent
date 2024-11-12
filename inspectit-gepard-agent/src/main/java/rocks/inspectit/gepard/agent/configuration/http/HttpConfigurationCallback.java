@@ -4,6 +4,8 @@ package rocks.inspectit.gepard.agent.configuration.http;
 import java.io.IOException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.ProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
@@ -17,7 +19,7 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
   @Override
   public void completed(SimpleHttpResponse result) {
 
-    logStatus(result.getCode());
+    logStatus(result);
     // Publish Event
     if (result.getCode() == 200 || result.getCode() == 201) {
       String body = result.getBodyText();
@@ -44,16 +46,24 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
     log.info("Cancelled configuration fetch");
   }
 
-  private void logStatus(int statusCode) {
-    log.info("Received status code {}", statusCode);
-    if (statusCode == 404) {
+  private void logStatus(SimpleHttpResponse response) {
+    log.info("Received status code {}", response.getCode());
+    if (response.getCode() == 404) {
       log.error("Configuration not found on configuration server");
     }
-    if (statusCode == 200 || statusCode == 201) {
-      log.info("Configuration fetched successfully");
+    if (response.getCode() == 200) {
+
+      try {
+        Header responseHeader = response.getHeader("x-gepard-service-registered");
+        if (responseHeader.getValue().equals("true")) {
+          log.info("Connection to configuration server established successfully.");
+        } else {
+          log.debug("Connection to configuration server reused.");
+        }
+      } catch (ProtocolException e) {
+        log.error("Configuration Server did not send a registration header in its response.", e);
+      }
     }
-    if (statusCode == 201) {
-      log.info("Agent-Connection registered successfully.");
-    }
+    log.info("Configuration fetched successfully");
   }
 }
