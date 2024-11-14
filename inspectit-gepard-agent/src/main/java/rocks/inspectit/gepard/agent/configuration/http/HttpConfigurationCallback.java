@@ -2,6 +2,7 @@
 package rocks.inspectit.gepard.agent.configuration.http;
 
 import java.io.IOException;
+import java.util.Objects;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.Header;
@@ -47,23 +48,26 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
   }
 
   private void logStatus(SimpleHttpResponse response) {
-    log.info("Received status code {}", response.getCode());
-    if (response.getCode() == 404) {
-      log.error("Configuration not found on configuration server");
-    }
-    if (response.getCode() == 200) {
+    int statusCode = response.getCode();
+    log.info("Received status code {}", statusCode);
 
+    if (statusCode == 404) {
+      log.error("Configuration not found on configuration server");
+    } else if (statusCode == 200) {
       try {
-        Header responseHeader = response.getHeader("x-gepard-service-registered");
-        if (responseHeader.getValue().equals("true")) {
-          log.info("Connection to configuration server established successfully.");
+        Header registrationHeader = response.getHeader("x-gepard-service-registered");
+        if (Objects.isNull(registrationHeader)) {
+          log.error("Configuration server did not return registration header!");
+        } else if (registrationHeader.getValue().equals("true")) {
+          log.info("Connection to configuration server was successfully established.");
         } else {
           log.debug("Connection to configuration server reused.");
         }
       } catch (ProtocolException e) {
-        log.error("Configuration Server did not send a registration header in its response.", e);
+        log.error(
+            "Error reading response header. There might be an issue with the config-server!", e);
       }
+      log.info("Configuration fetched successfully");
     }
-    log.info("Configuration fetched successfully");
   }
 }

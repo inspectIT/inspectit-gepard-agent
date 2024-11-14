@@ -71,8 +71,6 @@ public class InspectitAgentExtension implements AgentExtension {
 
     // Notify configuration server about this agent
     NotificationManager notificationManager = NotificationManager.create();
-    // TODO: Delete all the notification stuff.
-    // notificationManager.sendStartNotification();
     // Set up shutdown notification to configuration server
     notificationManager.setUpShutdownNotification();
 
