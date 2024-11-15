@@ -9,6 +9,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +20,7 @@ import rocks.inspectit.gepard.agent.internal.identity.model.IdentityInfo;
 class IdentityManagerTest {
 
   @Test
+  @Execution(ExecutionMode.SAME_THREAD)
   void testCreateIdentityManagerSuccessfully() {
     RuntimeMXBean mockRuntimeMXBean = mock(RuntimeMXBean.class);
     when(mockRuntimeMXBean.getName()).thenReturn("12345@mockedHostName");
