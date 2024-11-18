@@ -6,6 +6,8 @@ import java.lang.management.RuntimeMXBean;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Objects;
 import rocks.inspectit.gepard.agent.internal.identity.model.IdentityInfo;
 
@@ -38,13 +40,16 @@ public class IdentityManager {
    * @return the SHA3-256 hashed <code>String</code>
    */
   private static String hash(String input) {
+    String salt = generateSalt();
+    String saltedInput = salt + input;
+
     MessageDigest messageDigest;
     try {
       messageDigest = MessageDigest.getInstance("SHA3-256");
     } catch (NoSuchAlgorithmException e) {
       throw new UnsupportedOperationException("SHA3-256 not supported", e);
     }
-    byte[] bytes = messageDigest.digest(input.getBytes(StandardCharsets.UTF_8));
+    byte[] bytes = messageDigest.digest(saltedInput.getBytes(StandardCharsets.UTF_8));
     StringBuilder hexString = new StringBuilder(2 * bytes.length);
     for (byte b : bytes) {
       String hex = Integer.toHexString(0xff & b);
@@ -54,5 +59,13 @@ public class IdentityManager {
       hexString.append(hex);
     }
     return hexString.toString();
+  }
+
+  /** Generates a secure random 128bit string/salt */
+  private static String generateSalt() {
+    byte[] salt = new byte[16];
+    SecureRandom secureRandom = new SecureRandom();
+    secureRandom.nextBytes(salt);
+    return Base64.getEncoder().encodeToString(salt);
   }
 }
