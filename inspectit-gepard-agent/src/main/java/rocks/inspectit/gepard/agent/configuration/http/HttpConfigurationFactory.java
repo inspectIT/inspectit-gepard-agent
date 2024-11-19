@@ -16,6 +16,14 @@ import rocks.inspectit.gepard.commons.model.agent.Agent;
  */
 public class HttpConfigurationFactory {
 
+  public static final String X_GEPARD_SERVICE_NAME = "x-gepard-service-name";
+  public static final String X_GEPARD_VM_ID = "x-gepard-vm-id";
+  public static final String X_GEPARD_GEPARD_VERSION = "x-gepard-gepard-version";
+  public static final String X_GEPARD_OTEL_VERSION = "x-gepard-otel-version";
+  public static final String X_GEPARD_JAVA_VERSION = "x-gepard-java-version";
+  public static final String X_GEPARD_START_TIME = "x-gepard-start-time";
+  public static final String X_GEPARD_ATTRIBUTE = "x-gepard-attribute-";
+
   private HttpConfigurationFactory() {}
 
   /**
@@ -40,17 +48,17 @@ public class HttpConfigurationFactory {
       SimpleRequestBuilder requestBuilder, Agent agent) {
     Map<String, String> headers =
         Map.of(
-            "x-gepard-service-Name", agent.getServiceName(),
-            "x-gepard-vm-id", agent.getVmId(),
-            "x-gepard-gepard-version", agent.getGepardVersion(),
-            "x-gepard-otel-version", agent.getOtelVersion(),
-            "x-gepard-java-version", agent.getJavaVersion(),
-            "x-gepard-start-time", agent.getStartTime().toString());
+            X_GEPARD_SERVICE_NAME, agent.getServiceName(),
+            X_GEPARD_VM_ID, agent.getVmId(),
+            X_GEPARD_GEPARD_VERSION, agent.getGepardVersion(),
+            X_GEPARD_OTEL_VERSION, agent.getOtelVersion(),
+            X_GEPARD_JAVA_VERSION, agent.getJavaVersion(),
+            X_GEPARD_START_TIME, agent.getStartTime().toString());
 
     headers.forEach(requestBuilder::addHeader);
     agent
         .getAttributes()
-        .forEach((key, value) -> requestBuilder.addHeader("X-Gepard-Attribute-" + key, value));
+        .forEach((key, value) -> requestBuilder.addHeader(X_GEPARD_ATTRIBUTE + key, value));
 
     return requestBuilder;
   }

@@ -25,27 +25,6 @@ public class NotificationFactory {
   private NotificationFactory() {}
 
   /**
-   * Create an HTTP post request to notify the configuration server about the starting agent and
-   * it's information.
-   *
-   * @param baseUrl the base url of the configuration server
-   * @return the HTTP post request, containing agent information
-   * @throws URISyntaxException invalid uri
-   * @throws JsonProcessingException corrupted agent information
-   */
-  public static SimpleHttpRequest createStartNotification(String baseUrl)
-      throws URISyntaxException, JsonProcessingException {
-    String agentId = AgentInfo.INFO.getAgentId();
-    URI uri = new URI(baseUrl + "/connections/" + agentId);
-    String agentInfoString = mapper.writeValueAsString(AgentInfo.INFO.getAgent());
-
-    return SimpleRequestBuilder.post(uri)
-        .setBody(agentInfoString, ContentType.APPLICATION_JSON)
-        .setHeader("content-type", "application/json")
-        .build();
-  }
-
-  /**
    * Create an HTTP put request to notify the configuration server about the shutting down agent.
    *
    * @param baseUrl the base url of the configuration server

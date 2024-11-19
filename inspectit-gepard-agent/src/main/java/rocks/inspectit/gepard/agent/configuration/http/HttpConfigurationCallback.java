@@ -2,11 +2,8 @@
 package rocks.inspectit.gepard.agent.configuration.http;
 
 import java.io.IOException;
-import java.util.Objects;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.ProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.internal.configuration.observer.ConfigurationReceivedSubject;
@@ -49,25 +46,18 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
 
   private void logStatus(SimpleHttpResponse response) {
     int statusCode = response.getCode();
-    log.info("Received status code {}", statusCode);
 
-    if (statusCode == 404) {
-      log.error("Configuration not found on configuration server");
-    } else if (statusCode == 200) {
-      try {
-        Header registrationHeader = response.getHeader("x-gepard-service-registered");
-        if (Objects.isNull(registrationHeader)) {
-          log.error("Configuration server did not return registration header!");
-        } else if (registrationHeader.getValue().equals("true")) {
-          log.info("Connection to configuration server was successfully established.");
-        } else {
-          log.debug("Connection to configuration server reused.");
-        }
-      } catch (ProtocolException e) {
-        log.error(
-            "Error reading response header. There might be an issue with the config-server!", e);
-      }
+    if (statusCode == 200) {
       log.info("Configuration fetched successfully");
+    } else if (statusCode == 201) {
+      log.info(
+          "Connection to configuration server was successfully established. Configuration fetched successfully");
+    } else if (statusCode == 404) {
+      log.error("Configuration not found on configuration server");
+    } else {
+      log.error(
+          "Unexpected status code: {}. Please check the configuration server connection.",
+          statusCode);
     }
   }
 }
