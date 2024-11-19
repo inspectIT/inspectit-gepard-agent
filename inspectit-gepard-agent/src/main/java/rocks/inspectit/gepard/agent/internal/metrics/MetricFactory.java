@@ -3,7 +3,7 @@ package rocks.inspectit.gepard.agent.internal.metrics;
 
 import io.opentelemetry.api.metrics.ObservableDoubleGauge;
 import io.opentelemetry.api.metrics.ObservableDoubleMeasurement;
-import io.opentelemetry.sdk.metrics.export.MetricExporter;
+import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import java.util.function.Consumer;
 import rocks.inspectit.gepard.agent.internal.otel.OpenTelemetryAccessor;
 
@@ -13,9 +13,8 @@ public class MetricFactory {
   private MetricFactory() {}
 
   /**
-   * Creates an observable gauge metric. This gauge will record a value via calling the callback
-   * function everytime it is observed. The gauge is observed when the OpenTelemetry {@link
-   * MetricExporter} exports data.
+   * Creates an observable gauge metric. This gauge will record a measurement via calling the
+   * callback function everytime it is observed by the {@link PeriodicMetricReader}.
    *
    * @param name the name of the gauge
    * @param callback the callback function to record a measurement

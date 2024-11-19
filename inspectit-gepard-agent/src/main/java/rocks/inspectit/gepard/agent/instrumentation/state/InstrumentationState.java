@@ -133,7 +133,7 @@ public class InstrumentationState {
   /** Sets up self-monitoring to record the amount of instrumented classes. */
   private void setUpSelfMonitoring() {
     Consumer<ObservableDoubleMeasurement> callback =
-        (measurment) -> measurment.record(activeInstrumentations.estimatedSize());
+        (measurement) -> measurement.record(activeInstrumentations.estimatedSize());
     MetricFactory.createObservableDoubleGauge("inspectit.self.instrumented-classes", callback);
   }
 }
