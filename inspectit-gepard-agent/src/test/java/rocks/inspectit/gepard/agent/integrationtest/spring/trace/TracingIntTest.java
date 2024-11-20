@@ -17,9 +17,9 @@ import rocks.inspectit.gepard.agent.integrationtest.spring.SpringTestBase;
 /** Should check, if traces are received in our tracing backend according to our configuration. */
 class TracingIntTest extends SpringTestBase {
 
-  private static final String parentSpanName = "WebController.greeting";
+  private static final String PARENT_SPAN_NAME = "WebController.greeting";
 
-  private static final String childSpanName = "WebController.withSpan";
+  private static final String CHILD_SPAN_NAME = "WebController.withSpan";
 
   @Test
   void shouldSendSpansToBackendWhenScopesAreActive() throws Exception {
@@ -30,7 +30,7 @@ class TracingIntTest extends SpringTestBase {
     sendRequestToTarget("/greeting");
     Collection<ExportTraceServiceRequest> traces = waitForTraces();
 
-    assertSpans(traces, parentSpanName, childSpanName);
+    assertSpans(traces, PARENT_SPAN_NAME, CHILD_SPAN_NAME);
   }
 
   @Test
@@ -42,7 +42,7 @@ class TracingIntTest extends SpringTestBase {
     sendRequestToTarget("/greeting");
     Collection<ExportTraceServiceRequest> traces = waitForTraces();
 
-    assertNoSpans(traces, parentSpanName, childSpanName);
+    assertNoSpans(traces, PARENT_SPAN_NAME, CHILD_SPAN_NAME);
   }
 
   /**
