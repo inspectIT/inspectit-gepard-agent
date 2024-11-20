@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.integrationtest.spring.SpringTestBase;
 
 /** Should check, if traces are received in our tracing backend according to our configuration. */
-class TracingTest extends SpringTestBase {
+class TracingIntTest extends SpringTestBase {
 
   private static final String parentSpanName = "WebController.greeting";
 

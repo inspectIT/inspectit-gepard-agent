@@ -6,7 +6,7 @@ import static rocks.inspectit.gepard.agent.integrationtest.utils.LogUtils.assert
 import org.junit.jupiter.api.Test;
 import rocks.inspectit.gepard.agent.integrationtest.spring.SpringTestBase;
 
-public class ScopeTest extends SpringTestBase {
+public class ScopeIntTest extends SpringTestBase {
 
   @Test
   void scopeWithoutMethodInstrumentsAllMethods() throws Exception {
