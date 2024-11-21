@@ -17,9 +17,9 @@ import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
  * This class is used to create a mock for a tracing backend. We can write and retrieve traces
  * there.
  */
-public class TracingBackendMock {
+public class ObservabilityBackendMock {
 
-  private static final Logger logger = LoggerFactory.getLogger(TracingBackendMock.class);
+  private static final Logger logger = LoggerFactory.getLogger(ObservabilityBackendMock.class);
   private static final DockerImageName MOCK_IMAGE =
       DockerImageName.parse(
               "ghcr.io/open-telemetry/opentelemetry-java-instrumentation/smoke-test-fake-backend")
@@ -28,7 +28,7 @@ public class TracingBackendMock {
 
   private final GenericContainer<?> server;
 
-  private TracingBackendMock(Network network) {
+  private ObservabilityBackendMock(Network network) {
     server =
         new GenericContainer<>(MOCK_IMAGE)
             .withNetwork(network)
@@ -38,8 +38,8 @@ public class TracingBackendMock {
             .withLogConsumer(new Slf4jLogConsumer(logger));
   }
 
-  static TracingBackendMock create(Network network) {
-    return new TracingBackendMock(network);
+  static ObservabilityBackendMock create(Network network) {
+    return new ObservabilityBackendMock(network);
   }
 
   void start() {

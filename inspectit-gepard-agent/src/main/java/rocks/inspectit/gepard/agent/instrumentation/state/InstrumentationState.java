@@ -3,13 +3,16 @@ package rocks.inspectit.gepard.agent.instrumentation.state;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.opentelemetry.api.metrics.ObservableDoubleMeasurement;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
 import rocks.inspectit.gepard.agent.instrumentation.state.configuration.resolver.ConfigurationResolver;
 import rocks.inspectit.gepard.agent.internal.instrumentation.InstrumentedType;
 import rocks.inspectit.gepard.agent.internal.instrumentation.model.ClassInstrumentationConfiguration;
+import rocks.inspectit.gepard.agent.internal.metrics.MetricFactory;
 
 /** Stores the instrumentation configuration of all instrumented classes. */
 public class InstrumentationState {
@@ -36,7 +39,9 @@ public class InstrumentationState {
    */
   public static InstrumentationState create(
       ConfigurationResolver configurationResolver, MethodHookManager methodHookManager) {
-    return new InstrumentationState(configurationResolver, methodHookManager);
+    InstrumentationState state = new InstrumentationState(configurationResolver, methodHookManager);
+    state.setUpSelfMonitoring();
+    return state;
   }
 
   /**
@@ -123,5 +128,12 @@ public class InstrumentationState {
       } catch (Exception e) {
         log.error("There was an error while updating the hooks of class {}", clazz.getName(), e);
       }
+  }
+
+  /** Sets up self-monitoring to record the amount of instrumented classes. */
+  private void setUpSelfMonitoring() {
+    Consumer<ObservableDoubleMeasurement> callback =
+        (measurement) -> measurement.record(activeInstrumentations.estimatedSize());
+    MetricFactory.createObservableDoubleGauge("inspectit.self.instrumented-classes", callback);
   }
 }

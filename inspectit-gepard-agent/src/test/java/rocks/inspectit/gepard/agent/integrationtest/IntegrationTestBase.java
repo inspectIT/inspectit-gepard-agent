@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
+import io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import io.opentelemetry.proto.trace.v1.Span;
 import java.io.IOException;
@@ -14,7 +15,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import okhttp3.OkHttpClient;
@@ -32,6 +32,8 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.utility.MountableFile;
+import rocks.inspectit.gepard.agent.configuration.http.HttpConfigurationCallback;
+import rocks.inspectit.gepard.agent.instrumentation.hook.MethodHookManager;
 import rocks.inspectit.gepard.agent.integrationtest.utils.OkHttpUtils;
 
 /**
@@ -72,14 +74,14 @@ public abstract class IntegrationTestBase {
   }
 
   // The Observability Backend Mock
-  private static TracingBackendMock tracingBackendMock;
+  private static ObservabilityBackendMock backendMock;
   // The configuration Server Mock
   public static ConfigurationServerMock configurationServerMock;
 
   @BeforeAll
   static void setup() {
-    tracingBackendMock = TracingBackendMock.create(network);
-    tracingBackendMock.start();
+    backendMock = ObservabilityBackendMock.create(network);
+    backendMock.start();
 
     configurationServerMock = ConfigurationServerMock.create(network);
     configurationServerMock.start();
@@ -131,7 +133,7 @@ public abstract class IntegrationTestBase {
 
   @AfterEach
   void reset() throws IOException {
-    tracingBackendMock.reset();
+    backendMock.reset();
     configurationServerMock.reset();
   }
 
@@ -141,7 +143,7 @@ public abstract class IntegrationTestBase {
 
   @AfterAll
   static void cleanup() {
-    tracingBackendMock.stop();
+    backendMock.stop();
     configurationServerMock.stop();
   }
 
@@ -182,9 +184,12 @@ public abstract class IntegrationTestBase {
         .flatMap(it -> it.getSpansList().stream());
   }
 
+  /**
+   * @return the traces received by the backend mock
+   */
   protected Collection<ExportTraceServiceRequest> waitForTraces()
       throws IOException, InterruptedException {
-    String content = waitForContent();
+    String content = waitForContent("traces");
 
     return StreamSupport.stream(OBJECT_MAPPER.readTree(content).spliterator(), false)
         .map(
@@ -197,23 +202,47 @@ public abstract class IntegrationTestBase {
               }
               return builder.build();
             })
-        .collect(Collectors.toList());
+        .toList();
   }
 
-  private String waitForContent() throws IOException, InterruptedException {
+  /**
+   * @return the metrics received by the backend mock
+   */
+  protected Collection<ExportMetricsServiceRequest> waitForMetrics()
+      throws IOException, InterruptedException {
+    String content = waitForContent("metrics");
+
+    return StreamSupport.stream(OBJECT_MAPPER.readTree(content).spliterator(), false)
+        .map(
+            it -> {
+              ExportMetricsServiceRequest.Builder builder =
+                  ExportMetricsServiceRequest.newBuilder();
+              try {
+                JsonFormat.parser().merge(OBJECT_MAPPER.writeValueAsString(it), builder);
+              } catch (InvalidProtocolBufferException | JsonProcessingException e) {
+                e.printStackTrace();
+              }
+              return builder.build();
+            })
+        .toList();
+  }
+
+  /**
+   * Waits for specific content from the backend mock
+   *
+   * @param type traces, metrics or logs
+   */
+  private String waitForContent(String type) throws IOException, InterruptedException {
     long previousSize = 0;
     long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
     String content = "[]";
     while (System.currentTimeMillis() < deadline) {
 
-      Request request =
-          new Request.Builder()
-              .url(
-                  String.format(
-                      "http://%s:%d/get-traces",
-                      tracingBackendMock.getServer().getHost(),
-                      tracingBackendMock.getServer().getMappedPort(8080)))
-              .build();
+      String url =
+          String.format(
+              "http://%s:%d/get-%s",
+              backendMock.getServer().getHost(), backendMock.getServer().getMappedPort(8080), type);
+      Request request = new Request.Builder().url(url).build();
 
       try (ResponseBody body = client.newCall(request).execute().body()) {
         content = body.string();
@@ -232,7 +261,8 @@ public abstract class IntegrationTestBase {
 
   /**
    * Waits until the instrumentation was applied in the method hooks for the specified amount of
-   * times. The test should not fail here, if no further update message was found.
+   * times. The test should not fail here, if no further update message was found. <br>
+   * We use the log message from {@link MethodHookManager}.
    */
   protected void awaitInstrumentationUpdate(int amount) {
     String updateMessage =
@@ -247,7 +277,8 @@ public abstract class IntegrationTestBase {
 
   /**
    * Waits until the configuration was polled one more time. The test should not fail here, if no
-   * further update message was found.
+   * further update message was found. <br>
+   * We use the log message from {@link HttpConfigurationCallback}.
    */
   protected void awaitConfigurationUpdate() {
     String updateMessage =
