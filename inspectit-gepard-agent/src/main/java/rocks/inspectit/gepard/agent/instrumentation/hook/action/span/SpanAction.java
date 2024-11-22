@@ -27,7 +27,13 @@ public class SpanAction {
    */
   public Optional<AutoCloseable> startSpan(MethodExecutionContext executionContext) {
     String spanName = getSpanName(executionContext);
-    Attributes methodAttributes = SpanUtil.createMethodAttributes(executionContext);
+    Attributes methodAttributes;
+    try {
+      methodAttributes = SpanUtil.createMethodAttributes(executionContext);
+    } catch (Exception e) {
+      log.warn("Failed to read method attributes: {}", e.getMessage());
+      methodAttributes = Attributes.empty();
+    }
 
     // Use the OTel span
     if (SpanUtil.spanAlreadyExists(spanName)) {
