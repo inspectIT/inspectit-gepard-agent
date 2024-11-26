@@ -8,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.mockserver.client.MockServerClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
@@ -21,8 +19,6 @@ import org.testcontainers.utility.DockerImageName;
  * before the target container where the agent is running is started. (e.g. in every test method)
  */
 public class ConfigurationServerMock {
-
-  private static final Logger logger = LoggerFactory.getLogger(ConfigurationServerMock.class);
 
   private MockServerContainer server;
   private MockServerClient serverClient;
@@ -56,7 +52,7 @@ public class ConfigurationServerMock {
     String body = FileUtils.readFileToString(file, "UTF-8");
 
     serverClient
-        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
+        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration/.*"))
         .respond(response().withStatusCode(200).withBody(body));
 
     serverClient

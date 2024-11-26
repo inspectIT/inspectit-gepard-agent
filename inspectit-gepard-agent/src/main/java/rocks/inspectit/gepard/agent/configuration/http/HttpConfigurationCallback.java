@@ -16,12 +16,10 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
 
   @Override
   public void completed(SimpleHttpResponse result) {
-    log.info(
-        "Fetched configuration from configuration server and received status code {}",
-        result.getCode());
 
+    logStatus(result);
     // Publish Event
-    if (result.getCode() == 200) {
+    if (result.getCode() == 200 || result.getCode() == 201) {
       String body = result.getBodyText();
 
       try {
@@ -44,5 +42,22 @@ public class HttpConfigurationCallback implements FutureCallback<SimpleHttpRespo
   @Override
   public void cancelled() {
     log.info("Cancelled configuration fetch");
+  }
+
+  private void logStatus(SimpleHttpResponse response) {
+    int statusCode = response.getCode();
+
+    if (statusCode == 200) {
+      log.info("Configuration fetched successfully");
+    } else if (statusCode == 201) {
+      log.info(
+          "Connection to configuration server was successfully established. Configuration fetched successfully");
+    } else if (statusCode == 404) {
+      log.error("Configuration not found on configuration server");
+    } else {
+      log.error(
+          "Unexpected status code: {}. Please check the configuration server connection.",
+          statusCode);
+    }
   }
 }

@@ -15,13 +15,10 @@ public class NotificationManager {
 
   private final String serverBaseUrl;
 
-  private final StartNotifier startNotifier;
-
   private final ShutdownNotifier shutdownNotifier;
 
   private NotificationManager(String serverBaseUrl) {
     this.serverBaseUrl = serverBaseUrl;
-    this.startNotifier = new StartNotifier();
     this.shutdownNotifier = new ShutdownNotifier();
   }
 
@@ -33,22 +30,6 @@ public class NotificationManager {
   public static NotificationManager create() {
     String url = PropertiesResolver.getServerUrl();
     return new NotificationManager(url);
-  }
-
-  /**
-   * Sends a message to the configuration server, to notify it about this agent starting, if a
-   * configuration server url was provided.
-   *
-   * @return true, if the notification was executed successfully
-   */
-  public boolean sendStartNotification() {
-    boolean successful = false;
-    if (serverBaseUrl.isEmpty()) log.info("No configuration server url was provided");
-    else {
-      log.info("Sending start notification to configuration server with url: {}", serverBaseUrl);
-      successful = startNotifier.sendNotification(serverBaseUrl);
-    }
-    return successful;
   }
 
   /**

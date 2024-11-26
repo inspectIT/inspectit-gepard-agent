@@ -12,12 +12,15 @@ import org.junit.jupiter.api.Test;
 import org.mockserver.model.HttpError;
 import rocks.inspectit.gepard.agent.MockServerTestBase;
 import rocks.inspectit.gepard.agent.configuration.persistence.ConfigurationPersistence;
+import rocks.inspectit.gepard.agent.internal.identity.model.AgentInfo;
 
 class HttpConfigurationPollerTest extends MockServerTestBase {
 
   private static HttpConfigurationPoller poller;
 
   private static ConfigurationPersistence persistence;
+
+  private static String AGENT_ID = AgentInfo.INFO.getAgentId();
 
   @BeforeEach
   void beforeEach() {
@@ -33,7 +36,7 @@ class HttpConfigurationPollerTest extends MockServerTestBase {
   @Test
   void runDoesntLoadLocalConfigurationWhenPollingIsSuccessful() {
     mockServer
-        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
+        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration/" + AGENT_ID))
         .respond(response().withStatusCode(200));
     poller.run();
     verify(persistence, never()).loadLocalConfiguration();
@@ -52,7 +55,7 @@ class HttpConfigurationPollerTest extends MockServerTestBase {
   @Test
   void configurationRequestIsSentSuccessfully() {
     mockServer
-        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration"))
+        .when(request().withMethod("GET").withPath("/api/v1/agent-configuration/" + AGENT_ID))
         .respond(response().withStatusCode(200));
 
     boolean successful = poller.pollConfiguration();
