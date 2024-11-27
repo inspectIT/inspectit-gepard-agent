@@ -15,7 +15,7 @@ For example, you can add new methods to your tracing or record data for new metr
 The instrumentation configuration will be fetched from a remote server regularly. 
 The server's url is configurable via the property `inspectit.config.http.url`
 
-We are also developing our own [configuration server](https://github.com/inspectIT/inspectit-gepard-agentmanager).
+We are also developing our own [configuration server](https://github.com/inspectIT/inspectit-gepard-configurationserver).
 
 ## Installation
 
